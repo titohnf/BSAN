@@ -39,7 +39,7 @@ export function HeaderPusat() {
             aria-expanded={open}
             aria-haspopup="menu"
           >
-            <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+            <ShieldCheck className="w-5 h-5 text-slate-700 flex-shrink-0" />
             <span className="text-sm font-medium text-gray-700 hidden sm:block">Admin Pusat</span>
             <ChevronDown className={`w-3.5 h-3.5 text-gray-400 hidden sm:block transition ${open ? "rotate-180" : ""}`} />
           </button>

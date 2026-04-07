@@ -26,13 +26,13 @@ export function SidebarPusat({ activeMenu, onMenuChange, pendingCount = 0 }: Sid
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       {/* Brand */}
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-emerald-700">
+      <div className="flex items-center gap-3 px-5 py-5 border-b border-slate-700">
         <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
           <GraduationCap className="w-5 h-5 text-white" />
         </div>
         <div className="min-w-0">
           <p className="text-white font-semibold text-sm leading-tight truncate">Pemerintah Pusat</p>
-          <p className="text-emerald-200 text-xs leading-tight truncate">Admin Validasi POKJA</p>
+          <p className="text-slate-200 text-xs leading-tight truncate">Admin Validasi POKJA</p>
         </div>
       </div>
 
@@ -52,7 +52,7 @@ export function SidebarPusat({ activeMenu, onMenuChange, pendingCount = 0 }: Sid
                 "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                 isActive
                   ? "bg-white/15 text-white"
-                  : "text-emerald-100 hover:bg-white/10 hover:text-white"
+                  : "text-slate-100 hover:bg-white/10 hover:text-white"
               )}
             >
               <Icon className="w-4 h-4 flex-shrink-0" />
@@ -74,7 +74,7 @@ export function SidebarPusat({ activeMenu, onMenuChange, pendingCount = 0 }: Sid
             router.push("/sumber-rujukan/form")
             setMobileOpen(false)
           }}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-emerald-100 bg-white/10 hover:bg-white/15 hover:text-white transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-100 bg-white/10 hover:bg-white/15 hover:text-white transition-colors"
         >
           <BookOpenCheck className="w-4 h-4 flex-shrink-0" />
           Tambah Sumber Rujukan
@@ -82,11 +82,11 @@ export function SidebarPusat({ activeMenu, onMenuChange, pendingCount = 0 }: Sid
       </div>
 
       {/* Logout */}
-      <div className="px-3 py-4 border-t border-emerald-700">
+      <div className="px-3 py-4 border-t border-slate-700">
         <button
           type="button"
           onClick={logout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-emerald-100 hover:bg-white/10 hover:text-white transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-100 hover:bg-white/10 hover:text-white transition-colors"
         >
           <LogOut className="w-4 h-4 flex-shrink-0" />
           Keluar
@@ -98,12 +98,12 @@ export function SidebarPusat({ activeMenu, onMenuChange, pendingCount = 0 }: Sid
   return (
     <>
       {/* Desktop */}
-      <aside className="hidden md:flex flex-col w-60 flex-shrink-0 bg-emerald-800 sticky top-0 h-screen overflow-y-auto">
+      <aside className="hidden md:flex flex-col w-60 flex-shrink-0 bg-slate-900 sticky top-0 h-screen overflow-y-auto">
         <SidebarContent />
       </aside>
 
       {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-emerald-800 flex items-center justify-between px-4 py-3 shadow">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-slate-900 flex items-center justify-between px-4 py-3 shadow">
         <div className="flex items-center gap-2">
           <GraduationCap className="w-5 h-5 text-white" />
           <p className="text-white font-semibold text-sm">Admin Pusat</p>
@@ -120,7 +120,7 @@ export function SidebarPusat({ activeMenu, onMenuChange, pendingCount = 0 }: Sid
       {/* Mobile drawer */}
       {mobileOpen && (
         <div className="md:hidden fixed inset-0 z-30 flex">
-          <div className="w-64 bg-emerald-800 flex flex-col pt-16">
+          <div className="w-64 bg-slate-900 flex flex-col pt-16">
             <SidebarContent />
           </div>
           <div className="flex-1 bg-black/40" onClick={() => setMobileOpen(false)} />

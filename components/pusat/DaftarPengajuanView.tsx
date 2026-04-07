@@ -44,7 +44,7 @@ export function DaftarPengajuanView({ pengajuan, onSelect }: DaftarPengajuanView
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Cari wilayah..."
-            className="w-full h-9 pl-9 pr-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
+            className="w-full h-9 pl-9 pr-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-600 focus:border-slate-600 transition"
           />
         </div>
         <div className="relative">
@@ -52,7 +52,7 @@ export function DaftarPengajuanView({ pengajuan, onSelect }: DaftarPengajuanView
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value as PengajuanStatus | "semua")}
-            className="h-9 pl-9 pr-8 text-sm border border-gray-300 rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition text-gray-700"
+            className="h-9 pl-9 pr-8 text-sm border border-gray-300 rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-slate-600 focus:border-slate-600 transition text-gray-700"
           >
             {FILTER_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -107,7 +107,7 @@ export function DaftarPengajuanView({ pengajuan, onSelect }: DaftarPengajuanView
                     <td className="px-4 py-3.5 text-right">
                       <button
                         onClick={() => onSelect(p)}
-                        className="text-xs px-3 py-1.5 rounded-lg font-medium transition-colors bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                        className="text-xs px-3 py-1.5 rounded-lg font-medium transition-colors bg-slate-100 text-slate-700 hover:bg-slate-200"
                       >
                         {p.status === "menunggu-validasi" ? "Validasi" : "Lihat Detail"}
                       </button>

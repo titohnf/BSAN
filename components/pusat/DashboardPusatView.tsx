@@ -51,8 +51,8 @@ export function DashboardPusatView({ pengajuan, onViewDaftar }: DashboardPusatVi
   return (
     <div className="space-y-6">
       {/* Welcome banner */}
-      <div className="rounded-xl bg-emerald-700 text-white px-6 py-5">
-        <p className="text-xs font-medium text-emerald-200 uppercase tracking-wide">Selamat Datang</p>
+      <div className="rounded-xl bg-slate-800 text-white px-6 py-5">
+        <p className="text-xs font-medium text-slate-300 uppercase tracking-wide">Selamat Datang</p>
         <h2 className="text-xl font-bold mt-1">Dashboard Admin Pusat</h2>
       </div>
 
@@ -90,7 +90,7 @@ export function DashboardPusatView({ pengajuan, onViewDaftar }: DashboardPusatVi
             </div>
             <button
               onClick={onViewDaftar}
-              className="text-xs font-medium text-emerald-700 hover:text-emerald-900 transition-colors"
+              className="text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors"
             >
               Lihat Semua
             </button>
@@ -111,7 +111,7 @@ export function DashboardPusatView({ pengajuan, onViewDaftar }: DashboardPusatVi
                   </div>
                   <button
                     onClick={onViewDaftar}
-                    className="flex-shrink-0 text-xs px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 font-medium hover:bg-emerald-100 transition-colors"
+                    className="flex-shrink-0 text-xs px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 font-medium hover:bg-slate-200 transition-colors"
                   >
                     Validasi
                   </button>
