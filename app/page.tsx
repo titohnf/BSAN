@@ -68,19 +68,41 @@ function AdminPageInner() {
     } catch {}
   }, [pokjaList, mounted])
 
-  const [pusatMenu, setPusatMenu] = useState<PusatMenu>("dashboard")
-  const [pengajuan, setPengajuan] = useState<PengajuanPokja[]>(MOCK_PENGAJUAN)
-  const [selectedPengajuan, setSelectedPengajuan] = useState<PengajuanPokja | null>(null)
-  const [validatingPokja, setValidatingPokja] = useState<PokjaItem | null>(null)
+  useEffect(() => {
+    if (!mounted) return
+    if (searchParams.get("pokjaCreated") !== "1") return
 
-  const handleSavePengajuan = (updated: PengajuanPokja) => {
-    setPengajuan((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))
-  }
+    try {
+      const raw = sessionStorage.getItem("newPokjaData")
+      if (!raw) return
 
-  const handleValidatePokja = (updated: PokjaItem) => {
-    setPokjaList((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))
-    setValidatingPokja(null)
-  }
+      const parsed = JSON.parse(raw) as Omit<PokjaData, "sk"> & {
+        sk: Omit<PokjaData["sk"], "file"> & { file: string | null }
+      }
+
+      const newPokja: PokjaItem = {
+        id: `pokja-${Date.now()}`,
+        nama: `POKJA Budaya Sekolah – ${parsed.region}`,
+        status: "aktif",
+        data: {
+          ...parsed,
+          sk: { ...parsed.sk, file: null, periodeMultai: parsed.sk.periodeMultai ?? "" },
+        },
+      }
+
+      const updatedList = [...pokjaList, newPokja]
+      sessionStorage.removeItem("newPokjaData")
+      sessionStorage.setItem("pokjaList", JSON.stringify(updatedList))
+      setPokjaList(updatedList)
+    } catch {
+      sessionStorage.removeItem("newPokjaData")
+    }
+  }, [searchParams, mounted, pokjaList])
+
+  const navigateToBuatPokja = () => router.push("/buat-pokja")
+
+  // For admin dinas - use navigateToBuatPokja (defined in component)
+  const handleOpenForm = () => router.push("/buat-pokja")
 
   if (!authChecked) return null
 
@@ -143,7 +165,7 @@ function AdminPageInner() {
           {pusatMenu === "data-pokja" && (
             <DataPokjaView 
               pokjaList={pokjaList} 
-              onBuatPokja={() => {}}
+              onBuatPokja={navigateToBuatPokja}
               isAdminPusat={role === "pusat"}
               onValidatePusat={(pokja) => setValidatingPokja(pokja)}
             />

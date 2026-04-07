@@ -309,7 +309,17 @@ export default function BuatPokjaPage() {
   useEffect(() => {
     if (!submitted) return
     const t = setTimeout(() => {
-      window.location.href = "/?pokjaSubmitted=1"
+      const role = (() => {
+        try {
+          return JSON.parse(sessionStorage.getItem("auth") || "{}").role
+        } catch { return null }
+      })()
+      
+      if (role === "pusat") {
+        window.location.href = "/?pokjaCreated=1"
+      } else {
+        window.location.href = "/?pokjaSubmitted=1"
+      }
     }, 1800)
     return () => clearTimeout(t)
   }, [submitted])
@@ -318,15 +328,27 @@ export default function BuatPokjaPage() {
   // Success screen
   // ---------------------------------------------------------------------------
   if (submitted) {
+    const role = (() => {
+      try {
+        return JSON.parse(sessionStorage.getItem("auth") || "{}").role
+      } catch { return null }
+    })()
+    const isPusat = role === "pusat"
+
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
         <div className="bg-white rounded-2xl p-10 flex flex-col items-center gap-4 shadow-xl max-w-sm w-full text-center">
           <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
             <CheckCircle2 className="w-8 h-8 text-green-600" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900">Data Pokja Berhasil Dikirim!</h3>
+          <h3 className="text-xl font-bold text-gray-900">
+            {isPusat ? "POKJA Berhasil Dibuat!" : "Data Pokja Berhasil Dikirim!"}
+          </h3>
           <p className="text-sm text-gray-500 leading-relaxed">
-            Data Pokja wilayah <strong>{REGION}</strong> sedang menunggu verifikasi dari Admin Pusat.
+            {isPusat 
+              ? `POKJA untuk wilayah ${REGION} telah dibuat dan aktif.`
+              : `Data Pokja wilayah ${REGION} sedang menunggu verifikasi dari Admin Pusat.`
+            }
           </p>
           <p className="text-xs text-gray-400">Mengalihkan ke dashboard...</p>
         </div>
