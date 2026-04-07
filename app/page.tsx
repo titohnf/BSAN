@@ -12,13 +12,9 @@ import { KegiatanView } from "@/components/dashboard/KegiatanView"
 
 import { SidebarPusat, PusatMenu } from "@/components/pusat/SidebarPusat"
 import { HeaderPusat } from "@/components/pusat/HeaderPusat"
-import { DashboardPusatView } from "@/components/pusat/DashboardPusatView"
-import { DaftarPengajuanView } from "@/components/pusat/DaftarPengajuanView"
-import { DetailPengajuan } from "@/components/pusat/DetailPengajuan"
 
 import { SekolahDashboard } from "@/components/sekolah/SekolahDashboard"
 
-import { MOCK_PENGAJUAN, PengajuanPokja } from "@/data/mockPokja"
 import type { PokjaItem, PokjaData } from "@/types/pokja"
 
 type AdminRole = "dinas" | "pusat" | "sekolah"
@@ -68,9 +64,7 @@ function AdminPageInner() {
     } catch {}
   }, [pokjaList, mounted])
 
-  const [pusatMenu, setPusatMenu] = useState<PusatMenu>("dashboard-pusat")
-  const [pengajuan, setPengajuan] = useState<PengajuanPokja[]>(MOCK_PENGAJUAN)
-  const [selectedPengajuan, setSelectedPengajuan] = useState<PengajuanPokja | null>(null)
+  const [pusatMenu, setPusatMenu] = useState<PusatMenu>("dashboard")
 
   // Read ?menu= param so back-navigation from detail pages lands on the right view
   useEffect(() => {
@@ -124,10 +118,6 @@ function AdminPageInner() {
 
   const handleOpenForm = () => router.push("/buat-pokja")
 
-  const handleSavePengajuan = (updated: PengajuanPokja) => {
-    setPengajuan((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))
-  }
-
   if (!authChecked) return null
 
   if (role === "sekolah") {
@@ -173,30 +163,26 @@ function AdminPageInner() {
         <div className="md:hidden h-14" aria-hidden="true" />
         <HeaderPusat />
         <main className="flex-1 px-4 md:px-6 py-6">
-          {pusatMenu === "dashboard-pusat" && (
-            <DashboardPusatView
-              pengajuan={pengajuan}
-              onViewDaftar={() => setPusatMenu("daftar-pengajuan")}
+          {pusatMenu === "dashboard" && (
+            <DashboardView
+              region="Nasional"
+              pokjaList={pokjaList}
+              targetPokja={34}
+              onBuatPokja={() => {}}
+              onViewDataPokja={() => setPusatMenu("data-pokja")}
+              onViewSumberRujukan={() => setPusatMenu("sumber-rujukan")}
+              sumberRujukanStatus={{ total: 20, aktif: 15, menungguVerifikasi: 3, ditolak: 2 }}
+              onView Kegiatan={() => setPusatMenu("kegiatan")}
+              kegiatanStatus={{ total: 12, berlangsung: 4, menunggu: 5, selesai: 3 }}
             />
           )}
-          {pusatMenu === "daftar-pengajuan" && (
-            <DaftarPengajuanView
-              pengajuan={pengajuan}
-              onSelect={(p) => setSelectedPengajuan(p)}
-            />
+          {pusatMenu === "data-pokja" && (
+            <DataPokjaView pokjaList={pokjaList} onBuatPokja={() => {}} />
           )}
+          {pusatMenu === "sumber-rujukan" && <SumberRujukanView />}
+          {pusatMenu === "kegiatan" && < KegiatanView />}
         </main>
       </div>
-      {selectedPengajuan && (
-        <DetailPengajuan
-          item={selectedPengajuan}
-          onClose={() => setSelectedPengajuan(null)}
-          onSave={(updated) => {
-            handleSavePengajuan(updated)
-            setSelectedPengajuan(null)
-          }}
-        />
-      )}
     </div>
   )
 }

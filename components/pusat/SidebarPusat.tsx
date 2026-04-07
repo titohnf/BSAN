@@ -1,24 +1,25 @@
 "use client"
-import { LayoutDashboard, ClipboardList, GraduationCap, BookOpenCheck, LogOut, Menu, X } from "lucide-react"
+import { LayoutDashboard, Users, LogOut, GraduationCap, BookOpenCheck, CalendarDays, Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { clearAuthAndRedirectToLogin } from "@/lib/logout"
 
-export type PusatMenu = "dashboard-pusat" | "daftar-pengajuan"
+export type PusatMenu = "dashboard" | "data-pokja" | "sumber-rujukan" | "kegiatan"
 
 interface SidebarPusatProps {
   activeMenu: PusatMenu
   onMenuChange: (menu: PusatMenu) => void
-  pendingCount?: number
 }
 
 const navItems = [
-  { id: "dashboard-pusat" as PusatMenu, label: "Dashboard", icon: LayoutDashboard },
-  { id: "daftar-pengajuan" as PusatMenu, label: "Daftar Pengajuan", icon: ClipboardList },
+  { id: "dashboard" as PusatMenu, label: "Dashboard", icon: LayoutDashboard },
+  { id: "data-pokja" as PusatMenu, label: "Data Pokja", icon: Users },
+  { id: "sumber-rujukan" as PusatMenu, label: "Sumber Rujukan", icon: BookOpenCheck },
+  { id: "kegiatan" as PusatMenu, label: " Kegiatan", icon: CalendarDays },
 ]
 
-export function SidebarPusat({ activeMenu, onMenuChange, pendingCount = 0 }: SidebarPusatProps) {
+export function SidebarPusat({ activeMenu, onMenuChange }: SidebarPusatProps) {
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
   const logout = () => clearAuthAndRedirectToLogin(router)
@@ -32,7 +33,7 @@ export function SidebarPusat({ activeMenu, onMenuChange, pendingCount = 0 }: Sid
         </div>
         <div className="min-w-0">
           <p className="text-white font-semibold text-sm leading-tight truncate">Pemerintah Pusat</p>
-          <p className="text-slate-200 text-xs leading-tight truncate">Admin Validasi POKJA</p>
+          <p className="text-slate-200 text-xs leading-tight truncate">Admin POKJA Nasional</p>
         </div>
       </div>
 
@@ -57,11 +58,6 @@ export function SidebarPusat({ activeMenu, onMenuChange, pendingCount = 0 }: Sid
             >
               <Icon className="w-4 h-4 flex-shrink-0" />
               <span className="flex-1 text-left">{item.label}</span>
-              {item.id === "daftar-pengajuan" && pendingCount > 0 && (
-                <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-amber-400 text-amber-900 text-[10px] font-bold leading-none">
-                  {pendingCount}
-                </span>
-              )}
             </button>
           )
         })}
