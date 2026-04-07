@@ -12,9 +12,12 @@ import { KegiatanView } from "@/components/dashboard/KegiatanView"
 
 import { SidebarPusat, PusatMenu } from "@/components/pusat/SidebarPusat"
 import { HeaderPusat } from "@/components/pusat/HeaderPusat"
+import { DetailPengajuan } from "@/components/pusat/DetailPengajuan"
+import { DaftarPengajuanView } from "@/components/pusat/DaftarPengajuanView"
 
 import { SekolahDashboard } from "@/components/sekolah/SekolahDashboard"
 
+import { MOCK_PENGAJUAN, PengajuanPokja } from "@/data/mockPokja"
 import type { PokjaItem, PokjaData } from "@/types/pokja"
 
 type AdminRole = "dinas" | "pusat" | "sekolah"
@@ -65,6 +68,8 @@ function AdminPageInner() {
   }, [pokjaList, mounted])
 
   const [pusatMenu, setPusatMenu] = useState<PusatMenu>("dashboard")
+  const [pengajuan, setPengajuan] = useState<PengajuanPokja[]>(MOCK_PENGAJUAN)
+  const [selectedPengajuan, setSelectedPengajuan] = useState<PengajuanPokja | null>(null)
 
   // Read ?menu= param so back-navigation from detail pages lands on the right view
   useEffect(() => {
@@ -118,6 +123,10 @@ function AdminPageInner() {
 
   const handleOpenForm = () => router.push("/buat-pokja")
 
+  const handleSavePengajuan = (updated: PengajuanPokja) => {
+    setPengajuan((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))
+  }
+
   if (!authChecked) return null
 
   if (role === "sekolah") {
@@ -158,7 +167,7 @@ function AdminPageInner() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
-      <SidebarPusat activeMenu={pusatMenu} onMenuChange={setPusatMenu} />
+      <SidebarPusat activeMenu={pusatMenu} onMenuChange={setPusatMenu} pendingCount={pengajuan.filter((p) => p.status === "menunggu-validasi").length} />
       <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         <div className="md:hidden h-14" aria-hidden="true" />
         <HeaderPusat />
@@ -179,10 +188,26 @@ function AdminPageInner() {
           {pusatMenu === "data-pokja" && (
             <DataPokjaView pokjaList={pokjaList} onBuatPokja={() => {}} />
           )}
+          {pusatMenu === "validasi-pengajuan" && (
+            <DaftarPengajuanView
+              pengajuan={pengajuan}
+              onSelect={(p) => setSelectedPengajuan(p)}
+            />
+          )}
           {pusatMenu === "sumber-rujukan" && <SumberRujukanView />}
           {pusatMenu === "kegiatan" && < KegiatanView />}
         </main>
       </div>
+      {selectedPengajuan && (
+        <DetailPengajuan
+          item={selectedPengajuan}
+          onClose={() => setSelectedPengajuan(null)}
+          onSave={(updated) => {
+            handleSavePengajuan(updated)
+            setSelectedPengajuan(null)
+          }}
+        />
+      )}
     </div>
   )
 }

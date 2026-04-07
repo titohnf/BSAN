@@ -1,25 +1,27 @@
 "use client"
-import { LayoutDashboard, Users, LogOut, GraduationCap, BookOpenCheck, CalendarDays, Menu, X } from "lucide-react"
+import { LayoutDashboard, Users, LogOut, GraduationCap, BookOpenCheck, CalendarDays, Menu, X, ClipboardList } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { clearAuthAndRedirectToLogin } from "@/lib/logout"
 
-export type PusatMenu = "dashboard" | "data-pokja" | "sumber-rujukan" | "kegiatan"
+export type PusatMenu = "dashboard" | "data-pokja" | "sumber-rujukan" | "kegiatan" | "validasi-pengajuan"
 
 interface SidebarPusatProps {
   activeMenu: PusatMenu
   onMenuChange: (menu: PusatMenu) => void
+  pendingCount?: number
 }
 
 const navItems = [
   { id: "dashboard" as PusatMenu, label: "Dashboard", icon: LayoutDashboard },
   { id: "data-pokja" as PusatMenu, label: "Data Pokja", icon: Users },
+  { id: "validasi-pengajuan" as PusatMenu, label: "Validasi Pengajuan", icon: ClipboardList, badge: true },
   { id: "sumber-rujukan" as PusatMenu, label: "Sumber Rujukan", icon: BookOpenCheck },
   { id: "kegiatan" as PusatMenu, label: " Kegiatan", icon: CalendarDays },
 ]
 
-export function SidebarPusat({ activeMenu, onMenuChange }: SidebarPusatProps) {
+export function SidebarPusat({ activeMenu, onMenuChange, pendingCount = 0 }: SidebarPusatProps) {
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
   const logout = () => clearAuthAndRedirectToLogin(router)
@@ -58,6 +60,11 @@ export function SidebarPusat({ activeMenu, onMenuChange }: SidebarPusatProps) {
             >
               <Icon className="w-4 h-4 flex-shrink-0" />
               <span className="flex-1 text-left">{item.label}</span>
+              {item.badge && pendingCount > 0 && (
+                <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-amber-400 text-amber-900 text-[10px] font-bold leading-none">
+                  {pendingCount}
+                </span>
+              )}
             </button>
           )
         })}
