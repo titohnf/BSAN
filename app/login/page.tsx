@@ -73,7 +73,6 @@ export default function LoginPage() {
         {/* Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
           <h2 className="text-base font-semibold text-gray-900 mb-1">Masuk ke Akun</h2>
-          <p className="text-xs text-gray-500 mb-6">Masukkan kredensial Anda untuk melanjutkan</p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {/* Username */}
