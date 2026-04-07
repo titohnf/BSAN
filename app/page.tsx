@@ -33,6 +33,7 @@ function AdminPageInner() {
 
   const [role, setRole] = useState<AdminRole>("dinas")
   const [dinasMenu, setDinasMenu] = useState<DinaMenu>("dashboard")
+  const [pusatMenu, setPusatMenu] = useState<PusatMenu>("dashboard")
   const [pokjaList, setPokjaList] = useState<PokjaItem[]>([])
   const [mounted, setMounted] = useState(false)
   const [authChecked, setAuthChecked] = useState(false)
