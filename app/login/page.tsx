@@ -66,10 +66,10 @@ export default function LoginPage() {
             </svg>
           </div>
           <h1 className="text-xl font-bold text-gray-900 leading-tight">
-            POKJA Budaya Sekolah
+            Masuk ke Akun
           </h1>
           <p className="text-sm text-gray-500 mt-1">
-            Aman dan Nyaman
+            Budaya Sekolah Aman dan Nyaman
           </p>
         </div>
 
