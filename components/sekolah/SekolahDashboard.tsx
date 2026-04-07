@@ -1,0 +1,52 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { SekolahSidebar, type SekolahMenu } from "@/components/sekolah/SekolahSidebar"
+import { SekolahHeader } from "@/components/sekolah/SekolahHeader"
+import { SekolahSumberRujukanView } from "@/components/sekolah/SekolahSumberRujukanView"
+import { UsulInstansiForm } from "@/components/sekolah/UsulInstansiForm"
+import { clearAuthAndRedirectToLogin } from "@/lib/logout"
+
+type AuthPayload = {
+  username?: string
+  role?: string
+  wilayah?: string
+  namaSekolah?: string
+}
+
+export function SekolahDashboard() {
+  const router = useRouter()
+  const [menu, setMenu] = useState<SekolahMenu>("sumber-rujukan")
+  const [wilayah, setWilayah] = useState("Banda Aceh")
+  const [displayName, setDisplayName] = useState("Admin Sekolah")
+
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("auth")
+      if (!raw) return
+      const parsed = JSON.parse(raw) as AuthPayload
+      if (parsed.wilayah) setWilayah(parsed.wilayah)
+      if (parsed.namaSekolah) setDisplayName(parsed.namaSekolah)
+      else if (parsed.username) setDisplayName(parsed.username.replace(/\./g, " "))
+    } catch {
+      /* ignore */
+    }
+  }, [])
+
+  const logout = () => clearAuthAndRedirectToLogin(router)
+
+  return (
+    <div className="flex h-screen overflow-hidden bg-gray-50">
+      <SekolahSidebar activeMenu={menu} onMenuChange={setMenu} onLogout={logout} />
+      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        <div className="md:hidden h-14" aria-hidden="true" />
+        <SekolahHeader userName={displayName} onLogout={logout} />
+        <main className="flex-1 px-4 md:px-6 py-6">
+          {menu === "sumber-rujukan" && <SekolahSumberRujukanView wilayah={wilayah} />}
+          {menu === "usul-instansi" && <UsulInstansiForm wilayah={wilayah} />}
+        </main>
+      </div>
+    </div>
+  )
+}
