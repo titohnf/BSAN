@@ -34,7 +34,10 @@ function AdminPageInner() {
   const [role, setRole] = useState<AdminRole>("dinas")
   const [dinasMenu, setDinasMenu] = useState<DinaMenu>("dashboard")
   const [pusatMenu, setPusatMenu] = useState<PusatMenu>("dashboard")
+  const [pengajuan, setPengajuan] = useState<PengajuanPokja[]>(MOCK_PENGAJUAN)
   const [pokjaList, setPokjaList] = useState<PokjaItem[]>([])
+  const [selectedPengajuan, setSelectedPengajuan] = useState<PengajuanPokja | null>(null)
+  const [validatingPokja, setValidatingPokja] = useState<PokjaItem | null>(null)
   const [mounted, setMounted] = useState(false)
   const [authChecked, setAuthChecked] = useState(false)
 
@@ -104,6 +107,15 @@ function AdminPageInner() {
 
   // For admin dinas - use navigateToBuatPokja (defined in component)
   const handleOpenForm = () => router.push("/buat-pokja")
+
+  const handleSavePengajuan = (updated: PengajuanPokja) => {
+    setPengajuan((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))
+  }
+
+  const handleValidatePokja = (updated: PokjaItem) => {
+    setPokjaList((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))
+    setValidatingPokja(null)
+  }
 
   if (!authChecked) return null
 
