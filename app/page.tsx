@@ -13,6 +13,7 @@ import { KegiatanView } from "@/components/dashboard/KegiatanView"
 import { SidebarPusat, PusatMenu } from "@/components/pusat/SidebarPusat"
 import { HeaderPusat } from "@/components/pusat/HeaderPusat"
 import { DetailPengajuan } from "@/components/pusat/DetailPengajuan"
+import { ValidatePokjaDrawer } from "@/components/pusat/ValidatePokjaDrawer"
 import { DaftarPengajuanView } from "@/components/pusat/DaftarPengajuanView"
 
 import { SekolahDashboard } from "@/components/sekolah/SekolahDashboard"
@@ -70,61 +71,15 @@ function AdminPageInner() {
   const [pusatMenu, setPusatMenu] = useState<PusatMenu>("dashboard")
   const [pengajuan, setPengajuan] = useState<PengajuanPokja[]>(MOCK_PENGAJUAN)
   const [selectedPengajuan, setSelectedPengajuan] = useState<PengajuanPokja | null>(null)
-
-  // Read ?menu= param so back-navigation from detail pages lands on the right view
-  useEffect(() => {
-    const menuParam = searchParams.get("menu") as DinaMenu | null
-    if (menuParam && ["dashboard", "data-pokja", "sumber-rujukan", "kegiatan"].includes(menuParam)) {
-      setDinasMenu(menuParam)
-      router.replace("/")
-    }
-  }, [searchParams])
-
-  useEffect(() => {
-    if (hasProcessedSubmit.current) return
-    if (searchParams.get("pokjaSubmitted") !== "1") return
-    hasProcessedSubmit.current = true
-
-    try {
-      const raw = sessionStorage.getItem("newPokjaData")
-      if (!raw) return
-
-      const parsed = JSON.parse(raw) as Omit<PokjaData, "sk"> & {
-        sk: Omit<PokjaData["sk"], "file"> & { file: string | null }
-      }
-
-      const newPokja: PokjaItem = {
-        id: `pokja-${Date.now()}`,
-        nama: `POKJA Budaya Sekolah – ${parsed.region}`,
-        status: "masih-diverifikasi",
-        data: {
-          ...parsed,
-          sk: { ...parsed.sk, file: null, periodeMultai: parsed.sk.periodeMultai ?? "" },
-        },
-      }
-
-      // Read current list directly from sessionStorage to avoid stale React state
-      let existingList: PokjaItem[] = []
-      try {
-        const existingRaw = sessionStorage.getItem("pokjaList")
-        if (existingRaw) existingList = JSON.parse(existingRaw) as PokjaItem[]
-      } catch {}
-      const updatedList = [...existingList, newPokja]
-      sessionStorage.removeItem("newPokjaData")
-      sessionStorage.setItem("pokjaList", JSON.stringify(updatedList))
-      setPokjaList(updatedList)
-      setDinasMenu("data-pokja")
-      router.replace("/")
-    } catch {
-      sessionStorage.removeItem("newPokjaData")
-      router.replace("/")
-    }
-  }, [searchParams, router])
-
-  const handleOpenForm = () => router.push("/buat-pokja")
+  const [validatingPokja, setValidatingPokja] = useState<PokjaItem | null>(null)
 
   const handleSavePengajuan = (updated: PengajuanPokja) => {
     setPengajuan((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))
+  }
+
+  const handleValidatePokja = (updated: PokjaItem) => {
+    setPokjaList((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))
+    setValidatingPokja(null)
   }
 
   if (!authChecked) return null
@@ -167,7 +122,7 @@ function AdminPageInner() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
-      <SidebarPusat activeMenu={pusatMenu} onMenuChange={setPusatMenu} pendingCount={pengajuan.filter((p) => p.status === "menunggu-validasi").length} />
+      <SidebarPusat activeMenu={pusatMenu} onMenuChange={setPusatMenu} />
       <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         <div className="md:hidden h-14" aria-hidden="true" />
         <HeaderPusat />
@@ -186,12 +141,11 @@ function AdminPageInner() {
             />
           )}
           {pusatMenu === "data-pokja" && (
-            <DataPokjaView pokjaList={pokjaList} onBuatPokja={() => {}} />
-          )}
-          {pusatMenu === "validasi-pengajuan" && (
-            <DaftarPengajuanView
-              pengajuan={pengajuan}
-              onSelect={(p) => setSelectedPengajuan(p)}
+            <DataPokjaView 
+              pokjaList={pokjaList} 
+              onBuatPokja={() => {}}
+              isAdminPusat={role === "pusat"}
+              onValidatePusat={(pokja) => setValidatingPokja(pokja)}
             />
           )}
           {pusatMenu === "sumber-rujukan" && <SumberRujukanView />}
@@ -206,6 +160,13 @@ function AdminPageInner() {
             handleSavePengajuan(updated)
             setSelectedPengajuan(null)
           }}
+        />
+      )}
+      {validatingPokja && (
+        <ValidatePokjaDrawer
+          pokja={validatingPokja}
+          onClose={() => setValidatingPokja(null)}
+          onSave={handleValidatePokja}
         />
       )}
     </div>

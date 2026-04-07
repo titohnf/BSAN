@@ -268,9 +268,11 @@ function PokjaDetailDrawer({ pokja, onClose }: { pokja: PokjaItem; onClose: () =
 interface DataPokjaViewProps {
   pokjaList: PokjaItem[]
   onBuatPokja: () => void
+  isAdminPusat?: boolean
+  onValidatePusat?: (pokja: PokjaItem) => void
 }
 
-export function DataPokjaView({ pokjaList, onBuatPokja }: DataPokjaViewProps) {
+export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidatePusat }: DataPokjaViewProps) {
   const [detailPokja, setDetailPokja] = useState<PokjaItem | null>(null)
   const [search, setSearch] = useState("")
 
@@ -322,7 +324,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja }: DataPokjaViewProps) {
               <table className="min-w-full text-sm text-left">
                 <thead className="bg-gray-50 border-b border-gray-100">
                   <tr>
-                    {["No", "Nama POKJA", "Ketua POKJA", "Nomor SK", "Kontak Pokja", "Status", "Aksi"].map((col) => (
+                    {["No", "Nama POKJA", "Wilayah", "Jumlah Anggota", "Ketua POKJA", "Nomor SK", "Kontak Pokja", "Status", "Aksi"].map((col) => (
                       <th key={col} className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
                         {col}
                       </th>
@@ -346,8 +348,23 @@ export function DataPokjaView({ pokjaList, onBuatPokja }: DataPokjaViewProps) {
                         {/* Nama POKJA */}
                         <td className="px-4 py-3.5">
                           <p className="font-semibold text-gray-900 whitespace-nowrap">{pokja.nama}</p>
-                          {regionName && (
-                            <p className="text-xs text-gray-400 mt-0.5">{regionName}</p>
+                        </td>
+
+                        {/* Wilayah */}
+                        <td className="px-4 py-3.5">
+                          {regionName ? (
+                            <span className="text-gray-700">{regionName}</span>
+                          ) : (
+                            <span className="text-gray-400">—</span>
+                          )}
+                        </td>
+
+                        {/* Jumlah Anggota */}
+                        <td className="px-4 py-3.5">
+                          {safeData?.members ? (
+                            <span className="text-gray-700">{Object.values(safeData.members).filter(m => m && m.nama?.trim()).length} orang</span>
+                          ) : (
+                            <span className="text-gray-400">—</span>
                           )}
                         </td>
 
@@ -406,19 +423,29 @@ export function DataPokjaView({ pokjaList, onBuatPokja }: DataPokjaViewProps) {
 
                         {/* Aksi */}
                         <td className="px-4 py-3.5 whitespace-nowrap">
-                          <button
-                            onClick={() => setDetailPokja(pokja)}
-                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors"
-                          >
-                            <Eye className="w-3.5 h-3.5" />
-                            Lihat Detail
-                          </button>
+                          {isAdminPusat && pokja.status === "masih-diverifikasi" ? (
+                            <button
+                              onClick={() => onValidatePusat?.(pokja)}
+                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-600 hover:text-amber-800 transition-colors"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                              Validasi
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => setDetailPokja(pokja)}
+                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                              Lihat Detail
+                            </button>
+                          )}
                         </td>
                       </tr>
                     )
                   }) : (
                     <tr>
-                      <td colSpan={7} className="text-center py-12 text-gray-400 text-sm">
+                      <td colSpan={9} className="text-center py-12 text-gray-400 text-sm">
                         Data tidak ditemukan.
                       </td>
                     </tr>
