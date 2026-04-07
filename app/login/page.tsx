@@ -72,7 +72,7 @@ export default function LoginPage() {
 
         {/* Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-          <h2 className="text-base font-semibold text-gray-900 mb-1">Masuk ke Akun</h2>
+          <h2 className="text-base font-semibold text-gray-900 mb-5">Masuk ke Akun</h2>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {/* Username */}
