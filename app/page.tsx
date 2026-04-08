@@ -146,7 +146,7 @@ function AdminPageInner() {
                 onViewDataPokja={() => setDinasMenu("data-pokja")}
                 onViewSumberRujukan={() => setDinasMenu("sumber-rujukan")}
                 sumberRujukanStatus={{ total: 5, aktif: 3, menungguVerifikasi: 2, ditolak: 0 }}
-                onViewKegiatan={() => setDinasMenu("kegiatan")}
+                onViewActivities={() => setDinasMenu("kegiatan")}
                 kegiatanStatus={{ total: 5, berlangsung: 1, menunggu: 2, selesai: 2 }}
               />
             )}

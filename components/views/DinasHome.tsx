@@ -25,8 +25,10 @@ type Props = {
   onViewDataPokja?: () => void
   onViewSumberRujukan?: () => void
   sumberRujukanStatus?: { total: number; aktif: number; menungguVerifikasi: number; ditolak: number }
-  onViewKegiatan?: () => void
+  onViewActivities?: () => void
   kegiatanStatus?: { total: number; berlangsung: number; menunggu: number; selesai: number }
+  isAdminPusat?: boolean
+  onValidatePusat?: (pokja: PokjaItem) => void
 }
 
 function Panel({ children }: { children: React.ReactNode }) {
@@ -146,7 +148,9 @@ export function DashboardView({
   onBuatPokja,
   onViewSumberRujukan,
   sumberRujukanStatus = { total: 5, aktif: 3, menungguVerifikasi: 2, ditolak: 0 },
-  onViewKegiatan,
+  onViewActivities,
+  isAdminPusat,
+  onValidatePusat,
 }: Props) {
   const [mounted, setMounted] = useState(false)
   const [selectedItem, setSelectedItem] = useState<{ nama: string; jenis: string; kontak: string } | null>(null)
@@ -176,8 +180,8 @@ export function DashboardView({
 
       <Panel>
         <PanelHeader title="POKJA">
-          {/* Hanya tampilkan tombol Buat POKJA jika belum ada pokja */}
-          {total === 0 && <ViewBtn label="Buat POKJA" onClick={onBuatPokja} />}
+          {/* Tampilkan tombol Buat POKJA jika: Admin Pusat (bisa banyak) atau Dinas belum punya */}
+          {(isAdminPusat || total === 0) && <ViewBtn label="Buat POKJA" onClick={onBuatPokja} />}
         </PanelHeader>
         
         {/* Jika belum ada pokja, tampilkan empty state */}
