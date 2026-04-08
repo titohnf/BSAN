@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { ChevronRight, AlertTriangle } from "lucide-react"
+import { ChevronRight, AlertTriangle, CheckCircle2 } from "lucide-react"
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts"
 
 export type { PokjaStatus, PokjaItem } from "@/types/pokja"
@@ -176,36 +176,161 @@ export function DashboardView({
 
       <Panel>
         <PanelHeader title="POKJA">
-          <ViewBtn label="Buat POKJA" onClick={onBuatPokja} />
+          {/* Hanya tampilkan tombol Buat POKJA jika belum ada pokja */}
+          {total === 0 && <ViewBtn label="Buat POKJA" onClick={onBuatPokja} />}
         </PanelHeader>
-        <div className="px-5 py-4 grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <div className="space-y-3">
-            <div className="text-center py-5 rounded-xl bg-gradient-to-br from-green-50 to-green-100 border border-green-200">
-              <p className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-1">POKJA Aktif</p>
-              <p className="text-3xl font-bold text-green-700">{aktif}</p>
-              <p className="text-xs text-green-600 mt-1">{aktif} dari {targetPokja} target</p>
+        
+        {/* Jika belum ada pokja, tampilkan empty state */}
+        {total === 0 ? (
+          <div className="px-5 py-8 flex flex-col items-center text-center">
+            <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mb-4">
+              <svg className="w-8 h-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                { val: menunggu, label: "Menunggu", color: "text-amber-600" },
-                { val: ditolak,  label: "Ditolak",  color: "text-red-600" },
-                { val: draf,     label: "Draf",     color: "text-slate-600" },
-                { val: total,    label: "Total",    color: "text-gray-600" },
-              ].map((s) => (
-                <div key={s.label} className="rounded-lg bg-gray-50 border border-gray-100 p-2.5 text-center">
-                  <p className={`text-lg font-bold ${s.color}`}>{s.val}</p>
-                  <p className="text-xs text-gray-600 mt-0.5">{s.label}</p>
+            <h3 className="text-base font-bold text-gray-900 mb-2">Belum Ada POKJA</h3>
+            <p className="text-sm text-gray-500 max-w-md leading-relaxed mb-4">
+              Anda dapat membentuk 1 POKJA untuk wilayah {region}. Klik tombol di atas untuk memulai pembentukan POKJA.
+            </p>
+          </div>
+        ) : (
+          /* Jika sudah ada pokja, tampilkan informasi detail pokja */
+          <div className="px-5 py-4">
+            {pokjaList.map((pokja) => {
+              const statusConfig = {
+                "aktif": { 
+                  bg: "bg-green-50", 
+                  border: "border-green-200", 
+                  text: "text-green-700",
+                  badge: "bg-green-100 text-green-800" 
+                },
+                "masih-diverifikasi": { 
+                  bg: "bg-amber-50", 
+                  border: "border-amber-200", 
+                  text: "text-amber-700",
+                  badge: "bg-amber-100 text-amber-800" 
+                },
+                "ditolak": { 
+                  bg: "bg-red-50", 
+                  border: "border-red-200", 
+                  text: "text-red-700",
+                  badge: "bg-red-100 text-red-800" 
+                },
+                "belum-dibentuk": { 
+                  bg: "bg-gray-50", 
+                  border: "border-gray-200", 
+                  text: "text-gray-700",
+                  badge: "bg-gray-100 text-gray-800" 
+                }
+              }
+              
+              const config = statusConfig[pokja.status] || statusConfig["belum-dibentuk"]
+              const ketua = pokja.data?.members?.ketua
+              const sk = pokja.data?.sk
+              const kanal = pokja.data?.nomorKanal
+              const memberCount = pokja.data?.members 
+                ? Object.values(pokja.data.members).filter(m => m && m.nama?.trim()).length 
+                : 0
+
+              return (
+                <div key={pokja.id} className={`rounded-xl border-2 ${config.border} ${config.bg} p-5 space-y-4`}>
+                  {/* Header dengan nama dan status */}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-gray-900 mb-1">{pokja.nama}</h3>
+                      <p className="text-sm text-gray-600">{region}</p>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${config.badge}`}>
+                      {pokja.status === "aktif" ? "Aktif" : 
+                       pokja.status === "masih-diverifikasi" ? "Menunggu Verifikasi" :
+                       pokja.status === "ditolak" ? "Ditolak" : "Draf"}
+                    </span>
+                  </div>
+
+                  {/* Detail Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Ketua POKJA */}
+                    {ketua?.nama && (
+                      <div className="bg-white/60 rounded-lg p-3 border border-gray-200">
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Ketua POKJA</p>
+                        <p className="text-sm font-bold text-gray-900">{ketua.nama}</p>
+                        {ketua.instansi && <p className="text-xs text-gray-600 mt-0.5">{ketua.instansi}</p>}
+                      </div>
+                    )}
+
+                    {/* Jumlah Anggota */}
+                    <div className="bg-white/60 rounded-lg p-3 border border-gray-200">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Jumlah Anggota</p>
+                      <p className="text-sm font-bold text-gray-900">{memberCount} Orang</p>
+                    </div>
+
+                    {/* Nomor SK */}
+                    {sk?.nomorSK && (
+                      <div className="bg-white/60 rounded-lg p-3 border border-gray-200">
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Nomor SK</p>
+                        <p className="text-sm font-bold text-gray-900">{sk.nomorSK}</p>
+                        {sk.periodeSelesai && <p className="text-xs text-gray-600 mt-0.5">Berlaku s.d. {sk.periodeSelesai}</p>}
+                      </div>
+                    )}
+
+                    {/* Kanal Pengaduan */}
+                    {kanal && (
+                      <div className="bg-white/60 rounded-lg p-3 border border-gray-200">
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Kanal Pengaduan</p>
+                        <a 
+                          href={`https://wa.me/62${kanal.replace(/^0/, "")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm font-bold text-green-600 hover:text-green-700 flex items-center gap-1.5"
+                        >
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                          </svg>
+                          {kanal}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Info tambahan untuk status tertentu */}
+                  {pokja.status === "masih-diverifikasi" && (
+                    <div className="flex items-start gap-2 p-3 bg-amber-100/50 rounded-lg border border-amber-300">
+                      <AlertTriangle className="w-4 h-4 text-amber-700 flex-shrink-0 mt-0.5" />
+                      <p className="text-xs text-amber-800">
+                        <strong>Menunggu Verifikasi:</strong> POKJA Anda sedang dalam proses verifikasi oleh admin pusat. Mohon tunggu konfirmasi lebih lanjut.
+                      </p>
+                    </div>
+                  )}
+
+                  {pokja.status === "ditolak" && (
+                    <div className="flex items-start gap-2 p-3 bg-red-100/50 rounded-lg border border-red-300">
+                      <AlertTriangle className="w-4 h-4 text-red-700 flex-shrink-0 mt-0.5" />
+                      <p className="text-xs text-red-800">
+                        <strong>Ditolak:</strong> POKJA Anda tidak dapat diverifikasi. Silakan hubungi admin pusat untuk informasi lebih lanjut.
+                      </p>
+                    </div>
+                  )}
+
+                  {pokja.status === "aktif" && (
+                    <div className="flex items-start gap-2 p-3 bg-green-100/50 rounded-lg border border-green-300">
+                      <CheckCircle2 className="w-4 h-4 text-green-700 flex-shrink-0 mt-0.5" />
+                      <p className="text-xs text-green-800">
+                        <strong>POKJA Aktif:</strong> POKJA Anda telah diverifikasi dan aktif. Anda dapat mengelola kegiatan dan sumber rujukan.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Catatan batas maksimal */}
+                  <div className="pt-3 border-t border-gray-200">
+                    <p className="text-xs text-gray-500 italic">
+                      Admin Dinas hanya dapat membentuk 1 POKJA per wilayah. POKJA di atas adalah POKJA aktif untuk wilayah {region}.
+                    </p>
+                  </div>
                 </div>
-              ))}
-            </div>
+              )
+            })}
           </div>
-          <div className="rounded-xl border border-gray-100 overflow-hidden flex flex-col">
-            <div className="bg-gray-50 px-3 py-2 border-b border-gray-100 flex-shrink-0">
-              <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Perbandingan Nasional</p>
-            </div>
-            <ProvinceTable />
-          </div>
-        </div>
+        )}
       </Panel>
 
       <Panel>
