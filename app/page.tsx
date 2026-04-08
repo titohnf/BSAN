@@ -74,7 +74,7 @@ function AdminPageInner() {
 
   useEffect(() => {
     if (!mounted) return
-    if (searchParams.get("pokjaCreated") !== "1") return
+    if (searchParams.get("pokjaCreated") !== "1" && searchParams.get("pokjaSubmitted") !== "1") return
 
     try {
       const raw = sessionStorage.getItem("newPokjaData")
@@ -84,10 +84,16 @@ function AdminPageInner() {
         sk: Omit<PokjaData["sk"], "file"> & { file: string | null }
       }
 
+      const isPusat = (() => {
+        try {
+          return JSON.parse(sessionStorage.getItem("auth") || "{}").role === "pusat"
+        } catch { return false }
+      })()
+
       const newPokja: PokjaItem = {
         id: `pokja-${Date.now()}`,
         nama: `POKJA Budaya Sekolah – ${parsed.region}`,
-        status: "aktif",
+        status: isPusat ? "aktif" : "masih-diverifikasi",
         data: {
           ...parsed,
           sk: { ...parsed.sk, file: null, periodeMultai: parsed.sk.periodeMultai ?? "" },
@@ -171,7 +177,7 @@ function AdminPageInner() {
               onViewDataPokja={() => setPusatMenu("data-pokja")}
               onViewSumberRujukan={() => setPusatMenu("sumber-rujukan")}
               sumberRujukanStatus={{ total: 20, aktif: 15, menungguVerifikasi: 3, ditolak: 2 }}
-              onView Kegiatan={() => setPusatMenu("kegiatan")}
+              onViewActivities={() => setPusatMenu("kegiatan")}
               kegiatanStatus={{ total: 12, berlangsung: 4, menunggu: 5, selesai: 3 }}
             />
           )}
