@@ -1,45 +1,96 @@
 "use client"
-import { ClipboardList, CheckCircle2, XCircle, Clock, MapPin } from "lucide-react"
-import { PengajuanPokja } from "@/data/mockPokja"
+import { ClipboardList, CheckCircle2, XCircle, Clock, MapPin, Users, Plus, ChevronRight, AlertTriangle } from "lucide-react"
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts"
+import type { PokjaItem } from "@/types/pokja"
 
 interface DashboardPusatViewProps {
-  pengajuan: PengajuanPokja[]
-  onViewDaftar: () => void
+  pokjaList: PokjaItem[]
+  onValidatePusat?: (pokja: PokjaItem) => void
+  onViewSumberRujukan?: () => void
+  onViewActivities?: () => void
 }
 
-export function DashboardPusatView({ pengajuan, onViewDaftar }: DashboardPusatViewProps) {
-  const pending = pengajuan.filter((p) => p.status === "menunggu-validasi").length
-  const approved = pengajuan.filter((p) => p.status === "disetujui" || p.status === "ditolak-sebagian").length
-  const rejected = pengajuan.filter((p) => p.status === "ditolak").length
-  const total = pengajuan.length
+const RUJUKAN_BREAKDOWN = [
+  { label: "Puskesmas / Faskes",  count: 48 },
+  { label: "Konselor Sekolah",    count: 37 },
+  { label: "Kepolisian",          count: 29 },
+  { label: "LBH / Bantuan Hukum", count: 18 },
+  { label: "Lainnya",             count: 12 },
+]
+const RUJUKAN_COLORS = ["#10b981", "#8b5cf6", "#f59e0b", "#ef4444", "#64748b"]
+
+export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRujukan, onViewActivities }: DashboardPusatViewProps) {
+  const aktif = pokjaList.filter((p) => p.status === "aktif").length
+  const menunggu = pokjaList.filter((p) => p.status === "masih-diverifikasi").length
+  const ditolak = pokjaList.filter((p) => p.status === "ditolak").length
+  const total = pokjaList.length
+  const completionRate = Math.round((aktif / 34) * 100)
+
+  // Mock data untuk semua provinsi (dalam实际的 app, ini diambil dari database)
+  const provinces = [
+    { prov: "Prov. Aceh", pokja: aktif > 0 ? 1 : 0, status: aktif > 0 ? "aktif" : "belum" },
+    { prov: "Prov. Sumatra Utara", pokja: 4, status: "aktif" },
+    { prov: "Prov. Sumatra Barat", pokja: 3, status: "aktif" },
+    { prov: "Prov. Riau", pokja: 2, status: "aktif" },
+    { prov: "Prov. Jambi", pokja: 1, status: "aktif" },
+    { prov: "Prov. Sumatra Selatan", pokja: 2, status: "aktif" },
+    { prov: "Prov. Bengkulu", pokja: 1, status: "aktif" },
+    { prov: "Prov. Lampung", pokja: 2, status: "aktif" },
+    { prov: "Prov. DKI Jakarta", pokja: 1, status: "aktif" },
+    { prov: "Prov. Jawa Barat", pokja: 5, status: "aktif" },
+    { prov: "Prov. Jawa Tengah", pokja: 4, status: "aktif" },
+    { prov: "Prov. Jawa Timur", pokja: 4, status: "aktif" },
+    { prov: "Prov. DI Yogyakarta", pokja: 1, status: "aktif" },
+    { prov: "Prov. Banten", pokja: 2, status: "aktif" },
+    { prov: "Prov. Bali", pokja: 1, status: "aktif" },
+    { prov: "Prov. Nusa Tenggara Barat", pokja: 1, status: "aktif" },
+    { prov: "Prov. Nusa Tenggara Timur", pokja: 1, status: "aktif" },
+    { prov: "Prov. Kalimantan Barat", pokja: 1, status: "aktif" },
+    { prov: "Prov. Kalimantan Tengah", pokja: 1, status: "aktif" },
+    { prov: "Prov. Kalimantan Selatan", pokja: 1, status: "aktif" },
+    { prov: "Prov. Kalimantan Timur", pokja: 1, status: "aktif" },
+    { prov: "Prov. Sulawesi Utara", pokja: 1, status: "aktif" },
+    { prov: "Prov. Sulawesi Tengah", pokja: 1, status: "aktif" },
+    { prov: "Prov. Sulawesi Selatan", pokja: 1, status: "aktif" },
+    { prov: "Prov. Sulawesi Tenggara", pokja: 1, status: "aktif" },
+    { prov: "Prov. Maluku", pokja: 0, status: "belum" },
+    { prov: "Prov. Maluku Utara", pokja: 0, status: "belum" },
+    { prov: "Prov. Papua", pokja: 0, status: "belum" },
+    { prov: "Prov. Papua Barat", pokja: 0, status: "belum" },
+    { prov: "Prov. Gorontalo", pokja: 0, status: "belum" },
+    { prov: "Prov. Sulawesi Barat", pokja: 0, status: "belum" },
+    { prov: "Prov. Kalimantan Utara", pokja: 0, status: "belum" },
+    { prov: "Prov. Kepulauan Riau", pokja: 0, status: "belum" },
+    { prov: "Prov. Kepulauan Bangka Belitung", pokja: 0, status: "belum" },
+  ]
 
   const stats = [
     {
-      label: "Menunggu Validasi",
-      value: pending,
-      icon: Clock,
-      color: "text-amber-600",
-      bg: "bg-amber-50",
-      border: "border-amber-200",
-    },
-    {
-      label: "Disetujui",
-      value: approved,
+      label: "POKJA Aktif",
+      value: aktif,
       icon: CheckCircle2,
       color: "text-emerald-600",
       bg: "bg-emerald-50",
       border: "border-emerald-200",
     },
     {
+      label: "Menunggu Verifikasi",
+      value: menunggu,
+      icon: Clock,
+      color: "text-amber-600",
+      bg: "bg-amber-50",
+      border: "border-amber-200",
+    },
+    {
       label: "Ditolak",
-      value: rejected,
+      value: ditolak,
       icon: XCircle,
       color: "text-red-600",
       bg: "bg-red-50",
       border: "border-red-200",
     },
     {
-      label: "Total Pengajuan",
+      label: "Total POKJA",
       value: total,
       icon: ClipboardList,
       color: "text-blue-600",
@@ -53,7 +104,8 @@ export function DashboardPusatView({ pengajuan, onViewDaftar }: DashboardPusatVi
       {/* Welcome banner */}
       <div className="rounded-xl bg-slate-800 text-white px-6 py-5">
         <p className="text-xs font-medium text-slate-300 uppercase tracking-wide">Selamat Datang</p>
-        <h2 className="text-xl font-bold mt-1">Dashboard Admin Pusat</h2>
+        <h2 className="text-xl font-bold mt-1">Dashboard Admin Pusat - Nasional</h2>
+        <p className="text-sm text-slate-400 mt-1">Pengelolaan POKJA Budaya Sekolah Aman dan Nyaman Seluruh Indonesia</p>
       </div>
 
       {/* Stat cards */}
@@ -77,49 +129,190 @@ export function DashboardPusatView({ pengajuan, onViewDaftar }: DashboardPusatVi
         })}
       </div>
 
-      {/* Pending list preview */}
-      {pending > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+      {/* Progress completion */}
+      <div className="rounded-xl border border-gray-200 bg-white p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-gray-800">Cakupan Pembentukan POKJA Nasional</h3>
+          <span className="text-sm font-bold text-gray-900">{completionRate}%</span>
+        </div>
+        <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+            style={{ width: `${completionRate}%` }}
+          />
+        </div>
+        <p className="text-xs text-gray-500 mt-2">
+          {aktif} dari 34 provinsi telah membentuk POKJA
+        </p>
+      </div>
+
+      {/* Tabel provinsi */}
+      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100">
+          <h3 className="text-sm font-semibold text-gray-800">Pembentukan POKJA per Provinsi</h3>
+        </div>
+        <div className="overflow-x-auto max-h-96">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 border-b border-gray-100 sticky top-0">
+              <tr>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">No</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Provinsi</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Jumlah POKJA</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {provinces.map((p, i) => (
+                <tr key={p.prov} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 text-gray-400">{i + 1}</td>
+                  <td className="px-4 py-3 font-medium text-gray-900">{p.prov}</td>
+                  <td className="px-4 py-3">
+                    {p.status === "aktif" ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-medium">
+                        <CheckCircle2 className="w-3 h-3" />
+                        Aktif
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium">
+                        <Clock className="w-3 h-3" />
+                        Belum Dibentuk
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4 text-gray-400" />
+                      <span className="font-medium text-gray-900">{p.pokja}</span>
+                      <span className="text-gray-400 text-xs">POKJA</span>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Daftar pokja menunggu verifikasi */}
+      {menunggu > 0 && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50/50 overflow-hidden">
+          <div className="px-5 py-4 border-b border-amber-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-500" />
-              <h3 className="text-sm font-semibold text-gray-800">Pengajuan Menunggu Validasi</h3>
-              <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">
-                {pending}
+              <Clock className="w-4 h-4 text-amber-600" />
+              <h3 className="text-sm font-semibold text-gray-800">POKJA Menunggu Verifikasi</h3>
+              <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-amber-200 text-amber-800 text-xs font-bold">
+                {menunggu}
               </span>
             </div>
-            <button
-              onClick={onViewDaftar}
-              className="text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors"
-            >
-              Lihat Semua
-            </button>
           </div>
-
-          <ul className="divide-y divide-gray-100">
-            {pengajuan
-              .filter((p) => p.status === "menunggu-validasi")
-              .slice(0, 3)
+          <ul className="divide-y divide-amber-100">
+            {pokjaList
+              .filter((p) => p.status === "masih-diverifikasi")
+              .slice(0, 5)
               .map((p) => (
                 <li key={p.id} className="px-5 py-3 flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-4 h-4 text-gray-500" />
+                  <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-4 h-4 text-amber-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-800 truncate">{p.wilayah}</p>
-                    <p className="text-xs text-gray-400">Diajukan {p.tanggalPengajuan}</p>
+                    <p className="text-sm font-medium text-gray-800 truncate">{p.nama}</p>
+                    <p className="text-xs text-gray-500">{p.data?.region}</p>
                   </div>
-                  <button
-                    onClick={onViewDaftar}
-                    className="flex-shrink-0 text-xs px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 font-medium hover:bg-slate-200 transition-colors"
-                  >
-                    Validasi
-                  </button>
+                  <span className="text-xs text-amber-700 bg-amber-100 px-2 py-1 rounded-full">
+                    Menunggu Verifikasi
+                  </span>
                 </li>
               ))}
           </ul>
         </div>
       )}
+
+      {/* Sumber Rujukan */}
+      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-gray-800">Sumber Rujukan</h3>
+          {onViewSumberRujukan && (
+            <button onClick={onViewSumberRujukan} className="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1">
+              Kelola <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+        <div className="px-5 py-4 grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div className="flex flex-col items-center justify-center gap-4">
+            <div className="relative w-44 h-44 flex-shrink-0">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={RUJUKAN_BREAKDOWN} cx="50%" cy="50%" innerRadius={54} outerRadius={80} dataKey="count" startAngle={90} endAngle={-270} stroke="none">
+                    {RUJUKAN_BREAKDOWN.map((_, i) => <Cell key={`cell-${i}`} fill={RUJUKAN_COLORS[i]} />)}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <p className="text-2xl font-bold text-gray-900">{RUJUKAN_BREAKDOWN.reduce((a,b)=>a+b.count,0)}</p>
+                <p className="text-xs text-gray-500">Total</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap justify-center gap-x-3 gap-y-1.5">
+              {RUJUKAN_BREAKDOWN.map((r, i) => (
+                <div key={r.label} className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full" style={{backgroundColor: RUJUKAN_COLORS[i]}} />
+                  <p className="text-xs text-gray-600">{r.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-lg border border-gray-100 overflow-hidden">
+            <div className="max-h-64 overflow-y-auto">
+              <table className="w-full text-xs">
+                <thead><tr className="border-b border-gray-100 bg-gray-50">
+                  <th className="text-left px-3 py-2 font-semibold text-gray-600">Nama</th>
+                  <th className="text-left px-3 py-2 font-semibold text-gray-600">Jenis</th>
+                  <th className="text-left px-3 py-2 font-semibold text-gray-600">Kontak</th>
+                </tr></thead>
+                <tbody className="divide-y divide-gray-100">
+                  {[{nama:"Klinik Sehat",jenis:"Kesehatan",kontak:"0812"},{nama:"Psikolog Dina",jenis:"Konseling",kontak:"0813"}].map((item,i)=>(
+                    <tr key={i} className="hover:bg-gray-50">
+                      <td className="px-3 py-2.5 text-gray-800 font-medium">{item.nama}</td>
+                      <td className="px-3 py-2.5 text-gray-600">{item.jenis}</td>
+                      <td className="px-3 py-2.5 text-gray-500">{item.kontak}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Activities */}
+      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-gray-800">Activities</h3>
+          {onViewActivities && (
+            <button onClick={onViewActivities} className="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1">
+              Kelola <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+        <div className="px-5 py-4 grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div className="p-3 border border-gray-100 rounded-lg">
+            <p className="text-xs font-semibold text-gray-600 uppercase mb-2">Juni 2025</p>
+            <div className="grid grid-cols-7 gap-1 text-center">
+              {["M","S","S","R","K","J","S"].map((d,i)=><p key={i} className="text-xs font-medium text-gray-400">{d}</p>)}
+              {Array.from({length:30}).map((_,i)=><div key={i} className={`text-xs p-1 rounded ${[14,17,21].includes(i+1)?"bg-blue-100 text-blue-700 font-medium":"text-gray-500"}`}>{i+1}</div>)}
+            </div>
+          </div>
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-gray-600 uppercase">Activities Mendatang</p>
+            {[{tanggal:"14 Jun",judul:"Pelatihan"},{tanggal:"17 Jun",judul:"Verifikasi"},{tanggal:"21 Jun",judul:"Rapat"}].map((k,i)=>(
+              <div key={i} className="p-2.5 rounded-lg bg-gray-50 border border-gray-100">
+                <p className="text-xs font-medium text-gray-700">{k.judul}</p>
+                <p className="text-xs text-gray-500">{k.tanggal}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
