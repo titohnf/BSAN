@@ -12,9 +12,9 @@ import { KegiatanView } from "@/components/dashboard/KegiatanView"
 
 import { SidebarPusat, PusatMenu } from "@/components/pusat/SidebarPusat"
 import { HeaderPusat } from "@/components/pusat/HeaderPusat"
+import { DashboardPusatView } from "@/components/pusat/DashboardPusatView"
 import { DetailPengajuan } from "@/components/pusat/DetailPengajuan"
 import { ValidatePokjaDrawer } from "@/components/pusat/ValidatePokjaDrawer"
-import { DaftarPengajuanView } from "@/components/pusat/DaftarPengajuanView"
 
 import { SekolahDashboard } from "@/components/sekolah/SekolahDashboard"
 
@@ -169,16 +169,9 @@ function AdminPageInner() {
         <HeaderPusat />
         <main className="flex-1 px-4 md:px-6 py-6">
           {pusatMenu === "dashboard" && (
-            <DashboardView
-              region="Nasional"
+            <DashboardPusatView
               pokjaList={pokjaList}
-              targetPokja={34}
-              onBuatPokja={() => {}}
-              onViewDataPokja={() => setPusatMenu("data-pokja")}
-              onViewSumberRujukan={() => setPusatMenu("sumber-rujukan")}
-              sumberRujukanStatus={{ total: 20, aktif: 15, menungguVerifikasi: 3, ditolak: 2 }}
-              onViewActivities={() => setPusatMenu("kegiatan")}
-              kegiatanStatus={{ total: 12, berlangsung: 4, menunggu: 5, selesai: 3 }}
+              targetTotal={34}
             />
           )}
           {pusatMenu === "data-pokja" && (
