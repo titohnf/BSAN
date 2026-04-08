@@ -172,6 +172,8 @@ function AdminPageInner() {
             <DashboardPusatView
               pokjaList={pokjaList}
               onValidatePusat={(pokja) => setValidatingPokja(pokja)}
+              onViewSumberRujukan={() => setPusatMenu("sumber-rujukan")}
+              onViewActivities={() => setPusatMenu("k" as PusatMenu)}
             />
           )}
           {pusatMenu === "data-pokja" && (
