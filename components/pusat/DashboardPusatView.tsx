@@ -1,18 +1,18 @@
 "use client"
-import { ClipboardList, CheckCircle2, XCircle, Clock, MapPin, Users } from "lucide-react"
+import { ClipboardList, CheckCircle2, XCircle, Clock, MapPin, Users, Plus, ChevronRight } from "lucide-react"
 import type { PokjaItem } from "@/types/pokja"
 
 interface DashboardPusatViewProps {
   pokjaList: PokjaItem[]
-  targetTotal: number
+  onValidatePusat?: (pokja: PokjaItem) => void
 }
 
-export function DashboardPusatView({ pokjaList, targetTotal }: DashboardPusatViewProps) {
+export function DashboardPusatView({ pokjaList, onValidatePusat }: DashboardPusatViewProps) {
   const aktif = pokjaList.filter((p) => p.status === "aktif").length
   const menunggu = pokjaList.filter((p) => p.status === "masih-diverifikasi").length
   const ditolak = pokjaList.filter((p) => p.status === "ditolak").length
   const total = pokjaList.length
-  const completionRate = Math.round((aktif / targetTotal) * 100)
+  const completionRate = Math.round((aktif / 34) * 100)
 
   // Mock data untuk semua provinsi (dalam实际的 app, ini diambil dari database)
   const provinces = [
@@ -130,7 +130,7 @@ export function DashboardPusatView({ pokjaList, targetTotal }: DashboardPusatVie
           />
         </div>
         <p className="text-xs text-gray-500 mt-2">
-          {aktif} dari {targetTotal} provinsi telah membentuk POKJA
+          {aktif} dari 34 provinsi telah membentuk POKJA
         </p>
       </div>
 
