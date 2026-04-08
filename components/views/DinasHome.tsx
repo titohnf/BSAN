@@ -433,7 +433,7 @@ export function DashboardView({
 
       <Panel>
         <PanelHeader title="Kegiatan">
-          <ViewBtn label="Kelola" onClick={onViewKegiatan} />
+          <ViewBtn label="Kelola" onClick={onViewActivities} />
         </PanelHeader>
         <div className="px-5 py-4 grid grid-cols-1 lg:grid-cols-2 gap-5">
           <MiniCalendar />
