@@ -275,6 +275,7 @@ interface DataPokjaViewProps {
 export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidatePusat }: DataPokjaViewProps) {
   const [detailPokja, setDetailPokja] = useState<PokjaItem | null>(null)
   const [search, setSearch] = useState("")
+  const [page, setPage] = useState(1)
 
   const filtered = pokjaList.filter((p) => {
     const ketua = p.data?.members?.ketua?.nama ?? ""
@@ -287,19 +288,240 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
     )
   })
 
+  // Untuk admin dinas yang hanya punya 1 pokja, tampilkan detail view
+  const isDinasWithOnePokja = !isAdminPusat && pokjaList.length === 1
+  const pokja = isDinasWithOnePokja ? pokjaList[0] : null
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h2 className="text-xl font-bold text-gray-900">Data Pokja Wilayah</h2>
-        <Button color="blue" size="sm" icon={PlusCircle} onClick={onBuatPokja}>
-          Buat POKJA Baru
-        </Button>
+        {/* Hanya tampilkan tombol buat POKJA untuk admin pusat */}
+        {isAdminPusat && (
+          <Button color="blue" size="sm" icon={PlusCircle} onClick={onBuatPokja}>
+            Buat POKJA Baru
+          </Button>
+        )}
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
         {pokjaList.length === 0 ? (
           <EmptyStatePokja onBuatPokja={onBuatPokja} />
+        ) : isDinasWithOnePokja && pokja ? (
+          /* Detail view untuk admin dinas yang punya 1 pokja */
+          <div className="p-6 space-y-6">
+            {/* Header pokja */}
+            <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 pb-5 border-b border-gray-100">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 flex-wrap mb-2">
+                  <h3 className="text-2xl font-bold text-gray-900">{pokja.nama}</h3>
+                  <Badge variant={STATUS_CONFIG[pokja.status].variant} size="md">
+                    {STATUS_CONFIG[pokja.status].label}
+                  </Badge>
+                </div>
+                {pokja.data?.region && (
+                  <p className="text-sm text-gray-500">Wilayah: {pokja.data.region}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Grid info utama */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Ketua POKJA */}
+              {pokja.data?.members?.ketua?.nama && (
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl p-4 border border-blue-200">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                      <Users className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-1">Ketua POKJA</p>
+                      <p className="text-base font-bold text-gray-900 truncate">{pokja.data.members.ketua.nama}</p>
+                      {pokja.data.members.ketua.instansi && (
+                        <p className="text-xs text-gray-600 mt-0.5 truncate">{pokja.data.members.ketua.instansi}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Jumlah Anggota */}
+              <div className="bg-gradient-to-br from-green-50 to-green-100/50 rounded-xl p-4 border border-green-200">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
+                    <Users className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-1">Total Anggota</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {pokja.data?.members ? Object.values(pokja.data.members).filter(m => m && m.nama?.trim()).length : 0}
+                    </p>
+                    <p className="text-xs text-gray-600 mt-0.5">Orang terdaftar</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Nomor SK */}
+              {pokja.data?.sk?.nomorSK && (
+                <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-4 border border-purple-200">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-purple-700 uppercase tracking-wide mb-1">Nomor SK</p>
+                      <p className="text-sm font-bold text-gray-900 truncate">{pokja.data.sk.nomorSK}</p>
+                      {pokja.data.sk.tanggalSK && (
+                        <p className="text-xs text-gray-600 mt-0.5">Tgl: {pokja.data.sk.tanggalSK}</p>
+                      )}
+                      {pokja.data.sk.periodeSelesai && (
+                        <p className="text-xs text-gray-600">s.d. {pokja.data.sk.periodeSelesai}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Kanal Pengaduan */}
+            {pokja.data?.nomorKanal && (
+              <div className="rounded-xl border-2 border-green-200 bg-green-50 p-5">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
+                      <MessageCircle className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-1">
+                        Kanal Pengaduan &amp; Aspirasi
+                      </p>
+                      <p className="text-lg font-bold text-gray-900">{pokja.data.nomorKanal}</p>
+                    </div>
+                  </div>
+                  <a
+                    href={`https://wa.me/62${pokja.data.nomorKanal.replace(/^0/, "")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-lg bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition-colors flex-shrink-0"
+                  >
+                    <Phone className="w-4 h-4" />
+                    Hubungi via WhatsApp
+                  </a>
+                </div>
+              </div>
+            )}
+
+            {/* Daftar Anggota */}
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 border-b border-gray-100 bg-gray-50">
+                <h3 className="text-base font-bold text-gray-800">
+                  Daftar Anggota POKJA
+                  <span className="ml-2 text-sm font-normal text-gray-500">
+                    ({pokja.data?.members ? toTableRows(pokja.data.members).length : 0} anggota)
+                  </span>
+                </h3>
+                <div className="relative w-full sm:w-64">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+                    placeholder="Cari nama, posisi..."
+                    className="w-full pl-8 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  />
+                </div>
+              </div>
+
+              {(() => {
+                const rows = toTableRows(pokja.data?.members)
+                const filteredRows = rows.filter((r) =>
+                  [r.label, r.member.nama, r.member.email, r.member.instansi].some((v) =>
+                    v.toLowerCase().includes(search.toLowerCase())
+                  )
+                )
+                const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE))
+                const paginatedRows = filteredRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+
+                return rows.length === 0 ? (
+                  <div className="flex flex-col items-center py-12 text-center text-gray-400">
+                    <Users className="w-8 h-8 mb-2" />
+                    <p className="text-sm">Belum ada data anggota yang diisi.</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full text-sm text-left">
+                        <thead className="bg-gray-50 border-b border-gray-100">
+                          <tr>
+                            {["Posisi / Peran", "Nama", "Email", "Jenis Kelamin", "No. WhatsApp", "Instansi"].map((col) => (
+                              <th key={col} className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                                {col}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                          {paginatedRows.length > 0 ? paginatedRows.map((row) => (
+                            <tr key={row.key} className="hover:bg-gray-50 transition-colors">
+                              <td className="px-4 py-3 whitespace-nowrap">
+                                <Badge variant={ROLE_BADGE_MAP[row.key] ?? "neutral"} size="sm">
+                                  {row.label}
+                                </Badge>
+                              </td>
+                              <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">{row.member.nama}</td>
+                              <td className="px-4 py-3 text-gray-600 whitespace-nowrap">{row.member.email || "-"}</td>
+                              <td className="px-4 py-3 whitespace-nowrap">
+                                <span className={`text-xs font-medium ${row.member.jenisKelamin === "Perempuan" ? "text-pink-600" : "text-blue-600"}`}>
+                                  {row.member.jenisKelamin || "-"}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3 whitespace-nowrap text-gray-600">{row.member.noWhatsapp || "-"}</td>
+                              <td className="px-4 py-3">
+                                <p className="text-gray-600 max-w-[200px] truncate" title={row.member.instansi}>
+                                  {row.member.instansi || "-"}
+                                </p>
+                              </td>
+                            </tr>
+                          )) : (
+                            <tr>
+                              <td colSpan={6} className="text-center py-8 text-gray-400 text-sm">
+                                Data tidak ditemukan.
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {totalPages > 1 && (
+                      <div className="flex items-center justify-between px-5 py-3 border-t border-gray-100 bg-gray-50">
+                        <p className="text-xs text-gray-500">
+                          {Math.min((page - 1) * PAGE_SIZE + 1, filteredRows.length)}–{Math.min(page * PAGE_SIZE, filteredRows.length)} dari {filteredRows.length}
+                        </p>
+                        <div className="flex items-center gap-1">
+                          <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}
+                            className="p-1.5 rounded border border-gray-200 hover:bg-gray-100 disabled:opacity-40 transition-colors">
+                            <ChevronLeft className="w-3.5 h-3.5 text-gray-600" />
+                          </button>
+                          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                            <button key={p} onClick={() => setPage(p)}
+                              className={`w-7 h-7 rounded text-xs font-medium transition-colors ${p === page ? "bg-blue-600 text-white" : "border border-gray-200 text-gray-600 hover:bg-gray-100"}`}>
+                              {p}
+                            </button>
+                          ))}
+                          <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+                            className="p-1.5 rounded border border-gray-200 hover:bg-gray-100 disabled:opacity-40 transition-colors">
+                            <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )
+              })()}
+            </div>
+          </div>
         ) : (
           <>
             {/* Search bar */}
