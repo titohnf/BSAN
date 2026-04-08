@@ -169,9 +169,18 @@ function AdminPageInner() {
         <HeaderPusat />
         <main className="flex-1 px-4 md:px-6 py-6">
           {pusatMenu === "dashboard" && (
-            <DashboardPusatView
+            <DashboardView
+              region="Nasional"
               pokjaList={pokjaList}
-              targetTotal={34}
+              targetPokja={34}
+              onBuatPokja={navigateToBuatPokja}
+              onViewDataPokja={() => setPusatMenu("data-pokja")}
+              onViewSumberRujukan={() => setPusatMenu("sumber-rujukan")}
+              sumberRujukanStatus={{ total: 20, aktif: 15, menungguVerifikasi: 3, ditolak: 2 }}
+              onViewActivities={() => setPusatMenu("k" as PusatMenu)}
+              kegiatanStatus={{ total: 12, berlangsung: 4, menunggu: 5, selesai: 3 }}
+              isAdminPusat={true}
+              onValidatePusat={(pokja) => setValidatingPokja(pokja)}
             />
           )}
           {pusatMenu === "data-pokja" && (
