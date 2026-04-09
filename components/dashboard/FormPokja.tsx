@@ -629,6 +629,7 @@ export function FormPokja({ region, onClose, onSubmit }: FormPokjaProps) {
               {/* Anggota per Bidang */}
               <div className="space-y-3">
                 <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Anggota per Bidang</p>
+                <p className="text-xs text-blue-600 font-semibold">[v0] New version with 3 mandatory fields</p>
                 
                 {/* 3 Anggota Wajib dengan bidang disabled */}
                 <MemberSection
