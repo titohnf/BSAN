@@ -51,10 +51,14 @@ function MemberSection({
   label,
   value,
   onChange,
+  bidangValue,
+  bidangDisabled,
 }: {
   label: string
   value: MemberField
   onChange: (field: keyof MemberField, val: string) => void
+  bidangValue?: string
+  bidangDisabled?: boolean
 }) {
   return (
     <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
@@ -80,6 +84,17 @@ function MemberSection({
           value={value.email}
           onChange={(v) => onChange("email", v)}
         />
+        {/* Bidang (if specified and disabled) */}
+        {bidangValue !== undefined && (
+          <InputField
+            label="Bidang"
+            required
+            value={bidangValue}
+            readOnly={bidangDisabled}
+            onChange={() => {}}
+            className="sm:col-span-2"
+          />
+        )}
         {/* Jenis Kelamin */}
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-gray-600">
@@ -606,7 +621,36 @@ export function FormPokja({ region, onClose, onSubmit }: FormPokjaProps) {
               {/* Anggota per Bidang */}
               <div className="space-y-3">
                 <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Anggota per Bidang</p>
-                {BIDANG_ROLES.map((r) => (
+                
+                {/* 3 Anggota Wajib dengan bidang disabled */}
+                <MemberSection
+                  key="pendidikan"
+                  label="Anggota Wajib 1 (Bidang Pendidikan)"
+                  value={members.pendidikan}
+                  onChange={(field, val) => updateMember("pendidikan", field, val)}
+                  bidangValue="Pendidikan"
+                  bidangDisabled={true}
+                />
+                <MemberSection
+                  key="pppa"
+                  label="Anggota Wajib 2 (Bidang PPPA)"
+                  value={members.pppa}
+                  onChange={(field, val) => updateMember("pppa", field, val)}
+                  bidangValue="PPPA"
+                  bidangDisabled={true}
+                />
+                <MemberSection
+                  key="sosial"
+                  label="Anggota Wajib 3 (Bidang Sosial)"
+                  value={members.sosial}
+                  onChange={(field, val) => updateMember("sosial", field, val)}
+                  bidangValue="Sosial"
+                  bidangDisabled={true}
+                />
+
+                {/* Anggota Tambahan (opsional) */}
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest pt-2">Anggota Tambahan (Opsional)</p>
+                {BIDANG_ROLES.filter(r => !["pendidikan", "pppa", "sosial"].includes(r.key)).map((r) => (
                   <MemberSection
                     key={r.key}
                     label={r.label}
