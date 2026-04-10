@@ -8,6 +8,7 @@ export interface MemberField {
   jenisKelamin: "Laki-Laki" | "Perempuan" | ""
   noWhatsapp: string
   instansi: string
+  jabatan: string
 }
 
 export const PIMPINAN_ROLES = [
@@ -69,6 +70,7 @@ export const emptyMember = (): MemberField => ({
   jenisKelamin: "",
   noWhatsapp: "",
   instansi: "",
+  jabatan: "",
 })
 
 export function getRoleLabel(key: RoleKey): string {

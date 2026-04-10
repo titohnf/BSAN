@@ -51,10 +51,14 @@ function MemberSection({
   label,
   value,
   onChange,
+  bidangValue,
+  bidangDisabled,
 }: {
   label: string
   value: MemberField
   onChange: (field: keyof MemberField, val: string) => void
+  bidangValue?: string
+  bidangDisabled?: boolean
 }) {
   return (
     <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
@@ -64,64 +68,83 @@ function MemberSection({
         </div>
         <span className="text-sm font-semibold text-gray-800">{label}</span>
       </div>
-      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <InputField
-          label="Nama"
-          required
-          placeholder="Nama lengkap"
-          value={value.nama}
-          onChange={(v) => onChange("nama", v)}
-        />
-        <InputField
-          label="Email"
-          required
-          type="email"
-          placeholder="nama@dinas.go.id"
-          value={value.email}
-          onChange={(v) => onChange("email", v)}
-        />
-        {/* Jenis Kelamin */}
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-gray-600">
-            Jenis Kelamin <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <select
-              value={value.jenisKelamin}
-              onChange={(e) => onChange("jenisKelamin", e.target.value)}
-              className="w-full h-9 pl-3 pr-8 text-sm border border-gray-300 rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-gray-700"
-            >
-              <option value="" disabled>Pilih jenis kelamin</option>
-              <option value="Laki-Laki">Laki-Laki</option>
-              <option value="Perempuan">Perempuan</option>
-            </select>
-            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+      <div className="p-4 space-y-4">
+        {/* Row 1: Nama & Email */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField
+            label="Nama"
+            required
+            placeholder="Nama lengkap"
+            value={value.nama}
+            onChange={(v) => onChange("nama", v)}
+          />
+          <InputField
+            label="Email"
+            required
+            type="email"
+            placeholder="nama@dinas.go.id"
+            value={value.email}
+            onChange={(v) => onChange("email", v)}
+          />
+        </div>
+
+        {/* Row 2: Bidang (if specified and disabled) */}
+        {bidangValue !== undefined && (
+          <InputField
+            label="Bidang"
+            required
+            value={bidangValue}
+            readOnly={bidangDisabled}
+            onChange={() => {}}
+          />
+        )}
+
+        {/* Row 3: Jenis Kelamin & No WA */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Jenis Kelamin */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-gray-600">
+              Jenis Kelamin <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <select
+                value={value.jenisKelamin}
+                onChange={(e) => onChange("jenisKelamin", e.target.value)}
+                className="w-full h-9 pl-3 pr-8 text-sm border border-gray-300 rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-gray-700"
+              >
+                <option value="" disabled>Pilih jenis kelamin</option>
+                <option value="Laki-Laki">Laki-Laki</option>
+                <option value="Perempuan">Perempuan</option>
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+            </div>
+          </div>
+          {/* No WA */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-gray-600">
+              No. WhatsApp <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+              <input
+                type="tel"
+                inputMode="numeric"
+                value={value.noWhatsapp}
+                onChange={(e) => onChange("noWhatsapp", e.target.value.replace(/\D/g, ""))}
+                placeholder="08xxxxxxxxxx"
+                className="w-full h-9 pl-9 pr-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              />
+            </div>
           </div>
         </div>
-        {/* No WA */}
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-gray-600">
-            No. WhatsApp <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
-            <input
-              type="tel"
-              inputMode="numeric"
-              value={value.noWhatsapp}
-              onChange={(e) => onChange("noWhatsapp", e.target.value.replace(/\D/g, ""))}
-              placeholder="08xxxxxxxxxx"
-              className="w-full h-9 pl-9 pr-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-            />
-          </div>
-        </div>
+
+        {/* Row 4: Instansi */}
         <InputField
           label="Instansi"
           required
           placeholder="Nama instansi / lembaga"
           value={value.instansi}
           onChange={(v) => onChange("instansi", v)}
-          className="sm:col-span-2"
         />
       </div>
     </div>
@@ -606,7 +629,37 @@ export function FormPokja({ region, onClose, onSubmit }: FormPokjaProps) {
               {/* Anggota per Bidang */}
               <div className="space-y-3">
                 <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Anggota per Bidang</p>
-                {BIDANG_ROLES.map((r) => (
+                
+                {/* 3 Anggota Wajib dengan bidang disabled */}
+                {console.log("[v0] Rendering Step 2 - Anggota per Bidang section with mandatory fields")}
+                <MemberSection
+                  key="pendidikan"
+                  label="Anggota Wajib 1 (Bidang Pendidikan)"
+                  value={members.pendidikan}
+                  onChange={(field, val) => updateMember("pendidikan", field, val)}
+                  bidangValue="Pendidikan"
+                  bidangDisabled={true}
+                />
+                <MemberSection
+                  key="pppa"
+                  label="Anggota Wajib 2 (Bidang PPPA)"
+                  value={members.pppa}
+                  onChange={(field, val) => updateMember("pppa", field, val)}
+                  bidangValue="PPPA"
+                  bidangDisabled={true}
+                />
+                <MemberSection
+                  key="sosial"
+                  label="Anggota Wajib 3 (Bidang Sosial)"
+                  value={members.sosial}
+                  onChange={(field, val) => updateMember("sosial", field, val)}
+                  bidangValue="Sosial"
+                  bidangDisabled={true}
+                />
+
+                {/* Anggota Tambahan (opsional) */}
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest pt-2">Anggota Tambahan (Opsional)</p>
+                {BIDANG_ROLES.filter(r => !["pendidikan", "pppa", "sosial"].includes(r.key)).map((r) => (
                   <MemberSection
                     key={r.key}
                     label={r.label}
