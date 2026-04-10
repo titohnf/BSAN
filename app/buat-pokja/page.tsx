@@ -234,10 +234,10 @@ export default function BuatPokjaPage() {
     kesehatan: emptyMember(), kominfo: emptyMember(), dukbangga: emptyMember(),
   }))
 
-  // Step 2 – anggota generik
-  type AnggotaItem = { nama: string; email: string; jenisKelamin: string; bidang: string; noWhatsapp: string }
-  const emptyAnggota = (): AnggotaItem => ({ nama: "", email: "", jenisKelamin: "", bidang: "", noWhatsapp: "" })
-  const [anggotaList, setAnggotaList] = useState<AnggotaItem[]>([emptyAnggota()])
+  // Step 2 – anggota tambahan (opsional)
+  type AnggotaItem = { nama: string; email: string; jenisKelamin: string; bidang: string; noWhatsapp: string; instansi: string }
+  const emptyAnggota = (): AnggotaItem => ({ nama: "", email: "", jenisKelamin: "", bidang: "", noWhatsapp: "", instansi: "" })
+  const [anggotaList, setAnggotaList] = useState<AnggotaItem[]>([])
 
   const updateAnggota = (index: number, field: keyof AnggotaItem, val: string) => {
     setAnggotaList((prev) => prev.map((a, i) => i === index ? { ...a, [field]: val } : a))
@@ -490,18 +490,111 @@ export default function BuatPokjaPage() {
                   />
                 </div>
 
-                {/* Anggota Tambahan (Opsional) */}
+                {/* Anggota Tambahan (Dinamis) */}
                 <div className="flex flex-col gap-4">
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Anggota Tambahan (Opsional)</p>
                   
-                  {BIDANG_ROLES.filter(r => !["pendidikan", "pppa", "sosial"].includes(r.key)).map((r) => (
-                    <MemberSection 
-                      key={r.key}
-                      label={r.label} 
-                      value={members[r.key]} 
-                      onChange={(f, v) => updateMember(r.key, f, v)} 
-                    />
+                  {anggotaList.map((anggota, index) => (
+                    <div key={index} className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+                      <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                            <User className="w-3.5 h-3.5 text-blue-700" />
+                          </div>
+                          <span className="text-sm font-semibold text-gray-800">Anggota Tambahan {index + 1}</span>
+                        </div>
+                        <button
+                          onClick={() => removeAnggota(index)}
+                          className="p-1 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <InputField 
+                          label="Nama" 
+                          required 
+                          placeholder="Nama lengkap" 
+                          value={anggota.nama} 
+                          onChange={(v) => updateAnggota(index, "nama", v)} 
+                        />
+                        <InputField 
+                          label="Email" 
+                          required 
+                          type="email" 
+                          placeholder="nama@instansi.go.id" 
+                          value={anggota.email} 
+                          onChange={(v) => updateAnggota(index, "email", v)} 
+                        />
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-xs font-semibold text-gray-600">
+                            Bidang <span className="text-red-500">*</span>
+                          </label>
+                          <div className="relative">
+                            <select
+                              value={anggota.bidang}
+                              onChange={(e) => updateAnggota(index, "bidang", e.target.value)}
+                              className="w-full h-9 pl-3 pr-8 text-sm border border-gray-300 rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-gray-700"
+                            >
+                              <option value="" disabled>Pilih bidang</option>
+                              {["Kesehatan", "Kominfo", "Dukbangga", "Lainnya"].map((b) => (
+                                <option key={b} value={b}>{b}</option>
+                              ))}
+                            </select>
+                            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-xs font-semibold text-gray-600">
+                            Jenis Kelamin <span className="text-red-500">*</span>
+                          </label>
+                          <div className="relative">
+                            <select
+                              value={anggota.jenisKelamin}
+                              onChange={(e) => updateAnggota(index, "jenisKelamin", e.target.value)}
+                              className="w-full h-9 pl-3 pr-8 text-sm border border-gray-300 rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-gray-700"
+                            >
+                              <option value="" disabled>Pilih jenis kelamin</option>
+                              <option value="Laki-Laki">Laki-Laki</option>
+                              <option value="Perempuan">Perempuan</option>
+                            </select>
+                            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-xs font-semibold text-gray-600">
+                            No. WhatsApp <span className="text-red-500">*</span>
+                          </label>
+                          <div className="relative">
+                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                            <input
+                              type="tel"
+                              inputMode="numeric"
+                              value={anggota.noWhatsapp}
+                              onChange={(e) => updateAnggota(index, "noWhatsapp", e.target.value.replace(/\D/g, ""))}
+                              placeholder="08xxxxxxxxxx"
+                              className="w-full h-9 pl-9 pr-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                            />
+                          </div>
+                        </div>
+                        <InputField 
+                          label="Instansi" 
+                          required 
+                          placeholder="Nama instansi / lembaga" 
+                          value={anggota.instansi || ""} 
+                          onChange={(v) => updateAnggota(index, "instansi", v)} 
+                          className="sm:col-span-2"
+                        />
+                      </div>
+                    </div>
                   ))}
+                  
+                  <button
+                    onClick={addAnggota}
+                    className="flex items-center justify-center gap-2 w-full py-2.5 border-2 border-dashed border-blue-300 rounded-xl text-sm font-medium text-blue-600 hover:bg-blue-50 hover:border-blue-400 transition"
+                  >
+                    <span className="text-lg leading-none">+</span> Tambah Anggota Lainnya
+                  </button>
                 </div>
               </div>
             )}
