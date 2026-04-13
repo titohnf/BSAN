@@ -62,26 +62,88 @@ const PROVINCE_DATA = [
   { nama: "Prov. Sumatra Utara", totalKabKota: 33, pokjaKabKota: 0 },
 ]
 
+// Map nama provinsi ke region string yang digunakan di pokjaList
+const PROVINCE_REGION_MAP: Record<string, string[]> = {
+  "Prov. Aceh": ["Aceh", "Prov. Aceh"],
+  "Prov. Bali": ["Bali", "Prov. Bali"],
+  "Prov. Banten": ["Banten", "Prov. Banten"],
+  "Prov. Bengkulu": ["Bengkulu", "Prov. Bengkulu"],
+  "Prov. D.I. Yogyakarta": ["Yogyakarta", "D.I. Yogyakarta", "Prov. D.I. Yogyakarta"],
+  "Prov. D.K.I. Jakarta": ["DKI Jakarta", "Jakarta", "Prov. D.K.I. Jakarta"],
+  "Prov. Gorontalo": ["Gorontalo", "Prov. Gorontalo"],
+  "Prov. Jambi": ["Jambi", "Prov. Jambi"],
+  "Prov. Jawa Barat": ["Jawa Barat", "Prov. Jawa Barat"],
+  "Prov. Jawa Tengah": ["Jawa Tengah", "Prov. Jawa Tengah"],
+  "Prov. Jawa Timur": ["Jawa Timur", "Prov. Jawa Timur"],
+  "Prov. Kalimantan Barat": ["Kalimantan Barat", "Prov. Kalimantan Barat"],
+  "Prov. Kalimantan Selatan": ["Kalimantan Selatan", "Prov. Kalimantan Selatan"],
+  "Prov. Kalimantan Tengah": ["Kalimantan Tengah", "Prov. Kalimantan Tengah"],
+  "Prov. Kalimantan Timur": ["Kalimantan Timur", "Prov. Kalimantan Timur"],
+  "Prov. Kalimantan Utara": ["Kalimantan Utara", "Prov. Kalimantan Utara"],
+  "Prov. Kepulauan Bangka Belitung": ["Kepulauan Bangka Belitung", "Bangka Belitung"],
+  "Prov. Kepulauan Riau": ["Kepulauan Riau", "Riau Kepulauan"],
+  "Prov. Lampung": ["Lampung", "Prov. Lampung"],
+  "Prov. Maluku": ["Maluku", "Prov. Maluku"],
+  "Prov. Maluku Utara": ["Maluku Utara", "Prov. Maluku Utara"],
+  "Prov. Nusa Tenggara Barat": ["Nusa Tenggara Barat", "NTB"],
+  "Prov. Nusa Tenggara Timur": ["Nusa Tenggara Timur", "NTT"],
+  "Prov. Papua": ["Papua", "Prov. Papua"],
+  "Prov. Papua Barat": ["Papua Barat", "Prov. Papua Barat"],
+  "Prov. Papua Barat Daya": ["Papua Barat Daya"],
+  "Prov. Papua Pegunungan": ["Papua Pegunungan"],
+  "Prov. Papua Selatan": ["Papua Selatan"],
+  "Prov. Papua Tengah": ["Papua Tengah"],
+  "Prov. Riau": ["Riau", "Prov. Riau"],
+  "Prov. Sulawesi Barat": ["Sulawesi Barat", "Prov. Sulawesi Barat"],
+  "Prov. Sulawesi Selatan": ["Sulawesi Selatan", "Prov. Sulawesi Selatan"],
+  "Prov. Sulawesi Tengah": ["Sulawesi Tengah", "Prov. Sulawesi Tengah"],
+  "Prov. Sulawesi Tenggara": ["Sulawesi Tenggara", "Prov. Sulawesi Tenggara"],
+  "Prov. Sulawesi Utara": ["Sulawesi Utara", "Prov. Sulawesi Utara"],
+  "Prov. Sumatra Barat": ["Sumatra Barat", "Sumatera Barat"],
+  "Prov. Sumatra Selatan": ["Sumatra Selatan", "Sumatera Selatan"],
+  "Prov. Sumatra Utara": ["Sumatra Utara", "Sumatera Utara"],
+}
+
 export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRujukan, onViewActivities }: DashboardPusatViewProps) {
   const [search, setSearch] = useState("")
   const [entriesPerPage, setEntriesPerPage] = useState(10)
 
-  const aktif = pokjaList.filter((p) => p.status === "aktif").length
-  const menunggu = pokjaList.filter((p) => p.status === "masih-diverifikasi").length
-  const butuhPerbaikan = pokjaList.filter((p) => p.status === "butuh-perbaikan").length
-  const total = pokjaList.length
+  // Hitung pokja per provinsi dari pokjaList secara dinamis
+  const enrichedProvinces = PROVINCE_DATA.map((prov) => {
+    const aliases = PROVINCE_REGION_MAP[prov.nama] ?? [prov.nama]
+    const matching = pokjaList.filter((p) => {
+      const region = p.data?.region ?? p.nama
+      return aliases.some(a => region.toLowerCase().includes(a.toLowerCase()) || a.toLowerCase().includes(region.toLowerCase()))
+    })
+    const aktifCount = matching.filter(p => p.status === "aktif").length
+    const menungguCount = matching.filter(p => p.status === "masih-diverifikasi").length
+    const perbaikanCount = matching.filter(p => p.status === "butuh-perbaikan").length
+
+    // Status provinsi: ambil status paling relevan
+    let statusProv: "aktif" | "menunggu" | "perbaikan" | "belum" = "belum"
+    if (aktifCount > 0) statusProv = "aktif"
+    else if (menungguCount > 0) statusProv = "menunggu"
+    else if (perbaikanCount > 0) statusProv = "perbaikan"
+
+    return {
+      ...prov,
+      pokjaKabKota: matching.filter(p => p.status !== "belum-dibentuk").length,
+      statusProv,
+      matching,
+    }
+  })
 
   // Hitung total provinsi, kab/kota, dan pokja kab/kota yang terbentuk
   const totalProvinsi = PROVINCE_DATA.length
   const totalKabKota = PROVINCE_DATA.reduce((sum, p) => sum + p.totalKabKota, 0)
-  const totalPokjaKabKota = PROVINCE_DATA.reduce((sum, p) => sum + p.pokjaKabKota, 0)
+  const totalPokjaKabKota = enrichedProvinces.reduce((sum, p) => sum + p.pokjaKabKota, 0)
   const persentaseNasional = totalKabKota > 0 ? ((totalPokjaKabKota / totalKabKota) * 100).toFixed(1) : "0.0"
-  
-  // Hitung provinsi yang sudah terbentuk (punya minimal 1 pokja kab/kota)
-  const provinsiTerbentuk = PROVINCE_DATA.filter(p => p.pokjaKabKota > 0).length
+
+  // Hitung provinsi yang sudah terbentuk (punya minimal 1 pokja)
+  const provinsiTerbentuk = enrichedProvinces.filter(p => p.pokjaKabKota > 0).length
 
   // Filter data berdasarkan search
-  const filteredProvinces = PROVINCE_DATA.filter(p => 
+  const filteredProvinces = enrichedProvinces.filter(p =>
     p.nama.toLowerCase().includes(search.toLowerCase())
   )
 
@@ -237,9 +299,16 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
             <tbody className="divide-y divide-gray-100">
               {filteredProvinces.slice(0, entriesPerPage).map((prov, idx) => {
                 const persentase = prov.totalKabKota > 0 ? ((prov.pokjaKabKota / prov.totalKabKota) * 100).toFixed(0) : 0
-                const status = prov.pokjaKabKota > 0 ? "Ada" : "Belum Ada"
-                const statusPokja = prov.pokjaKabKota > 0 ? "Ada" : "Belum"
-                
+                const lihatPokja = prov.pokjaKabKota > 0 ? "Ada" : "Belum Ada"
+
+                const statusConfig = {
+                  aktif:    { label: "Aktif",              cls: "bg-green-100 border border-green-300 text-green-700" },
+                  menunggu: { label: "Menunggu Verifikasi", cls: "bg-amber-100 border border-amber-300 text-amber-700" },
+                  perbaikan:{ label: "Butuh Perbaikan",     cls: "bg-red-100 border border-red-300 text-red-700" },
+                  belum:    { label: "Belum",               cls: "bg-gray-100 border border-gray-200 text-gray-500" },
+                }
+                const sc = statusConfig[prov.statusProv]
+
                 return (
                   <tr key={prov.nama} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3.5 text-gray-500">{idx + 1}</td>
@@ -250,20 +319,16 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
                     </td>
                     <td className="px-4 py-3.5">
                       <span className={`inline-block px-3 py-1 rounded-md text-xs font-medium ${
-                        status === "Ada" 
-                          ? "bg-white border border-gray-300 text-gray-700" 
+                        lihatPokja === "Ada"
+                          ? "bg-white border border-gray-300 text-gray-700"
                           : "bg-gray-100 border border-gray-200 text-gray-500"
                       }`}>
-                        {status}
+                        {lihatPokja}
                       </span>
                     </td>
                     <td className="px-4 py-3.5">
-                      <span className={`inline-block px-3 py-1 rounded-md text-xs font-medium ${
-                        statusPokja === "Ada" 
-                          ? "bg-white border border-gray-300 text-gray-700" 
-                          : "bg-gray-100 border border-gray-200 text-gray-500"
-                      }`}>
-                        {statusPokja}
+                      <span className={`inline-block px-3 py-1 rounded-md text-xs font-medium ${sc.cls}`}>
+                        {sc.label}
                       </span>
                     </td>
                     <td className="px-4 py-3.5 text-center text-gray-900 font-medium">
