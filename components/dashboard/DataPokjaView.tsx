@@ -417,6 +417,58 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
               </div>
             )}
 
+            {/* Riwayat Aktivitas */}
+            {pokja.validasiLog && pokja.validasiLog.length > 0 && (
+              <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div className="px-5 py-4 border-b border-gray-100 bg-gray-50 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-gray-500" />
+                  <h3 className="text-base font-bold text-gray-800">Riwayat Aktivitas</h3>
+                  <span className="text-sm font-normal text-gray-400">({pokja.validasiLog.length} log)</span>
+                </div>
+                <div className="divide-y divide-gray-100">
+                  {[...pokja.validasiLog].reverse().map((log, idx) => {
+                    const aksiConfig: Record<string, { label: string; color: string; dot: string }> = {
+                      pengajuan:   { label: "Pengajuan",          color: "text-blue-700 bg-blue-50 border-blue-200",    dot: "bg-blue-500" },
+                      terima:      { label: "Diterima",           color: "text-green-700 bg-green-50 border-green-200",  dot: "bg-green-500" },
+                      aktivasi:    { label: "Diaktivasi",         color: "text-green-700 bg-green-50 border-green-200",  dot: "bg-green-500" },
+                      tolak:       { label: "Ditolak",            color: "text-red-700 bg-red-50 border-red-200",        dot: "bg-red-500" },
+                      perbaiki:    { label: "Perbaikan Diajukan", color: "text-amber-700 bg-amber-50 border-amber-200",  dot: "bg-amber-500" },
+                      sk_expired:  { label: "SK Kedaluwarsa",     color: "text-orange-700 bg-orange-50 border-orange-200", dot: "bg-orange-500" },
+                    }
+                    const aktorLabel: Record<string, string> = {
+                      user:        "Admin Dinas",
+                      admin_pusat: "Admin Pusat",
+                      sistem:      "Sistem",
+                    }
+                    const cfg = aksiConfig[log.aksi] ?? { label: log.aksi, color: "text-gray-700 bg-gray-50 border-gray-200", dot: "bg-gray-400" }
+                    return (
+                      <div key={idx} className="px-5 py-4 flex items-start gap-4">
+                        <div className="flex flex-col items-center gap-1 pt-0.5">
+                          <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${cfg.dot}`} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded border ${cfg.color}`}>
+                              {cfg.label}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              oleh <span className="font-medium text-gray-700">{aktorLabel[log.aktor] ?? log.aktor}</span>
+                            </span>
+                            <span className="text-xs text-gray-400 ml-auto">{log.tanggal}</span>
+                          </div>
+                          {log.alasan && (
+                            <p className="text-sm text-gray-600 bg-gray-50 rounded px-3 py-2 mt-1 border border-gray-100">
+                              {log.alasan}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Daftar Anggota */}
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 border-b border-gray-100 bg-gray-50">
