@@ -200,17 +200,17 @@ function AdminPageInner() {
           seen.add(p.id)
 
           if (mockIds.has(p.id)) {
-            // Entri MOCK yang statusnya berubah — update langsung via id
+            // Entri MOCK yang berubah — update status, data, dan validasiLog
             const idx = merged.findIndex(m => m.id === p.id)
-            if (idx !== -1) merged[idx] = { ...merged[idx], status: p.status, data: p.data }
+            if (idx !== -1) merged[idx] = { ...merged[idx], status: p.status, data: p.data, validasiLog: p.validasiLog }
             continue
           }
 
           const key = p.nama.trim().toLowerCase()
           if (mockNames.has(key)) {
-            // Entri lama yang disimpan dengan id berbeda tapi nama sama — update MOCK entry
+            // Entri lama dengan id berbeda tapi nama sama — update MOCK entry
             const idx = merged.findIndex(m => m.nama.trim().toLowerCase() === key)
-            if (idx !== -1) merged[idx] = { ...merged[idx], status: p.status, data: p.data }
+            if (idx !== -1) merged[idx] = { ...merged[idx], status: p.status, data: p.data, validasiLog: p.validasiLog }
           } else {
             // Genuinely new entry — append
             merged.push(p)
@@ -218,10 +218,14 @@ function AdminPageInner() {
         }
       }
 
-      // Re-persist: MOCK entries hanya jika statusnya berubah dari default, plus entri genuinely baru
-      const mockDefaults = new Map(MOCK_POKJA_LIST.map(p => [p.id, p.status]))
+      // Re-persist: MOCK entries yang berubah (status OR validasiLog), plus entri genuinely baru
+      const mockDefaults = new Map(MOCK_POKJA_LIST.map(p => [p.id, { status: p.status, hasLog: false }]))
       const toSave = merged.filter(p => {
-        if (mockDefaults.has(p.id)) return p.status !== mockDefaults.get(p.id)
+        const def = mockDefaults.get(p.id)
+        if (def) {
+          // Save MOCK entry jika statusnya berubah ATAU punya validasiLog
+          return p.status !== def.status || (p.validasiLog && p.validasiLog.length > 0)
+        }
         return true
       })
       localStorage.setItem("pokjaList", JSON.stringify(toSave))
@@ -240,9 +244,10 @@ function AdminPageInner() {
       const toSave = pokjaList.filter(p => {
         if (seen.has(p.id)) return false
         seen.add(p.id)
-        // Jika entri ini ada di MOCK, simpan hanya jika statusnya berbeda dari default MOCK
-        if (mockDefaults.has(p.id)) return p.status !== mockDefaults.get(p.id)
-        // Entri non-MOCK (genuinely user-created) selalu disimpan
+        // MOCK entry: simpan jika status berubah ATAU punya validasiLog
+        if (mockDefaults.has(p.id)) {
+          return p.status !== mockDefaults.get(p.id) || (p.validasiLog && p.validasiLog.length > 0)
+        }
         return true
       })
       localStorage.setItem("pokjaList", JSON.stringify(toSave))
