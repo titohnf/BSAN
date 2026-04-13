@@ -275,10 +275,14 @@ function AdminPageInner() {
         newId = `pokja-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
       }
 
+      const today = new Date().toISOString().slice(0, 10)
+      const newLog = { tanggal: today, aksi: "pengajuan", aktor: isPusat ? "admin_pusat" : "user" }
+
       const newPokja: PokjaItem = {
         id: newId,
         nama: parsed.region,
         status: isPusat ? "aktif" : "masih-diverifikasi",
+        validasiLog: [newLog],
         data: {
           ...parsed,
           sk: { ...parsed.sk, file: null, periodeMultai: parsed.sk.periodeMultai ?? "" },
@@ -299,7 +303,13 @@ function AdminPageInner() {
         )
         if (sameRegionIdx !== -1) {
           const updated = [...deduped]
-          updated[sameRegionIdx] = { ...updated[sameRegionIdx], status: newPokja.status, data: newPokja.data }
+          const existing = updated[sameRegionIdx]
+          updated[sameRegionIdx] = {
+            ...existing,
+            status: newPokja.status,
+            data: newPokja.data,
+            validasiLog: [...(existing.validasiLog ?? []), newLog],
+          }
           return updated
         }
         if (deduped.some(p => p.id === newId)) return deduped
