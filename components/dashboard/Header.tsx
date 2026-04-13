@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Bell, ChevronDown, LogOut, UserCircle2 } from "lucide-react"
+import { Bell, ChevronDown, LogOut, RotateCcw, UserCircle2 } from "lucide-react"
 import { clearAuthAndRedirectToLogin } from "@/lib/logout"
 
 interface HeaderProps {
@@ -23,6 +23,12 @@ export function Header({ userName = "Admin Dinas" }: HeaderProps) {
   }, [])
 
   const logout = () => clearAuthAndRedirectToLogin(router)
+
+  const reset = () => {
+    localStorage.removeItem("pokjaList")
+    setOpen(false)
+    window.location.reload()
+  }
 
   return (
     <header className="sticky top-0 z-10 bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-end shadow-sm">
@@ -53,13 +59,23 @@ export function Header({ userName = "Admin Dinas" }: HeaderProps) {
               role="menu"
               className="absolute right-0 mt-1 w-48 rounded-lg border border-gray-200 bg-white py-1 shadow-lg z-50"
             >
+              <div className="px-3 py-1.5">
+                <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Demo</p>
+              </div>
               <button
                 type="button"
                 role="menuitem"
-                onClick={() => {
-                  setOpen(false)
-                  logout()
-                }}
+                onClick={reset}
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-amber-600 hover:bg-amber-50"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Reset ke Default
+              </button>
+              <div className="my-1 border-t border-gray-100" />
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => { setOpen(false); logout() }}
                 className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
               >
                 <LogOut className="w-4 h-4 text-gray-500" />
