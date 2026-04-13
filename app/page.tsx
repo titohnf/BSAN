@@ -166,19 +166,36 @@ function AdminPageInner() {
     try {
       const stored = localStorage.getItem("pokjaList")
       const mockIds = new Set(MOCK_POKJA_LIST.map(p => p.id))
-      let userPokja: PokjaItem[] = []
+      const mockNames = new Map(MOCK_POKJA_LIST.map(p => [p.nama.trim().toLowerCase(), p]))
+
+      // Start with a mutable copy of MOCK
+      const merged = MOCK_POKJA_LIST.map(p => ({ ...p }))
+
       if (stored) {
         const parsed = JSON.parse(stored) as PokjaItem[]
-        userPokja = parsed.filter(p => !mockIds.has(p.id))
+        // Deduplicate parsed entries by id
+        const seenUser = new Set<string>()
+        for (const p of parsed) {
+          if (seenUser.has(p.id)) continue
+          seenUser.add(p.id)
+          if (mockIds.has(p.id)) continue // skip exact id collision
+
+          const key = p.nama.trim().toLowerCase()
+          if (mockNames.has(key)) {
+            // Entry from localStorage matches a MOCK by name — update the MOCK entry in-place
+            const idx = merged.findIndex(m => m.nama.trim().toLowerCase() === key)
+            if (idx !== -1) merged[idx] = { ...merged[idx], status: p.status, data: p.data }
+          } else {
+            // Genuinely new entry — append
+            merged.push(p)
+          }
+        }
       }
-      const seenUser = new Set<string>()
-      const uniqueUserPokja = userPokja.filter(p => {
-        if (seenUser.has(p.id)) return false
-        seenUser.add(p.id)
-        return true
-      })
-      localStorage.setItem("pokjaList", JSON.stringify(uniqueUserPokja))
-      return [...MOCK_POKJA_LIST, ...uniqueUserPokja]
+
+      // Persist only the non-mock entries (those not in mockIds)
+      const toSave = merged.filter(p => !mockIds.has(p.id))
+      localStorage.setItem("pokjaList", JSON.stringify(toSave))
+      return merged
     } catch {
       return MOCK_POKJA_LIST
     }
