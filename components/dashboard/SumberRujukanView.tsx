@@ -80,7 +80,7 @@ export const PENYEDIA_CONFIG: Record<string, { color: string; bg: string }> = {
 export const SEED: SumberRujukan[] = [
   {
     id: "sr-review-1",
-    namaInstansi: "Unit Layanan Psikologi Terpadu (contoh menunggu review)",
+    namaInstansi: "Unit Layanan Psikologi Terpadu",
     kategoriBentukDukungan: "Psikologi",
     kategoriPenyedia: "Pemerintah Daerah",
     provinsi: "Aceh",
@@ -145,7 +145,7 @@ export const SEED: SumberRujukan[] = [
   },
   {
     id: "sr-7",
-    namaInstansi: "Klinik Pratama Medika (contoh arsip dihapus)",
+    namaInstansi: "Klinik Pratama Medika",
     kategoriBentukDukungan: "Fasilitas Kesehatan", kategoriPenyedia: "Swasta",
     provinsi: "Aceh", kabupatenKota: "Banda Aceh", namaJalan: "Jl. Prof. Ali Hasyimi No. 20",
     nomorCallCenter: "065145678", aksesInfo: "publik", status: "dihapus",
