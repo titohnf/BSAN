@@ -161,45 +161,7 @@ function AdminPageInner() {
   const [dinasMenu, setDinasMenu] = useState<DinaMenu>("dashboard")
   const [pusatMenu, setPusatMenu] = useState<PusatMenu>("dashboard")
   const [pengajuan, setPengajuan] = useState<PengajuanPokja[]>(MOCK_PENGAJUAN)
-  const [pokjaList, setPokjaList] = useState<PokjaItem[]>(() => {
-    if (typeof window === "undefined") return MOCK_POKJA_LIST
-    try {
-      const stored = localStorage.getItem("pokjaList")
-      const mockIds = new Set(MOCK_POKJA_LIST.map(p => p.id))
-      const mockNames = new Map(MOCK_POKJA_LIST.map(p => [p.nama.trim().toLowerCase(), p]))
-
-      // Start with a mutable copy of MOCK
-      const merged = MOCK_POKJA_LIST.map(p => ({ ...p }))
-
-      if (stored) {
-        const parsed = JSON.parse(stored) as PokjaItem[]
-        // Deduplicate parsed entries by id
-        const seenUser = new Set<string>()
-        for (const p of parsed) {
-          if (seenUser.has(p.id)) continue
-          seenUser.add(p.id)
-          if (mockIds.has(p.id)) continue // skip exact id collision
-
-          const key = p.nama.trim().toLowerCase()
-          if (mockNames.has(key)) {
-            // Entry from localStorage matches a MOCK by name — update the MOCK entry in-place
-            const idx = merged.findIndex(m => m.nama.trim().toLowerCase() === key)
-            if (idx !== -1) merged[idx] = { ...merged[idx], status: p.status, data: p.data }
-          } else {
-            // Genuinely new entry — append
-            merged.push(p)
-          }
-        }
-      }
-
-      // Persist only the non-mock entries (those not in mockIds)
-      const toSave = merged.filter(p => !mockIds.has(p.id))
-      localStorage.setItem("pokjaList", JSON.stringify(toSave))
-      return merged
-    } catch {
-      return MOCK_POKJA_LIST
-    }
-  })
+  const [pokjaList, setPokjaList] = useState<PokjaItem[]>(MOCK_POKJA_LIST)
   const [selectedPengajuan, setSelectedPengajuan] = useState<PengajuanPokja | null>(null)
   const [validatingPokja, setValidatingPokja] = useState<PokjaItem | null>(null)
   const [mounted, setMounted] = useState(false)
@@ -222,6 +184,41 @@ function AdminPageInner() {
   }, [router])
 
   useEffect(() => {
+    try {
+      const stored = localStorage.getItem("pokjaList")
+      const mockIds  = new Set(MOCK_POKJA_LIST.map(p => p.id))
+      const mockNames = new Map(MOCK_POKJA_LIST.map(p => [p.nama.trim().toLowerCase(), p.id]))
+
+      // Start with a fresh mutable copy of MOCK
+      const merged: PokjaItem[] = MOCK_POKJA_LIST.map(p => ({ ...p }))
+
+      if (stored) {
+        const parsed = JSON.parse(stored) as PokjaItem[]
+        const seen = new Set<string>()
+        for (const p of parsed) {
+          if (seen.has(p.id)) continue
+          seen.add(p.id)
+          if (mockIds.has(p.id)) continue // exact id collision — skip
+
+          const key = p.nama.trim().toLowerCase()
+          if (mockNames.has(key)) {
+            // Same-named province — update the MOCK entry status/data, don't add new row
+            const idx = merged.findIndex(m => m.nama.trim().toLowerCase() === key)
+            if (idx !== -1) merged[idx] = { ...merged[idx], status: p.status, data: p.data }
+          } else {
+            // Genuinely new entry (future: kab/kota) — append
+            merged.push(p)
+          }
+        }
+      }
+
+      // Re-persist only non-mock entries (mock-named entries are now embedded in MOCK)
+      const toSave = merged.filter(p => !mockIds.has(p.id))
+      localStorage.setItem("pokjaList", JSON.stringify(toSave))
+      setPokjaList(merged)
+    } catch {
+      setPokjaList(MOCK_POKJA_LIST)
+    }
     setMounted(true)
   }, [])
 
