@@ -301,11 +301,20 @@ export function DashboardView({
 
                   {/* Info tambahan untuk status tertentu */}
                   {pokja.status === "masih-diverifikasi" && (
-                    <div className="flex items-start gap-2 p-3 bg-amber-100/50 rounded-lg border border-amber-300">
-                      <AlertTriangle className="w-4 h-4 text-amber-700 flex-shrink-0 mt-0.5" />
-                      <p className="text-xs text-amber-800">
-                        <strong>Menunggu Verifikasi:</strong> POKJA Anda sedang dalam proses verifikasi oleh admin pusat. Mohon tunggu konfirmasi lebih lanjut.
-                      </p>
+                    <div className="space-y-2">
+                      <div className="flex items-start gap-2 p-3 bg-amber-100/50 rounded-lg border border-amber-300">
+                        <AlertTriangle className="w-4 h-4 text-amber-700 flex-shrink-0 mt-0.5" />
+                        <p className="text-xs text-amber-800">
+                          <strong>Menunggu Verifikasi:</strong> POKJA Anda sedang dalam proses verifikasi oleh admin pusat. Mohon tunggu konfirmasi lebih lanjut.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => onPerbaikiPokja?.(pokja)}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        Edit Data POKJA
+                      </button>
                     </div>
                   )}
 
@@ -336,11 +345,20 @@ export function DashboardView({
                   })()}
 
                   {pokja.status === "aktif" && (
-                    <div className="flex items-start gap-2 p-3 bg-green-100/50 rounded-lg border border-green-300">
-                      <CheckCircle2 className="w-4 h-4 text-green-700 flex-shrink-0 mt-0.5" />
-                      <p className="text-xs text-green-800">
-                        <strong>POKJA Aktif:</strong> POKJA Anda telah diverifikasi dan aktif. Anda dapat mengelola kegiatan dan sumber rujukan.
-                      </p>
+                    <div className="space-y-2">
+                      <div className="flex items-start gap-2 p-3 bg-green-100/50 rounded-lg border border-green-300">
+                        <CheckCircle2 className="w-4 h-4 text-green-700 flex-shrink-0 mt-0.5" />
+                        <p className="text-xs text-green-800">
+                          <strong>POKJA Aktif:</strong> POKJA Anda telah diverifikasi dan aktif. Anda dapat mengelola kegiatan dan sumber rujukan.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => onPerbaikiPokja?.(pokja)}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        Edit Data POKJA
+                      </button>
                     </div>
                   )}
 

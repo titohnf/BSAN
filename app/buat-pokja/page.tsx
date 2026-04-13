@@ -285,6 +285,7 @@ export default function BuatPokjaPage() {
   const [step, setStep] = useState(1)
   const [submitted, setSubmitted] = useState(false)
   const [isPerbaikanMode, setIsPerbaikanMode] = useState(false)
+  const [deskripsiPerbaikan, setDeskripsiPerbaikan] = useState("")
 
   // Step 1
   const [kanalPengaduan, setKanalPengaduan] = useState("")
@@ -387,7 +388,11 @@ export default function BuatPokjaPage() {
       sk: { file: skFile, nomorSK: skDetail.nomorSK, tanggalSK: skDetail.tanggalSK, periodeMultai: skDetail.periodeMulai, periodeSelesai: skDetail.periodeSelesai },
     }
     try {
-      const serialisable = { ...payload, sk: { ...payload.sk, file: payload.sk.file?.name ?? null } }
+      const serialisable = {
+        ...payload,
+        sk: { ...payload.sk, file: payload.sk.file?.name ?? null },
+        ...(isPerbaikanMode && { deskripsiPerbaikan: deskripsiPerbaikan.trim() }),
+      }
       const key = isPerbaikanMode ? "perbaikanSubmitData" : "newPokjaData"
       sessionStorage.setItem(key, JSON.stringify(serialisable))
     } catch {}
@@ -794,6 +799,23 @@ export default function BuatPokjaPage() {
                     <ReviewRow label="Periode" value={skDetail.periodeMulai && skDetail.periodeSelesai ? `${skDetail.periodeMulai} s/d ${skDetail.periodeSelesai}` : "-"} />
                   </div>
                 </div>
+
+                {/* Deskripsi perubahan — hanya mode perbaikan/edit */}
+                {isPerbaikanMode && (
+                  <div>
+                    <div className="mb-3">
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Catatan Perubahan</p>
+                      <p className="text-xs text-gray-400 mt-0.5">Jelaskan perubahan apa saja yang Anda lakukan pada data POKJA ini.</p>
+                    </div>
+                    <textarea
+                      value={deskripsiPerbaikan}
+                      onChange={(e) => setDeskripsiPerbaikan(e.target.value)}
+                      placeholder="Contoh: Memperbarui nomor SK, mengganti anggota koordinator, dan memperpanjang periode berlaku..."
+                      rows={4}
+                      className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    />
+                  </div>
+                )}
               </div>
             )}
           </div>

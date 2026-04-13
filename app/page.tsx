@@ -346,15 +346,19 @@ function AdminPageInner() {
       const parsed = JSON.parse(raw) as Omit<PokjaData, "sk"> & {
         sk: Omit<PokjaData["sk"], "file"> & { file: string | null }
         prevStatus?: string
+        deskripsiPerbaikan?: string
       }
 
       const today = new Date().toISOString().slice(0, 10)
       const isEdit = parsed.prevStatus === "aktif"
+      const defaultAlasan = isEdit
+        ? "Data POKJA diperbarui dan diajukan ulang untuk verifikasi"
+        : "Data diperbaiki dan diajukan kembali"
       const logPerbaiki = {
         tanggal: today,
         aksi: isEdit ? "edit" : "perbaiki",
         aktor: "user",
-        alasan: isEdit ? "Data POKJA diperbarui dan diajukan ulang untuk verifikasi" : "Data diperbaiki dan diajukan kembali",
+        alasan: parsed.deskripsiPerbaikan?.trim() || defaultAlasan,
       }
 
       setPokjaList((prev) => {
