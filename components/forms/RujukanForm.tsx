@@ -491,83 +491,81 @@ function RujukanFormInner() {
 
         <SectionCard icon={<Phone className="w-4 h-4" />} title="Informasi Kontak">
           <div className="space-y-4">
+
+            {/* Info banner */}
+            {!isReadOnly && (
+              <div className="rounded-lg bg-blue-50 border border-blue-100 px-3 py-2.5 space-y-1">
+                <p className="text-xs text-blue-700">
+                  <span className="font-semibold">Nomor call center</span> dapat ditambahkan lebih dari satu.
+                </p>
+                <p className="text-xs text-blue-600">
+                  Bila call center tidak tersedia, nomor pribadi Anda akan menjadi kontak rujukan dan dapat diakses publik.
+                </p>
+              </div>
+            )}
+
+            {/* Label row */}
+            {!isReadOnly && (
+              <div className="flex gap-2 items-center">
+                <span className="flex-1 text-xs font-semibold text-gray-700">Nomor <span className="text-red-500">*</span></span>
+                <span className="w-36 text-xs font-semibold text-gray-700">Tipe Kontak</span>
+                {form.kontak.length > 1 && <span className="w-9" />}
+              </div>
+            )}
+
             {/* Kontak entries */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               {isReadOnly ? (
-                /* Read-only: display each kontak entry */
                 form.kontak.filter((k) => k.nomor.trim()).map((k, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 border border-gray-200">
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${k.tipe === "call_center" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}`}>
-                      <Phone className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">{k.tipe === "call_center" ? "Call Center" : "Nomor Pribadi"}</p>
+                  <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-50 border border-gray-200">
+                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${k.tipe === "call_center" ? "bg-blue-500" : "bg-green-500"}`} />
+                    <div className="flex-1">
                       <p className="text-sm font-medium text-gray-900">{k.nomor}</p>
                     </div>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${k.tipe === "call_center" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}`}>
+                      {k.tipe === "call_center" ? "Call Center" : "Nomor Pribadi"}
+                    </span>
                   </div>
                 ))
               ) : (
                 form.kontak.map((k, i) => (
-                  <div key={i} className="flex gap-2 items-start">
+                  <div key={i} className="flex gap-2 items-center">
                     {/* Nomor input */}
-                    <div className="flex-1">
-                      {i === 0 && <FieldLabel required>Nomor Kontak</FieldLabel>}
-                      <div className={i === 0 ? "mt-1.5" : ""}>
-                        <input
-                          type="tel"
-                          value={k.nomor}
-                          onChange={(e) => {
-                            const updated = form.kontak.map((c, idx) =>
-                              idx === i ? { ...c, nomor: e.target.value.replace(/\D/g, "") } : c
-                            )
-                            set("kontak", updated)
-                          }}
-                          placeholder="08xxxxxxxxxx"
-                          className="w-full h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white"
-                        />
-                      </div>
-                    </div>
-                    {/* Tipe toggle */}
-                    <div className="flex flex-col gap-1.5">
-                      {i === 0 && <span className="text-xs font-semibold text-gray-700">Tipe</span>}
-                      <div className={`flex rounded-lg border border-gray-300 overflow-hidden ${i === 0 ? "" : "mt-0"}`}>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const updated = form.kontak.map((c, idx) =>
-                              idx === i ? { ...c, tipe: "call_center" as const } : c
-                            )
-                            set("kontak", updated)
-                          }}
-                          className={`h-9 px-3 text-xs font-medium transition whitespace-nowrap ${k.tipe === "call_center" ? "bg-blue-600 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
-                        >
-                          Call Center
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const updated = form.kontak.map((c, idx) =>
-                              idx === i ? { ...c, tipe: "nomor_pribadi" as const } : c
-                            )
-                            set("kontak", updated)
-                          }}
-                          className={`h-9 px-3 text-xs font-medium transition whitespace-nowrap border-l border-gray-300 ${k.tipe === "nomor_pribadi" ? "bg-green-600 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
-                        >
-                          Nomor Pribadi
-                        </button>
-                      </div>
-                    </div>
+                    <input
+                      type="tel"
+                      value={k.nomor}
+                      onChange={(e) => {
+                        const updated = form.kontak.map((c, idx) =>
+                          idx === i ? { ...c, nomor: e.target.value.replace(/\D/g, "") } : c
+                        )
+                        set("kontak", updated)
+                      }}
+                      placeholder="08xxxxxxxxxx"
+                      className="flex-1 h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white"
+                    />
+                    {/* Tipe select */}
+                    <select
+                      value={k.tipe}
+                      onChange={(e) => {
+                        const updated = form.kontak.map((c, idx) =>
+                          idx === i ? { ...c, tipe: e.target.value as "call_center" | "nomor_pribadi" } : c
+                        )
+                        set("kontak", updated)
+                      }}
+                      className="w-36 h-9 px-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-700 cursor-pointer"
+                    >
+                      <option value="call_center">Call Center</option>
+                      <option value="nomor_pribadi">Nomor Pribadi</option>
+                    </select>
                     {/* Remove button */}
                     {form.kontak.length > 1 && (
-                      <div className={i === 0 ? "pt-6" : ""}>
-                        <button
-                          type="button"
-                          onClick={() => set("kontak", form.kontak.filter((_, idx) => idx !== i))}
-                          className="h-9 w-9 flex items-center justify-center rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition flex-shrink-0"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => set("kontak", form.kontak.filter((_, idx) => idx !== i))}
+                        className="h-9 w-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:border-red-200 hover:text-red-500 hover:bg-red-50 transition flex-shrink-0"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     )}
                   </div>
                 ))
@@ -579,7 +577,7 @@ function RujukanFormInner() {
               <button
                 type="button"
                 onClick={() => set("kontak", [...form.kontak, { nomor: "", tipe: "call_center" }])}
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 border border-blue-200 bg-blue-50 hover:bg-blue-100 rounded-lg px-3 py-2 transition"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-800 border border-dashed border-gray-300 hover:border-gray-400 rounded-lg px-3 py-2 transition w-full justify-center"
               >
                 <Plus className="w-3.5 h-3.5" /> Tambah Kontak
               </button>
