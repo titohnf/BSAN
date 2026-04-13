@@ -151,6 +151,12 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
 
   return (
     <div className="space-y-6">
+      {/* Title */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard Admin Pusat</h1>
+        <p className="text-sm text-gray-500 mt-1">Pantau status pembentukan POKJA di seluruh Indonesia</p>
+      </div>
+
       {/* Header Stats - 3 cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {headerStats.map((stat) => {
@@ -178,6 +184,41 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
           )
         })}
       </div>
+
+      {/* Daftar pokja menunggu verifikasi */}
+      {menunggu > 0 && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50/50 overflow-hidden">
+          <div className="px-5 py-4 border-b border-amber-100 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-600" />
+              <h3 className="text-sm font-semibold text-gray-800">POKJA Menunggu Verifikasi</h3>
+              <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-amber-200 text-amber-800 text-xs font-bold">
+                {menunggu}
+              </span>
+            </div>
+          </div>
+          <ul className="divide-y divide-amber-100">
+            {pokjaList
+              .filter((p) => p.status === "masih-diverifikasi")
+              .slice(0, 5)
+              .map((p) => (
+                <li key={p.id} className="px-5 py-3 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-4 h-4 text-amber-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-800 truncate">
+                      {(p.data?.region ?? p.nama).replace(/^Prov\.\s*/i, "")}
+                    </p>
+                  </div>
+                  <span className="text-xs text-amber-700 bg-amber-100 px-2 py-1 rounded-full">
+                    Menunggu Verifikasi
+                  </span>
+                </li>
+              ))}
+          </ul>
+        </div>
+      )}
 
       {/* Tabel Provinsi dengan Header */}
       <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
@@ -239,11 +280,6 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
                 </th>
                 <th className="px-4 py-3 text-left">
                   <button className="flex items-center gap-1 text-xs font-semibold text-gray-600 uppercase tracking-wide hover:text-gray-900">
-                    Lihat Pokja
-                  </button>
-                </th>
-                <th className="px-4 py-3 text-left">
-                  <button className="flex items-center gap-1 text-xs font-semibold text-gray-600 uppercase tracking-wide hover:text-gray-900">
                     Status Pokja
                   </button>
                 </th>
@@ -280,19 +316,8 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
                 return (
                   <tr key={prov.nama} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3.5 text-gray-500">{idx + 1}</td>
-                    <td className="px-4 py-3.5">
-                      <a href="#" className="text-blue-600 hover:text-blue-800 font-medium hover:underline">
-                        {prov.nama}
-                      </a>
-                    </td>
-                    <td className="px-4 py-3.5">
-                      <span className={`inline-block px-3 py-1 rounded-md text-xs font-medium ${
-                        lihatPokja === "Ada"
-                          ? "bg-white border border-gray-300 text-gray-700"
-                          : "bg-gray-100 border border-gray-200 text-gray-500"
-                      }`}>
-                        {lihatPokja}
-                      </span>
+                    <td className="px-4 py-3.5 font-medium text-gray-900">
+                      {prov.nama.replace(/^Prov\.\s*/i, "")}
                     </td>
                     <td className="px-4 py-3.5">
                       <span className={`inline-block px-3 py-1 rounded-md text-xs font-medium ${sc.cls}`}>
@@ -313,7 +338,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
               })}
               {/* Total Row */}
               <tr className="bg-gray-100 border-t-2 border-gray-300 font-bold">
-                <td colSpan={4} className="px-4 py-3.5 text-center text-gray-900 uppercase tracking-wide">
+                <td colSpan={3} className="px-4 py-3.5 text-center text-gray-900 uppercase tracking-wide">
                   Total Nasional
                 </td>
                 <td className="px-4 py-3.5 text-center text-gray-900">
@@ -330,39 +355,6 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
           </table>
         </div>
       </div>
-
-      {/* Daftar pokja menunggu verifikasi */}
-      {menunggu > 0 && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50/50 overflow-hidden">
-          <div className="px-5 py-4 border-b border-amber-100 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-600" />
-              <h3 className="text-sm font-semibold text-gray-800">POKJA Menunggu Verifikasi</h3>
-              <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-amber-200 text-amber-800 text-xs font-bold">
-                {menunggu}
-              </span>
-            </div>
-          </div>
-          <ul className="divide-y divide-amber-100">
-            {pokjaList
-              .filter((p) => p.status === "masih-diverifikasi")
-              .slice(0, 5)
-              .map((p) => (
-                <li key={p.id} className="px-5 py-3 flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-4 h-4 text-amber-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-800 truncate">{p.data?.region ?? p.nama}</p>
-                  </div>
-                  <span className="text-xs text-amber-700 bg-amber-100 px-2 py-1 rounded-full">
-                    Menunggu Verifikasi
-                  </span>
-                </li>
-              ))}
-          </ul>
-        </div>
-      )}
 
       {/* Sumber Rujukan */}
       <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
