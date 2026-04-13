@@ -54,7 +54,14 @@ export type PokjaStatus =
   | "belum-dibentuk"
   | "masih-diverifikasi"
   | "aktif"
-  | "ditolak"
+  | "butuh-perbaikan"
+
+export interface ValidasiLog {
+  tanggal: string
+  aksi: "pengajuan" | "terima" | "tolak" | "perbaiki" | "aktivasi" | "sk_expired"
+  aktor: "user" | "admin_pusat" | "sistem"
+  alasan?: string
+}
 
 /** One POKJA entry stored in the dinas state */
 export interface PokjaItem {
@@ -62,6 +69,9 @@ export interface PokjaItem {
   nama: string
   status: PokjaStatus
   data: PokjaData
+  tanggalDiverifikasi?: string
+  alasanPenolakan?: string
+  validasiLog: ValidasiLog[]
 }
 
 export const emptyMember = (): MemberField => ({

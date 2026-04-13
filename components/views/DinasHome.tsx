@@ -24,7 +24,7 @@ type Props = {
   onBuatPokja?: () => void
   onViewDataPokja?: () => void
   onViewSumberRujukan?: () => void
-  sumberRujukanStatus?: { total: number; aktif: number; menungguVerifikasi: number; ditolak: number }
+  sumberRujukanStatus?: { total: number; aktif: number; menungguVerifikasi: number; butuhPerbaikan: number }
   onViewActivities?: () => void
   kegiatanStatus?: { total: number; berlangsung: number; menunggu: number; selesai: number }
   isAdminPusat?: boolean
@@ -147,7 +147,7 @@ export function DashboardView({
   targetPokja = 10,
   onBuatPokja,
   onViewSumberRujukan,
-  sumberRujukanStatus = { total: 5, aktif: 3, menungguVerifikasi: 2, ditolak: 0 },
+  sumberRujukanStatus = { total: 5, aktif: 3, menungguVerifikasi: 2, butuhPerbaikan: 0 },
   onViewActivities,
   isAdminPusat,
   onValidatePusat,
@@ -161,7 +161,7 @@ export function DashboardView({
   const total    = pokjaList.length
   const aktif    = pokjaList.filter((p) => p.status === "aktif").length
   const menunggu = pokjaList.filter((p) => p.status === "masih-diverifikasi").length
-  const ditolak  = pokjaList.filter((p) => p.status === "ditolak").length
+  const butuhPerbaikan = pokjaList.filter((p) => p.status === "butuh-perbaikan").length
   const draf     = pokjaList.filter((p) => p.status === "belum-dibentuk").length
   const pending  = sumberRujukanStatus.menungguVerifikasi
 
@@ -214,7 +214,7 @@ export function DashboardView({
                   text: "text-amber-700",
                   badge: "bg-amber-100 text-amber-800" 
                 },
-                "ditolak": { 
+                "butuh-perbaikan": { 
                   bg: "bg-red-50", 
                   border: "border-red-200", 
                   text: "text-red-700",
@@ -247,7 +247,7 @@ export function DashboardView({
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${config.badge}`}>
                       {pokja.status === "aktif" ? "Aktif" : 
                        pokja.status === "masih-diverifikasi" ? "Menunggu Verifikasi" :
-                       pokja.status === "ditolak" ? "Ditolak" : "Draf"}
+                       pokja.status === "butuh-perbaikan" ? "Butuh Perbaikan" : "Draf"}
                     </span>
                   </div>
 
@@ -306,11 +306,11 @@ export function DashboardView({
                     </div>
                   )}
 
-                  {pokja.status === "ditolak" && (
+                  {pokja.status === "butuh-perbaikan" && (
                     <div className="flex items-start gap-2 p-3 bg-red-100/50 rounded-lg border border-red-300">
                       <AlertTriangle className="w-4 h-4 text-red-700 flex-shrink-0 mt-0.5" />
                       <p className="text-xs text-red-800">
-                        <strong>Ditolak:</strong> POKJA Anda tidak dapat diverifikasi. Silakan hubungi admin pusat untuk informasi lebih lanjut.
+                        <strong>Butuh Perbaikan:</strong> POKJA Anda perlu diperbaiki. Silakan hubungi admin pusat untuk informasi lebih lanjut.
                       </p>
                     </div>
                   )}

@@ -68,7 +68,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
 
   const aktif = pokjaList.filter((p) => p.status === "aktif").length
   const menunggu = pokjaList.filter((p) => p.status === "masih-diverifikasi").length
-  const ditolak = pokjaList.filter((p) => p.status === "ditolak").length
+  const butuhPerbaikan = pokjaList.filter((p) => p.status === "butuh-perbaikan").length
   const total = pokjaList.length
 
   // Hitung total provinsi, kab/kota, dan pokja kab/kota yang terbentuk
