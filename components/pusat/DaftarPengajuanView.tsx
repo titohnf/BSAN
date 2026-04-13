@@ -3,8 +3,6 @@ import { Search, MapPin, Clock, CheckCircle2, XCircle, AlertCircle, Filter, Buil
 import { useState, useMemo } from "react"
 import type { PokjaItem, PokjaStatus } from "@/types/pokja"
 
-type WilayahTipe = "provinsi" | "kabupaten" | "kota" | "semua"
-
 interface DaftarPengajuanViewProps {
   pokjaList: PokjaItem[]
   onSelect: (item: PokjaItem) => void
@@ -25,34 +23,6 @@ const STATUS_FILTER_OPTIONS: { value: PokjaStatus | "semua"; label: string }[] =
   { value: "butuh-perbaikan", label: "Butuh Perbaikan" },
 ]
 
-const TIPE_FILTER_OPTIONS: { value: WilayahTipe; label: string }[] = [
-  { value: "semua", label: "Semua Tipe" },
-  { value: "provinsi", label: "Provinsi" },
-  { value: "kabupaten", label: "Kabupaten" },
-  { value: "kota", label: "Kota" },
-]
-
-function getWilayahTipe(wilayah: string): WilayahTipe {
-  const lower = wilayah.toLowerCase()
-  if (lower.includes("kab.") || lower.includes("kabupaten")) return "kabupaten"
-  if (lower.startsWith("kota ") || lower === "kota") return "kota"
-  if (lower.startsWith("prov") || lower.startsWith("prov.")) return "provinsi"
-  return "kabupaten"
-}
-
-const TIPE_LABEL: Record<WilayahTipe, string> = {
-  provinsi: "Provinsi",
-  kabupaten: "Kabupaten",
-  kota: "Kota",
-  semua: "",
-}
-
-const TIPE_COLOR: Record<WilayahTipe, string> = {
-  provinsi: "bg-blue-50 text-blue-700",
-  kabupaten: "bg-amber-50 text-amber-700",
-  kota: "bg-purple-50 text-purple-700",
-  semua: "",
-}
 
 function isSkExpired(periodeSelesai: string): boolean {
   if (!periodeSelesai) return false
@@ -70,7 +40,6 @@ function formatDate(dateStr: string): string {
 export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanViewProps) {
   const [search, setSearch] = useState("")
   const [filterStatus, setFilterStatus] = useState<PokjaStatus | "semua">("semua")
-  const [filterTipe, setFilterTipe] = useState<WilayahTipe>("semua")
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
 
@@ -84,12 +53,10 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
   }, [pokjaList])
 
   const filtered = processedPokja.filter((p) => {
-    const matchSearch = p.nama.toLowerCase().includes(search.toLowerCase()) || 
+    const matchSearch = p.nama.toLowerCase().includes(search.toLowerCase()) ||
                         p.data?.region?.toLowerCase().includes(search.toLowerCase())
     const matchStatus = filterStatus === "semua" || p.effectiveStatus === filterStatus
-    const matchTipe = filterTipe === "semua" || getWilayahTipe(p.nama) === filterTipe
-
-    return matchSearch && matchStatus && matchTipe
+    return matchSearch && matchStatus
   })
 
   const totalPages = Math.ceil(filtered.length / itemsPerPage)
@@ -168,14 +135,7 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
                         </div>
                         <div>
                           <p className="font-medium text-gray-900 leading-tight">{p.data?.region ?? p.nama}</p>
-                          {(() => {
-                            const tipe = getWilayahTipe(p.nama)
-                            return (
-                              <span className={`inline-block text-xs font-medium px-1.5 py-0.5 rounded mt-0.5 ${TIPE_COLOR[tipe]}`}>
-                                {TIPE_LABEL[tipe]}
-                              </span>
-                            )
-                          })()}
+                          <p className="text-xs text-gray-400 mt-0.5">Provinsi</p>
                         </div>
                       </div>
                     </td>

@@ -62,66 +62,20 @@ const PROVINCE_DATA = [
   { nama: "Prov. Sumatra Utara", totalKabKota: 33, pokjaKabKota: 0 },
 ]
 
-// Map nama provinsi ke region string yang digunakan di pokjaList
-const PROVINCE_REGION_MAP: Record<string, string[]> = {
-  "Prov. Aceh": ["Aceh", "Prov. Aceh"],
-  "Prov. Bali": ["Bali", "Prov. Bali"],
-  "Prov. Banten": ["Banten", "Prov. Banten"],
-  "Prov. Bengkulu": ["Bengkulu", "Prov. Bengkulu"],
-  "Prov. D.I. Yogyakarta": ["Yogyakarta", "D.I. Yogyakarta", "Prov. D.I. Yogyakarta"],
-  "Prov. D.K.I. Jakarta": ["DKI Jakarta", "Jakarta", "Prov. D.K.I. Jakarta"],
-  "Prov. Gorontalo": ["Gorontalo", "Prov. Gorontalo"],
-  "Prov. Jambi": ["Jambi", "Prov. Jambi"],
-  "Prov. Jawa Barat": ["Jawa Barat", "Prov. Jawa Barat"],
-  "Prov. Jawa Tengah": ["Jawa Tengah", "Prov. Jawa Tengah"],
-  "Prov. Jawa Timur": ["Jawa Timur", "Prov. Jawa Timur"],
-  "Prov. Kalimantan Barat": ["Kalimantan Barat", "Prov. Kalimantan Barat"],
-  "Prov. Kalimantan Selatan": ["Kalimantan Selatan", "Prov. Kalimantan Selatan"],
-  "Prov. Kalimantan Tengah": ["Kalimantan Tengah", "Prov. Kalimantan Tengah"],
-  "Prov. Kalimantan Timur": ["Kalimantan Timur", "Prov. Kalimantan Timur"],
-  "Prov. Kalimantan Utara": ["Kalimantan Utara", "Prov. Kalimantan Utara"],
-  "Prov. Kepulauan Bangka Belitung": ["Kepulauan Bangka Belitung", "Bangka Belitung"],
-  "Prov. Kepulauan Riau": ["Kepulauan Riau", "Riau Kepulauan"],
-  "Prov. Lampung": ["Lampung", "Prov. Lampung"],
-  "Prov. Maluku": ["Maluku", "Prov. Maluku"],
-  "Prov. Maluku Utara": ["Maluku Utara", "Prov. Maluku Utara"],
-  "Prov. Nusa Tenggara Barat": ["Nusa Tenggara Barat", "NTB"],
-  "Prov. Nusa Tenggara Timur": ["Nusa Tenggara Timur", "NTT"],
-  "Prov. Papua": ["Papua", "Prov. Papua"],
-  "Prov. Papua Barat": ["Papua Barat", "Prov. Papua Barat"],
-  "Prov. Papua Barat Daya": ["Papua Barat Daya"],
-  "Prov. Papua Pegunungan": ["Papua Pegunungan"],
-  "Prov. Papua Selatan": ["Papua Selatan"],
-  "Prov. Papua Tengah": ["Papua Tengah"],
-  "Prov. Riau": ["Riau", "Prov. Riau"],
-  "Prov. Sulawesi Barat": ["Sulawesi Barat", "Prov. Sulawesi Barat"],
-  "Prov. Sulawesi Selatan": ["Sulawesi Selatan", "Prov. Sulawesi Selatan"],
-  "Prov. Sulawesi Tengah": ["Sulawesi Tengah", "Prov. Sulawesi Tengah"],
-  "Prov. Sulawesi Tenggara": ["Sulawesi Tenggara", "Prov. Sulawesi Tenggara"],
-  "Prov. Sulawesi Utara": ["Sulawesi Utara", "Prov. Sulawesi Utara"],
-  "Prov. Sumatra Barat": ["Sumatra Barat", "Sumatera Barat"],
-  "Prov. Sumatra Selatan": ["Sumatra Selatan", "Sumatera Selatan"],
-  "Prov. Sumatra Utara": ["Sumatra Utara", "Sumatera Utara"],
-}
+// Matching menggunakan exact match pada p.nama (yang kini seragam "Prov. X")
+// sehingga tidak perlu map kompleks — cukup cocokkan p.nama === prov.nama
+
 
 export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRujukan, onViewActivities }: DashboardPusatViewProps) {
   const [search, setSearch] = useState("")
   const [entriesPerPage, setEntriesPerPage] = useState(10)
 
   // Hitung pokja per provinsi dari pokjaList secara dinamis
+  // p.nama dan prov.nama sekarang keduanya menggunakan format "Prov. X" — exact match
   const enrichedProvinces = PROVINCE_DATA.map((prov) => {
-    const aliases = PROVINCE_REGION_MAP[prov.nama] ?? [prov.nama]
-    const matching = pokjaList.filter((p) => {
-      // Match by data.region first (most reliable), then fall back to nama
-      const region = (p.data?.region ?? "").trim()
-      const namaFallback = p.nama.trim()
-      const haystack = region || namaFallback
-      return aliases.some(a =>
-        haystack.toLowerCase() === a.toLowerCase() ||
-        haystack.toLowerCase().includes(a.toLowerCase()) ||
-        a.toLowerCase().includes(haystack.toLowerCase())
-      )
-    })
+    const matching = pokjaList.filter((p) =>
+      p.nama.trim().toLowerCase() === prov.nama.trim().toLowerCase()
+    )
 
     const aktifCount = matching.filter(p => p.status === "aktif").length
     const menungguCount = matching.filter(p => p.status === "masih-diverifikasi").length
