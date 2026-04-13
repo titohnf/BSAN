@@ -43,6 +43,16 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
 
+  const handleSearchChange = (value: string) => {
+    setSearch(value)
+    setCurrentPage(1)
+  }
+
+  const handleFilterChange = (value: PokjaStatus | "semua") => {
+    setFilterStatus(value)
+    setCurrentPage(1)
+  }
+
   const processedPokja = useMemo(() => {
     return pokjaList.map(p => {
       const periodeSelesai = p.data?.sk?.periodeSelesai || ""
@@ -89,7 +99,7 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
           <input
             type="search"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="Cari wilayah..."
             className="w-full h-9 pl-9 pr-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-600 focus:border-slate-600 transition"
           />
@@ -98,7 +108,7 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
           <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
           <select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value as PokjaStatus | "semua")}
+            onChange={(e) => handleFilterChange(e.target.value as PokjaStatus | "semua")}
             className="h-9 pl-9 pr-8 text-sm border border-gray-300 rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-slate-600 focus:border-slate-600 transition text-gray-700"
           >
             {STATUS_FILTER_OPTIONS.map((o) => (
