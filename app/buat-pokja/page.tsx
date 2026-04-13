@@ -86,10 +86,9 @@ function MemberSection({ label, value, onChange }: {
         </div>
         <span className="text-sm font-semibold text-gray-800">{label}</span>
       </div>
+      {/* Order: Nama, Jenis Kelamin, Instansi, Jabatan, Email, No. WhatsApp */}
       <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
         <InputField label="Nama" required placeholder="Nama lengkap" value={value.nama} onChange={(v) => onChange("nama", v)} />
-        <InputField label="Email" required type="email" placeholder="nama@dinas.go.id" value={value.email} onChange={(v) => onChange("email", v)} />
-        <InputField label="Jabatan" required placeholder="Contoh: Kepala Bidang, Staff, dll" value={value.jabatan} onChange={(v) => onChange("jabatan", v)} />
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-gray-600">Jenis Kelamin <span className="text-red-500">*</span></label>
           <div className="relative">
@@ -105,6 +104,9 @@ function MemberSection({ label, value, onChange }: {
             <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
           </div>
         </div>
+        <InputField label="Instansi" required placeholder="Nama instansi" value={value.instansi} onChange={(v) => onChange("instansi", v)} />
+        <InputField label="Jabatan" placeholder="Contoh: Kepala Bidang, Staff, dll" value={value.jabatan ?? ""} onChange={(v) => onChange("jabatan", v)} />
+        <InputField label="Email" required type="email" placeholder="nama@dinas.go.id" value={value.email} onChange={(v) => onChange("email", v)} />
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-gray-600">No. WhatsApp <span className="text-red-500">*</span></label>
           <div className="relative">
@@ -117,7 +119,6 @@ function MemberSection({ label, value, onChange }: {
             />
           </div>
         </div>
-        <InputField label="Instansi" required placeholder="Nama instansi" value={value.instansi} onChange={(v) => onChange("instansi", v)} />
       </div>
     </div>
   )
@@ -137,19 +138,9 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue }: {
         </div>
         <span className="text-sm font-semibold text-gray-800">{label}</span>
       </div>
+      {/* Order: Nama, Jenis Kelamin, Bidang, Instansi, Jabatan, Email, No. WhatsApp */}
       <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
         <InputField label="Nama" required placeholder="Nama lengkap" value={value.nama} onChange={(v) => onChange("nama", v)} />
-        <InputField label="Email" required type="email" placeholder="nama@dinas.go.id" value={value.email} onChange={(v) => onChange("email", v)} />
-        <InputField label="Jabatan" required placeholder="Contoh: Kepala Bidang, Staff, dll" value={value.jabatan} onChange={(v) => onChange("jabatan", v)} />
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-gray-600">Bidang <span className="text-red-500">*</span></label>
-          <input
-            type="text"
-            value={bidangValue}
-            disabled
-            className="w-full h-9 px-3 text-sm border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
-          />
-        </div>
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-gray-600">Jenis Kelamin <span className="text-red-500">*</span></label>
           <div className="relative">
@@ -166,6 +157,18 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue }: {
           </div>
         </div>
         <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-gray-600">Bidang <span className="text-red-500">*</span></label>
+          <input
+            type="text"
+            value={bidangValue}
+            disabled
+            className="w-full h-9 px-3 text-sm border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+          />
+        </div>
+        <InputField label="Instansi" required placeholder="Nama instansi" value={value.instansi} onChange={(v) => onChange("instansi", v)} />
+        <InputField label="Jabatan" placeholder="Contoh: Kepala Bidang, Staff, dll" value={value.jabatan ?? ""} onChange={(v) => onChange("jabatan", v)} />
+        <InputField label="Email" required type="email" placeholder="nama@dinas.go.id" value={value.email} onChange={(v) => onChange("email", v)} />
+        <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-gray-600">No. WhatsApp <span className="text-red-500">*</span></label>
           <div className="relative">
             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
@@ -177,7 +180,6 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue }: {
             />
           </div>
         </div>
-        <InputField label="Instansi" required placeholder="Nama instansi" value={value.instansi} onChange={(v) => onChange("instansi", v)} />
       </div>
     </div>
   )
@@ -206,10 +208,11 @@ function ReviewMemberCard({ label, member }: { label: string; member: MemberFiel
       {!isEmpty && (
         <div className="px-3 py-2 grid grid-cols-2 gap-x-4 gap-y-1.5">
           <ReviewRow label="Nama" value={member.nama} />
-          <ReviewRow label="Email" value={member.email} />
           <ReviewRow label="Jenis Kelamin" value={member.jenisKelamin} />
-          <ReviewRow label="No. WhatsApp" value={member.noWhatsapp} />
           <ReviewRow label="Instansi" value={member.instansi} />
+          {member.jabatan && <ReviewRow label="Jabatan" value={member.jabatan} />}
+          <ReviewRow label="Email" value={member.email} />
+          <ReviewRow label="No. WhatsApp" value={member.noWhatsapp} />
         </div>
       )}
     </div>
