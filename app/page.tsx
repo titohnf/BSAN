@@ -330,7 +330,70 @@ function AdminPageInner() {
     }
   }, [mounted, searchParams])
 
+  // Handler: perbaikan pokja dari admin dinas setelah ditolak
+  const hasProcessedPerbaikan = useRef(false)
+  useEffect(() => {
+    if (!mounted) return
+    if (searchParams.get("pokjaPerbaikan") !== "1") return
+    if (hasProcessedPerbaikan.current) return
+    hasProcessedPerbaikan.current = true
+
+    try {
+      const raw = sessionStorage.getItem("perbaikanSubmitData")
+      if (!raw) return
+      sessionStorage.removeItem("perbaikanSubmitData")
+
+      const parsed = JSON.parse(raw) as Omit<PokjaData, "sk"> & {
+        sk: Omit<PokjaData["sk"], "file"> & { file: string | null }
+      }
+
+      const today = new Date().toISOString().slice(0, 10)
+      const logPerbaiki = { tanggal: today, aksi: "perbaiki", aktor: "user", alasan: "Data diperbaiki dan diajukan kembali" }
+
+      setPokjaList((prev) => {
+        const seen = new Set<string>()
+        const deduped = prev.filter(p => { if (seen.has(p.id)) return false; seen.add(p.id); return true })
+        const idx = deduped.findIndex(p =>
+          p.nama.trim().toLowerCase() === parsed.region.trim().toLowerCase()
+        )
+        if (idx === -1) return deduped
+        const updated = [...deduped]
+        const existing = updated[idx]
+        updated[idx] = {
+          ...existing,
+          status: "masih-diverifikasi",
+          data: { ...parsed, sk: { ...parsed.sk, file: null, periodeMultai: parsed.sk.periodeMultai ?? "" } },
+          validasiLog: [...(existing.validasiLog ?? []), logPerbaiki],
+        }
+        return updated
+      })
+
+      const url = new URL(window.location.href)
+      url.searchParams.delete("pokjaPerbaikan")
+      window.history.replaceState({}, "", url.toString())
+    } catch (e) {
+      console.error("Failed to process pokja perbaikan", e)
+    }
+  }, [mounted, searchParams])
+
   const navigateToBuatPokja = () => {
+    router.push("/buat-pokja")
+  }
+
+  // Handler: admin dinas klik "Perbaiki Data" dari banner penolakan
+  const handlePerbaikiPokja = (pokja: PokjaItem) => {
+    try {
+      sessionStorage.setItem("perbaikanPokjaData", JSON.stringify({
+        nomorKanal: pokja.data?.nomorKanal ?? "",
+        members: pokja.data?.members ?? {},
+        sk: {
+          nomorSK: pokja.data?.sk?.nomorSK ?? "",
+          tanggalSK: pokja.data?.sk?.tanggalSK ?? "",
+          periodeMulai: pokja.data?.sk?.periodeMultai ?? "",
+          periodeSelesai: pokja.data?.sk?.periodeSelesai ?? "",
+        },
+      }))
+    } catch {}
     router.push("/buat-pokja")
   }
 
@@ -368,6 +431,7 @@ function AdminPageInner() {
                   onBuatPokja={navigateToBuatPokja}
                   isAdminPusat={false}
                   onValidatePusat={(p) => setValidatingPokja(p)}
+                  onPerbaikiPokja={handlePerbaikiPokja}
                 />
               )}
               {dinasMenu === "sumber-rujukan" && <SumberRujukanView />}

@@ -270,9 +270,10 @@ interface DataPokjaViewProps {
   onBuatPokja: () => void
   isAdminPusat?: boolean
   onValidatePusat?: (pokja: PokjaItem) => void
+  onPerbaikiPokja?: (pokja: PokjaItem) => void
 }
 
-export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidatePusat }: DataPokjaViewProps) {
+export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidatePusat, onPerbaikiPokja }: DataPokjaViewProps) {
   const [detailPokja, setDetailPokja] = useState<PokjaItem | null>(null)
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
@@ -330,6 +331,39 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                 )}
               </div>
             </div>
+
+            {/* Banner penolakan — hanya tampil untuk admin dinas saat status butuh-perbaikan */}
+            {!isAdminPusat && pokja.status === "butuh-perbaikan" && (() => {
+              const logTolak = [...(pokja.validasiLog ?? [])].reverse().find(l => l.aksi === "tolak")
+              return (
+                <div className="rounded-xl border border-red-200 bg-red-50 p-4">
+                  <div className="flex items-start gap-3">
+                    <XCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-red-800 mb-1">Pengajuan Ditolak oleh Admin Pusat</p>
+                      {logTolak?.alasan && (
+                        <p className="text-sm text-red-700 bg-red-100 rounded-lg px-3 py-2 border border-red-200">
+                          <span className="font-medium">Alasan: </span>{logTolak.alasan}
+                        </p>
+                      )}
+                      {!logTolak?.alasan && (
+                        <p className="text-sm text-red-600">Silakan perbaiki data POKJA Anda dan ajukan kembali.</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="mt-4 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => onPerbaikiPokja?.(pokja)}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors"
+                    >
+                      <FileText className="w-4 h-4" />
+                      Perbaiki Data POKJA
+                    </button>
+                  </div>
+                </div>
+              )
+            })()}
 
             {/* Grid info utama */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

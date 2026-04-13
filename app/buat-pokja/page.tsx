@@ -284,6 +284,7 @@ export default function BuatPokjaPage() {
 
   const [step, setStep] = useState(1)
   const [submitted, setSubmitted] = useState(false)
+  const [isPerbaikanMode, setIsPerbaikanMode] = useState(false)
 
   // Step 1
   const [kanalPengaduan, setKanalPengaduan] = useState("")
@@ -310,6 +311,34 @@ export default function BuatPokjaPage() {
   const [skFile, setSkFile] = useState<File | null>(null)
   const [fileError, setFileError] = useState("")
   const [skDetail, setSkDetail] = useState({ nomorSK: "", tanggalSK: "", periodeMulai: "", periodeSelesai: "" })
+
+  // ---------------------------------------------------------------------------
+  // Mount: baca perbaikanPokjaData dari sessionStorage untuk mode perbaikan
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("perbaikanPokjaData")
+      if (!raw) return
+      const parsed = JSON.parse(raw) as {
+        nomorKanal: string
+        members: Members
+        sk: { nomorSK: string; tanggalSK: string; periodeMulai: string; periodeSelesai: string }
+      }
+      setIsPerbaikanMode(true)
+      setKanalPengaduan(parsed.nomorKanal ?? "")
+      if (parsed.members) setMembers(parsed.members)
+      if (parsed.sk) {
+        setSkDetail({
+          nomorSK: parsed.sk.nomorSK ?? "",
+          tanggalSK: parsed.sk.tanggalSK ?? "",
+          periodeMulai: parsed.sk.periodeMulai ?? "",
+          periodeSelesai: parsed.sk.periodeSelesai ?? "",
+        })
+      }
+      // Hapus setelah dibaca agar tidak terbawa ke sesi lain
+      sessionStorage.removeItem("perbaikanPokjaData")
+    } catch {}
+  }, [])
 
   // ---------------------------------------------------------------------------
   // Auto-fill dummy data
@@ -351,22 +380,21 @@ export default function BuatPokjaPage() {
   const handleBack = () => setStep((s) => Math.max(s - 1, 1))
 
   const handleSubmit = () => {
-    setSubmitted(true)
     const payload: PokjaData = {
       region: REGION,
       nomorKanal: kanalPengaduan,
       members,
       sk: { file: skFile, nomorSK: skDetail.nomorSK, tanggalSK: skDetail.tanggalSK, periodeMultai: skDetail.periodeMulai, periodeSelesai: skDetail.periodeSelesai },
     }
-    // Store in sessionStorage so page.tsx can pick it up on navigate-back
     try {
       const serialisable = { ...payload, sk: { ...payload.sk, file: payload.sk.file?.name ?? null } }
-      sessionStorage.setItem("newPokjaData", JSON.stringify(serialisable))
+      const key = isPerbaikanMode ? "perbaikanSubmitData" : "newPokjaData"
+      sessionStorage.setItem(key, JSON.stringify(serialisable))
     } catch {}
     setSubmitted(true)
   }
 
-  // Navigate after success screen using window.location to avoid router initialization issues
+  // Navigate after success screen
   useEffect(() => {
     if (!submitted) return
     const t = setTimeout(() => {
@@ -375,15 +403,16 @@ export default function BuatPokjaPage() {
           return JSON.parse(sessionStorage.getItem("auth") || "{}").role
         } catch { return null }
       })()
-      
-      if (role === "pusat") {
+      if (isPerbaikanMode) {
+        window.location.href = "/?pokjaPerbaikan=1"
+      } else if (role === "pusat") {
         window.location.href = "/?pokjaCreated=1"
       } else {
         window.location.href = "/?pokjaSubmitted=1"
       }
     }, 1800)
     return () => clearTimeout(t)
-  }, [submitted])
+  }, [submitted, isPerbaikanMode])
 
   // ---------------------------------------------------------------------------
   // Success screen
@@ -403,12 +432,18 @@ export default function BuatPokjaPage() {
             <CheckCircle2 className="w-8 h-8 text-green-600" />
           </div>
           <h3 className="text-xl font-bold text-gray-900">
-            {isPusat ? "POKJA Berhasil Dibuat!" : "Data Pokja Berhasil Dikirim!"}
+            {isPerbaikanMode
+              ? "Perbaikan Berhasil Dikirim!"
+              : isPusat
+                ? "POKJA Berhasil Dibuat!"
+                : "Data Pokja Berhasil Dikirim!"}
           </h3>
           <p className="text-sm text-gray-500 leading-relaxed">
-            {isPusat 
-              ? `POKJA untuk wilayah ${REGION} telah dibuat dan aktif.`
-              : `Data Pokja wilayah ${REGION} sedang menunggu verifikasi dari Admin Pusat.`
+            {isPerbaikanMode
+              ? `Perbaikan data POKJA wilayah ${REGION} telah dikirim dan kembali menunggu verifikasi Admin Pusat.`
+              : isPusat
+                ? `POKJA untuk wilayah ${REGION} telah dibuat dan aktif.`
+                : `Data Pokja wilayah ${REGION} sedang menunggu verifikasi dari Admin Pusat.`
             }
           </p>
           <p className="text-xs text-gray-400">Mengalihkan ke dashboard...</p>
@@ -434,7 +469,14 @@ export default function BuatPokjaPage() {
               Kembali
             </button>
             <span className="text-gray-300">/</span>
-            <h1 className="text-sm font-semibold text-gray-900">Pembentukan POKJA — {REGION}</h1>
+            <h1 className="text-sm font-semibold text-gray-900">
+              {isPerbaikanMode ? "Perbaikan Data POKJA" : "Pembentukan POKJA"} — {REGION}
+            </h1>
+            {isPerbaikanMode && (
+              <span className="text-xs font-medium text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">
+                Mode Perbaikan
+              </span>
+            )}
           </div>
 
           {/* Auto-fill button */}
@@ -783,7 +825,8 @@ export default function BuatPokjaPage() {
               onClick={handleSubmit}
               className="flex items-center gap-2 px-6 py-2 text-sm font-semibold bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
             >
-              <CheckCircle2 className="w-4 h-4" /> Submit Pengajuan
+              <CheckCircle2 className="w-4 h-4" />
+              {isPerbaikanMode ? "Kirim Perbaikan" : "Submit Pengajuan"}
             </button>
           )}
         </div>
