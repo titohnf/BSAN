@@ -133,6 +133,12 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
     }
   })
 
+  // Variabel agregat dari pokjaList (digunakan di bagian bawah komponen)
+  const aktif = pokjaList.filter((p) => p.status === "aktif").length
+  const menunggu = pokjaList.filter((p) => p.status === "masih-diverifikasi").length
+  const ditolak = pokjaList.filter((p) => p.status === "ditolak").length
+  const total = pokjaList.length
+
   // Hitung total provinsi, kab/kota, dan pokja kab/kota yang terbentuk
   const totalProvinsi = PROVINCE_DATA.length
   const totalKabKota = PROVINCE_DATA.reduce((sum, p) => sum + p.totalKabKota, 0)
