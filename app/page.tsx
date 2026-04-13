@@ -177,7 +177,28 @@ function AdminPageInner() {
   const [dinasMenu, setDinasMenu] = useState<DinaMenu>("dashboard")
   const [pusatMenu, setPusatMenu] = useState<PusatMenu>("dashboard")
   const [pengajuan, setPengajuan] = useState<PengajuanPokja[]>(MOCK_PENGAJUAN)
-  const [pokjaList, setPokjaList] = useState<PokjaItem[]>(MOCK_POKJA_LIST)
+  const [pokjaList, setPokjaList] = useState<PokjaItem[]>(() => {
+    if (typeof window === "undefined") return MOCK_POKJA_LIST
+    try {
+      const stored = localStorage.getItem("pokjaList")
+      const mockIds = new Set(MOCK_POKJA_LIST.map(p => p.id))
+      let userPokja: PokjaItem[] = []
+      if (stored) {
+        const parsed = JSON.parse(stored) as PokjaItem[]
+        userPokja = parsed.filter(p => !mockIds.has(p.id))
+      }
+      const seenUser = new Set<string>()
+      const uniqueUserPokja = userPokja.filter(p => {
+        if (seenUser.has(p.id)) return false
+        seenUser.add(p.id)
+        return true
+      })
+      localStorage.setItem("pokjaList", JSON.stringify(uniqueUserPokja))
+      return [...MOCK_POKJA_LIST, ...uniqueUserPokja]
+    } catch {
+      return MOCK_POKJA_LIST
+    }
+  })
   const [selectedPengajuan, setSelectedPengajuan] = useState<PengajuanPokja | null>(null)
   const [validatingPokja, setValidatingPokja] = useState<PokjaItem | null>(null)
   const [mounted, setMounted] = useState(false)
@@ -200,28 +221,6 @@ function AdminPageInner() {
   }, [router])
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("pokjaList")
-      const mockIds = new Set(MOCK_POKJA_LIST.map(p => p.id))
-      let userPokja: PokjaItem[] = []
-      if (stored) {
-        const parsed = JSON.parse(stored) as PokjaItem[]
-        // Strip any entry whose id collides with a mock entry
-        userPokja = parsed.filter(p => !mockIds.has(p.id))
-      }
-      // Deduplicate remaining user entries by id
-      const seen = new Set<string>(mockIds)
-      const uniqueUserPokja = userPokja.filter(p => {
-        if (seen.has(p.id)) return false
-        seen.add(p.id)
-        return true
-      })
-      // Immediately persist the cleaned list so stale ids are gone
-      localStorage.setItem("pokjaList", JSON.stringify(uniqueUserPokja))
-      setPokjaList([...MOCK_POKJA_LIST, ...uniqueUserPokja])
-    } catch {
-      setPokjaList(MOCK_POKJA_LIST)
-    }
     setMounted(true)
   }, [])
 
