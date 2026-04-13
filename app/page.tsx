@@ -150,7 +150,7 @@ const MOCK_POKJA_LIST: PokjaItem[] = [
       sk: { file: null, nomorSK: "456/005/2024", tanggalSK: "2024-02-01", periodeMultai: "2024-02-01", periodeSelesai: "2027-02-01" } 
     } 
   },
-  { id: "p5", nama: "Prov. Aceh", status: "belum-dibentuk", data: { region: "Aceh", nomorKanal: "", members: { catatan: emptyMember() }, sk: { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" } } },
+  { id: "p5", nama: "Prov. Aceh", status: "belum-dibentuk", data: { region: "Prov. Aceh", nomorKanal: "", members: { catatan: emptyMember() }, sk: { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" } } },
   { id: "p6", nama: "Prov. Bali", status: "belum-dibentuk", data: { region: "Bali", nomorKanal: "", members: { catatan: emptyMember() }, sk: { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" } } },
   { id: "p7", nama: "Prov. Banten", status: "belum-dibentuk", data: { region: "Banten", nomorKanal: "", members: { catatan: emptyMember() }, sk: { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" } } },
   { id: "p8", nama: "Prov. Bengkulu", status: "belum-dibentuk", data: { region: "Bengkulu", nomorKanal: "", members: { catatan: emptyMember() }, sk: { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" } } },
@@ -275,14 +275,23 @@ function AdminPageInner() {
       }
 
       setPokjaList((prev) => {
-        if (prev.some(p => p.id === newId)) return prev
-        // Deduplicate entire list sebelum menambah item baru
+        // Deduplicate entire list
         const seen = new Set<string>()
         const deduped = prev.filter(p => {
           if (seen.has(p.id)) return false
           seen.add(p.id)
           return true
         })
+        // Jika sudah ada pokja dengan region sama, update statusnya — jangan tambah baru
+        const sameRegionIdx = deduped.findIndex(p => 
+          (p.data?.region ?? p.nama).toLowerCase() === (newPokja.data?.region ?? newPokja.nama).toLowerCase()
+        )
+        if (sameRegionIdx !== -1) {
+          const updated = [...deduped]
+          updated[sameRegionIdx] = { ...updated[sameRegionIdx], status: newPokja.status, data: newPokja.data }
+          return updated
+        }
+        if (deduped.some(p => p.id === newId)) return deduped
         return [...deduped, newPokja]
       })
 

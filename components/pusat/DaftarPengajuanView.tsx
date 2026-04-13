@@ -35,9 +35,23 @@ const TIPE_FILTER_OPTIONS: { value: WilayahTipe; label: string }[] = [
 function getWilayahTipe(wilayah: string): WilayahTipe {
   const lower = wilayah.toLowerCase()
   if (lower.includes("kab.") || lower.includes("kabupaten")) return "kabupaten"
-  if (lower.includes("kota") || lower.includes("kota ") || lower === "kota") return "kota"
+  if (lower.startsWith("kota ") || lower === "kota") return "kota"
   if (lower.startsWith("prov") || lower.startsWith("prov.")) return "provinsi"
   return "kabupaten"
+}
+
+const TIPE_LABEL: Record<WilayahTipe, string> = {
+  provinsi: "Provinsi",
+  kabupaten: "Kabupaten",
+  kota: "Kota",
+  semua: "",
+}
+
+const TIPE_COLOR: Record<WilayahTipe, string> = {
+  provinsi: "bg-blue-50 text-blue-700",
+  kabupaten: "bg-amber-50 text-amber-700",
+  kota: "bg-purple-50 text-purple-700",
+  semua: "",
 }
 
 function isSkExpired(periodeSelesai: string): boolean {
@@ -74,6 +88,7 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
                         p.data?.region?.toLowerCase().includes(search.toLowerCase())
     const matchStatus = filterStatus === "semua" || p.effectiveStatus === filterStatus
     const matchTipe = filterTipe === "semua" || getWilayahTipe(p.nama) === filterTipe
+
     return matchSearch && matchStatus && matchTipe
   })
 
@@ -153,6 +168,14 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
                         </div>
                         <div>
                           <p className="font-medium text-gray-900 leading-tight">{p.data?.region ?? p.nama}</p>
+                          {(() => {
+                            const tipe = getWilayahTipe(p.nama)
+                            return (
+                              <span className={`inline-block text-xs font-medium px-1.5 py-0.5 rounded mt-0.5 ${TIPE_COLOR[tipe]}`}>
+                                {TIPE_LABEL[tipe]}
+                              </span>
+                            )
+                          })()}
                         </div>
                       </div>
                     </td>
