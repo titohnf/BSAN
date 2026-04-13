@@ -306,6 +306,7 @@ function AdminPageInner() {
               {dinasMenu === "dashboard" && (
                 <DashboardView
                   pokjaList={pokjaList.filter((p) => p.data.region === REGION)}
+                  onBuatPokja={navigateToBuatPokja}
                   onViewDataPokja={() => setDinasMenu("data-pokja")}
                   onViewSumberRujukan={() => setDinasMenu("sumber-rujukan")}
                   onViewActivities={() => setDinasMenu("kActivities")}
