@@ -158,11 +158,12 @@ export function DashboardView({
 
   useEffect(() => { setMounted(true) }, [])
 
-  const total    = pokjaList.length
-  const aktif    = pokjaList.filter((p) => p.status === "aktif").length
-  const menunggu = pokjaList.filter((p) => p.status === "masih-diverifikasi").length
-  const butuhPerbaikan = pokjaList.filter((p) => p.status === "butuh-perbaikan").length
-  const draf     = pokjaList.filter((p) => p.status === "belum-dibentuk").length
+  // Abaikan entry placeholder "belum-dibentuk" dari MOCK — dinas dianggap belum punya pokja
+  const activePokjaList = pokjaList.filter((p) => p.status !== "belum-dibentuk")
+  const total    = activePokjaList.length
+  const aktif    = activePokjaList.filter((p) => p.status === "aktif").length
+  const menunggu = activePokjaList.filter((p) => p.status === "masih-diverifikasi").length
+  const butuhPerbaikan = activePokjaList.filter((p) => p.status === "butuh-perbaikan").length
   const pending  = sumberRujukanStatus.menungguVerifikasi
 
   const pendingData = [
@@ -181,7 +182,7 @@ export function DashboardView({
       <Panel>
         <PanelHeader title="POKJA">
           {/* Tampilkan tombol Buat POKJA jika: Admin Pusat (bisa banyak) atau Dinas belum punya */}
-          {(isAdminPusat || total === 0) && <ViewBtn label="Buat POKJA" onClick={onBuatPokja} />}
+          {total === 0 && <ViewBtn label="Buat POKJA" onClick={onBuatPokja} />}
         </PanelHeader>
         
         {/* Jika belum ada pokja, tampilkan empty state */}
@@ -200,7 +201,7 @@ export function DashboardView({
         ) : (
           /* Jika sudah ada pokja, tampilkan informasi detail pokja */
           <div className="px-5 py-4">
-            {pokjaList.map((pokja) => {
+            {activePokjaList.map((pokja) => {
               const statusConfig = {
                 "aktif": { 
                   bg: "bg-green-50", 
