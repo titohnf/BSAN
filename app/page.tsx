@@ -229,9 +229,13 @@ function AdminPageInner() {
     if (!mounted) return
     try {
       const mockIds = new Set(MOCK_POKJA_LIST.map(p => p.id))
+      const mockNames = new Set(MOCK_POKJA_LIST.map(p => p.nama.trim().toLowerCase()))
       const seen = new Set<string>()
       const userPokja = pokjaList.filter(p => {
-        if (mockIds.has(p.id) || seen.has(p.id)) return false
+        // Exclude mock entries (by id) and any stale user entries whose name matches a mock
+        if (mockIds.has(p.id)) return false
+        if (mockNames.has(p.nama.trim().toLowerCase())) return false
+        if (seen.has(p.id)) return false
         seen.add(p.id)
         return true
       })
