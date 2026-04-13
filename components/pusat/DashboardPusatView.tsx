@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import { ClipboardList, CheckCircle2, XCircle, Clock, MapPin, Users, Plus, ChevronRight, AlertTriangle, Building2, MapPinned, TrendingUp } from "lucide-react"
-import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts"
+import { PieChart, Pie, Cell } from "recharts"
 import type { PokjaItem } from "@/types/pokja"
 
 interface DashboardPusatViewProps {
@@ -427,13 +427,11 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
         <div className="px-5 py-4 grid grid-cols-1 lg:grid-cols-2 gap-5">
           <div className="flex flex-col items-center justify-center gap-4">
             <div className="relative w-44 h-44 flex-shrink-0">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
+              <PieChart width={176} height={176}>
                   <Pie data={RUJUKAN_BREAKDOWN} cx="50%" cy="50%" innerRadius={54} outerRadius={80} dataKey="count" startAngle={90} endAngle={-270} stroke="none">
                     {RUJUKAN_BREAKDOWN.map((_, i) => <Cell key={`cell-${i}`} fill={RUJUKAN_COLORS[i]} />)}
                   </Pie>
                 </PieChart>
-              </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <p className="text-2xl font-bold text-gray-900">{RUJUKAN_BREAKDOWN.reduce((a,b)=>a+b.count,0)}</p>
                 <p className="text-xs text-gray-500">Total</p>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { ChevronRight, AlertTriangle, CheckCircle2 } from "lucide-react"
-import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts"
+import { PieChart, Pie, Cell } from "recharts"
 
 export type { PokjaStatus, PokjaItem } from "@/types/pokja"
 import type { PokjaItem } from "@/types/pokja"
@@ -344,8 +344,7 @@ export function DashboardView({
         <div className="px-5 py-4 grid grid-cols-1 lg:grid-cols-2 gap-5">
           <div className="flex flex-col items-center justify-center gap-4">
             <div className="relative w-44 h-44 flex-shrink-0">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
+              <PieChart width={176} height={176}>
                   <Pie
                     data={RUJUKAN_BREAKDOWN}
                     cx="50%"
@@ -369,7 +368,6 @@ export function DashboardView({
                     ))}
                   </Pie>
                 </PieChart>
-              </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                 {hoveredRujukan ? (
                   <div className="text-center px-2">

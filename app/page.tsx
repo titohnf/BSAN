@@ -202,19 +202,22 @@ function AdminPageInner() {
   useEffect(() => {
     try {
       const stored = localStorage.getItem("pokjaList")
-      const dummyIds = new Set(["p1", "p2", "p3"])
+      const mockIds = new Set(MOCK_POKJA_LIST.map(p => p.id))
       let userPokja: PokjaItem[] = []
       if (stored) {
         const parsed = JSON.parse(stored) as PokjaItem[]
-        userPokja = parsed.filter(p => !dummyIds.has(p.id))
+        // Strip any entry whose id collides with a mock entry
+        userPokja = parsed.filter(p => !mockIds.has(p.id))
       }
-      // Deduplicate by id
-      const seen = new Set<string>(["p1", "p2", "p3"])
+      // Deduplicate remaining user entries by id
+      const seen = new Set<string>(mockIds)
       const uniqueUserPokja = userPokja.filter(p => {
         if (seen.has(p.id)) return false
         seen.add(p.id)
         return true
       })
+      // Immediately persist the cleaned list so stale ids are gone
+      localStorage.setItem("pokjaList", JSON.stringify(uniqueUserPokja))
       setPokjaList([...MOCK_POKJA_LIST, ...uniqueUserPokja])
     } catch {
       setPokjaList(MOCK_POKJA_LIST)
@@ -225,10 +228,10 @@ function AdminPageInner() {
   useEffect(() => {
     if (!mounted) return
     try {
-      const dummyIds = new Set(["p1", "p2", "p3"])
+      const mockIds = new Set(MOCK_POKJA_LIST.map(p => p.id))
       const seen = new Set<string>()
       const userPokja = pokjaList.filter(p => {
-        if (dummyIds.has(p.id) || seen.has(p.id)) return false
+        if (mockIds.has(p.id) || seen.has(p.id)) return false
         seen.add(p.id)
         return true
       })
