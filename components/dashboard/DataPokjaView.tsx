@@ -288,9 +288,14 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
     )
   })
 
-  // Untuk admin dinas yang hanya punya 1 pokja, tampilkan detail view
-  const isDinasWithOnePokja = !isAdminPusat && pokjaList.length === 1
-  const pokja = isDinasWithOnePokja ? pokjaList[0] : null
+  // Untuk admin dinas: abaikan entry belum-dibentuk (entry placeholder dari MOCK)
+  const activePokjaList = !isAdminPusat
+    ? pokjaList.filter(p => p.status !== "belum-dibentuk")
+    : pokjaList
+
+  // Untuk admin dinas yang hanya punya 1 pokja aktif/menunggu/butuh-perbaikan, tampilkan detail view
+  const isDinasWithOnePokja = !isAdminPusat && activePokjaList.length === 1
+  const pokja = isDinasWithOnePokja ? activePokjaList[0] : null
 
   return (
     <div className="space-y-6">
@@ -306,7 +311,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-        {pokjaList.length === 0 ? (
+        {activePokjaList.length === 0 ? (
           <EmptyStatePokja onBuatPokja={onBuatPokja} />
         ) : isDinasWithOnePokja && pokja ? (
           /* Detail view untuk admin dinas yang punya 1 pokja */
