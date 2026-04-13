@@ -423,6 +423,7 @@ function AdminPageInner() {
                   onViewDataPokja={() => setDinasMenu("data-pokja")}
                   onViewSumberRujukan={() => setDinasMenu("sumber-rujukan")}
                   onViewActivities={() => setDinasMenu("kActivities")}
+                  onPerbaikiPokja={handlePerbaikiPokja}
                 />
               )}
               {dinasMenu === "data-pokja" && (

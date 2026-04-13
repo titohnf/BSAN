@@ -29,6 +29,7 @@ type Props = {
   kegiatanStatus?: { total: number; berlangsung: number; menunggu: number; selesai: number }
   isAdminPusat?: boolean
   onValidatePusat?: (pokja: PokjaItem) => void
+  onPerbaikiPokja?: (pokja: PokjaItem) => void
 }
 
 function Panel({ children }: { children: React.ReactNode }) {
@@ -151,6 +152,7 @@ export function DashboardView({
   onViewActivities,
   isAdminPusat,
   onValidatePusat,
+  onPerbaikiPokja,
 }: Props) {
   const [mounted, setMounted] = useState(false)
   const [selectedItem, setSelectedItem] = useState<{ nama: string; jenis: string; kontak: string } | null>(null)
@@ -307,14 +309,31 @@ export function DashboardView({
                     </div>
                   )}
 
-                  {pokja.status === "butuh-perbaikan" && (
-                    <div className="flex items-start gap-2 p-3 bg-red-100/50 rounded-lg border border-red-300">
-                      <AlertTriangle className="w-4 h-4 text-red-700 flex-shrink-0 mt-0.5" />
-                      <p className="text-xs text-red-800">
-                        <strong>Butuh Perbaikan:</strong> POKJA Anda perlu diperbaiki. Silakan hubungi admin pusat untuk informasi lebih lanjut.
-                      </p>
-                    </div>
-                  )}
+                  {pokja.status === "butuh-perbaikan" && (() => {
+                    const logTolak = [...(pokja.validasiLog ?? [])].reverse().find(l => l.aksi === "tolak")
+                    return (
+                      <div className="rounded-xl border border-red-200 bg-red-50 p-4 space-y-3">
+                        <div className="flex items-start gap-2">
+                          <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold text-red-800">Pengajuan Ditolak oleh Admin Pusat</p>
+                            {logTolak?.alasan && (
+                              <p className="text-xs text-red-700 mt-1 bg-red-100 rounded px-2 py-1.5 border border-red-200">
+                                <span className="font-medium">Alasan: </span>{logTolak.alasan}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => onPerbaikiPokja?.(pokja)}
+                          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors"
+                        >
+                          Perbaiki Data POKJA
+                        </button>
+                      </div>
+                    )
+                  })()}
 
                   {pokja.status === "aktif" && (
                     <div className="flex items-start gap-2 p-3 bg-green-100/50 rounded-lg border border-green-300">
