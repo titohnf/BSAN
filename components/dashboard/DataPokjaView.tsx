@@ -27,7 +27,7 @@ const STATUS_CONFIG = {
   "belum-dibentuk": { label: "Belum Dibentuk", variant: "neutral" as const, icon: Clock },
   "masih-diverifikasi": { label: "Menunggu Verifikasi", variant: "warning" as const, icon: Clock },
   aktif: { label: "Aktif", variant: "success" as const, icon: CheckCircle2 },
-  ditolak: { label: "Ditolak", variant: "error" as const, icon: XCircle },
+  "butuh-perbaikan": { label: "Butuh Perbaikan", variant: "error" as const, icon: XCircle },
 }
 
 const ROLE_BADGE_MAP: Record<string, "informational" | "success" | "warning" | "neutral"> = {

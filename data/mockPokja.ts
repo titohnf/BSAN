@@ -20,7 +20,7 @@ export type PengajuanStatus =
   | "menunggu-validasi"
   | "disetujui"
   | "ditolak-sebagian"
-  | "ditolak"
+  | "butuh-perbaikan"
 
 export interface PengajuanPokja {
   id: string
@@ -156,7 +156,7 @@ export const MOCK_PENGAJUAN: PengajuanPokja[] = [
     periodeSelesai: "2027-04-07",
     skFileName: "SK_POKJA_Jateng.pdf",
     tanggalPengajuan: "2024-03-22",
-    status: "ditolak",
+    status: "butuh-perbaikan",
     alasanPenolakan: "Dokumen SK tidak memenuhi format yang ditentukan. Nomor SK tidak sesuai dengan ketentuan administrasi.",
     members: [
       makeMember("Ketua Pokja", "Dr. Slamet Riyadi", "slamet.riyadi@jateng.go.id", "Laki-Laki", "08511234567", "Dinas Pendidikan Prov. Jateng"),

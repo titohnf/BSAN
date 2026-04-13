@@ -5,18 +5,13 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { clearAuthAndRedirectToLogin } from "@/lib/logout"
 
-export type PusatMenu = "dashboard" | "data-pokja" | "sumber-rujukan" | "kegiatan"
-
-interface SidebarPusatProps {
-  activeMenu: PusatMenu
-  onMenuChange: (menu: PusatMenu) => void
-}
+export type PusatMenu = "dashboard" | "pokja" | "sumber-rujukan" | "kegiatan"
 
 const navItems = [
   { id: "dashboard" as PusatMenu, label: "Dashboard", icon: LayoutDashboard },
-  { id: "data-pokja" as PusatMenu, label: "Data Pokja", icon: Users },
+  { id: "pokja" as PusatMenu, label: "POKJA", icon: Users },
   { id: "sumber-rujukan" as PusatMenu, label: "Sumber Rujukan", icon: BookOpenCheck },
-  { id: "kegiatan" as PusatMenu, label: " kegiatan", icon: CalendarDays },
+  { id: "k" as PusatMenu, label: " kegiatan", icon: CalendarDays },
 ]
 
 export function SidebarPusat({ activeMenu, onMenuChange }: SidebarPusatProps) {
