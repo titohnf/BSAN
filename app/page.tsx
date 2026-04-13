@@ -198,22 +198,32 @@ function AdminPageInner() {
         for (const p of parsed) {
           if (seen.has(p.id)) continue
           seen.add(p.id)
-          if (mockIds.has(p.id)) continue // exact id collision — skip
+
+          if (mockIds.has(p.id)) {
+            // Entri MOCK yang statusnya berubah — update langsung via id
+            const idx = merged.findIndex(m => m.id === p.id)
+            if (idx !== -1) merged[idx] = { ...merged[idx], status: p.status, data: p.data }
+            continue
+          }
 
           const key = p.nama.trim().toLowerCase()
           if (mockNames.has(key)) {
-            // Same-named province — update the MOCK entry status/data, don't add new row
+            // Entri lama yang disimpan dengan id berbeda tapi nama sama — update MOCK entry
             const idx = merged.findIndex(m => m.nama.trim().toLowerCase() === key)
             if (idx !== -1) merged[idx] = { ...merged[idx], status: p.status, data: p.data }
           } else {
-            // Genuinely new entry (future: kab/kota) — append
+            // Genuinely new entry — append
             merged.push(p)
           }
         }
       }
 
-      // Re-persist only non-mock entries (mock-named entries are now embedded in MOCK)
-      const toSave = merged.filter(p => !mockIds.has(p.id))
+      // Re-persist: MOCK entries hanya jika statusnya berubah dari default, plus entri genuinely baru
+      const mockDefaults = new Map(MOCK_POKJA_LIST.map(p => [p.id, p.status]))
+      const toSave = merged.filter(p => {
+        if (mockDefaults.has(p.id)) return p.status !== mockDefaults.get(p.id)
+        return true
+      })
       localStorage.setItem("pokjaList", JSON.stringify(toSave))
       setPokjaList(merged)
     } catch {
@@ -225,18 +235,17 @@ function AdminPageInner() {
   useEffect(() => {
     if (!mounted) return
     try {
-      const mockIds = new Set(MOCK_POKJA_LIST.map(p => p.id))
-      const mockNames = new Set(MOCK_POKJA_LIST.map(p => p.nama.trim().toLowerCase()))
+      const mockDefaults = new Map(MOCK_POKJA_LIST.map(p => [p.id, p.status]))
       const seen = new Set<string>()
-      const userPokja = pokjaList.filter(p => {
-        // Exclude mock entries (by id) and any stale user entries whose name matches a mock
-        if (mockIds.has(p.id)) return false
-        if (mockNames.has(p.nama.trim().toLowerCase())) return false
+      const toSave = pokjaList.filter(p => {
         if (seen.has(p.id)) return false
         seen.add(p.id)
+        // Jika entri ini ada di MOCK, simpan hanya jika statusnya berbeda dari default MOCK
+        if (mockDefaults.has(p.id)) return p.status !== mockDefaults.get(p.id)
+        // Entri non-MOCK (genuinely user-created) selalu disimpan
         return true
       })
-      localStorage.setItem("pokjaList", JSON.stringify(userPokja))
+      localStorage.setItem("pokjaList", JSON.stringify(toSave))
     } catch {}
   }, [pokjaList, mounted])
 
