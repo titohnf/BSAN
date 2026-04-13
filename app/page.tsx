@@ -266,7 +266,7 @@ function AdminPageInner() {
 
       const newPokja: PokjaItem = {
         id: newId,
-        nama: `POKJA Budaya Sekolah – ${parsed.region}`,
+        nama: parsed.region,
         status: isPusat ? "aktif" : "masih-diverifikasi",
         data: {
           ...parsed,

@@ -152,8 +152,7 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
                           <MapPin className="w-4 h-4 text-gray-500" />
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900 leading-tight">{p.nama}</p>
-                          <p className="text-xs text-gray-400 mt-0.5">{p.data?.region}</p>
+                          <p className="font-medium text-gray-900 leading-tight">{p.data?.region ?? p.nama}</p>
                         </div>
                       </div>
                     </td>
