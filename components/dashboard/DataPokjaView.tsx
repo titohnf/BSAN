@@ -528,13 +528,14 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
             </div>
 
             {/* Riwayat Aktivitas */}
-            {(
-              <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                <div className="px-5 py-4 border-b border-gray-100 bg-gray-50 flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-gray-500" />
-                  <h3 className="text-base font-bold text-gray-800">Riwayat Aktivitas</h3>
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div className="px-5 py-4 border-b border-gray-100 bg-gray-50 flex items-center gap-2">
+                <FileText className="w-4 h-4 text-gray-500" />
+                <h3 className="text-base font-bold text-gray-800">Riwayat Aktivitas</h3>
+                {pokja.validasiLog && pokja.validasiLog.length > 0 && (
                   <span className="text-sm font-normal text-gray-400">({pokja.validasiLog.length} log)</span>
-                </div>
+                )}
+              </div>
                 <div className="divide-y divide-gray-100">
                   {!pokja.validasiLog || pokja.validasiLog.length === 0
                     ? <p className="px-5 py-4 text-sm text-gray-400">Belum ada riwayat aktivitas.</p>
@@ -579,9 +580,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                       })
                   }
                 </div>
-              </div>
-            )}
-
+            </div>
           </div>
         ) : (
           <>
