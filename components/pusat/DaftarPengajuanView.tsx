@@ -52,12 +52,18 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
     })
   }, [pokjaList])
 
-  const filtered = processedPokja.filter((p) => {
-    const matchSearch = p.nama.toLowerCase().includes(search.toLowerCase()) ||
-                        p.data?.region?.toLowerCase().includes(search.toLowerCase())
-    const matchStatus = filterStatus === "semua" || p.effectiveStatus === filterStatus
-    return matchSearch && matchStatus
-  })
+  const filtered = processedPokja
+    .filter((p) => {
+      const matchSearch = p.nama.toLowerCase().includes(search.toLowerCase()) ||
+                          p.data?.region?.toLowerCase().includes(search.toLowerCase())
+      const matchStatus = filterStatus === "semua" || p.effectiveStatus === filterStatus
+      return matchSearch && matchStatus
+    })
+    .sort((a, b) => {
+      const nameA = (a.data?.region ?? a.nama).replace(/^Prov\.\s*/i, "")
+      const nameB = (b.data?.region ?? b.nama).replace(/^Prov\.\s*/i, "")
+      return nameA.localeCompare(nameB, "id")
+    })
 
   const totalPages = Math.ceil(filtered.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
