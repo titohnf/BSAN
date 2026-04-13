@@ -9,6 +9,7 @@ interface DashboardPusatViewProps {
   onValidatePusat?: (pokja: PokjaItem) => void
   onViewSumberRujukan?: () => void
   onViewActivities?: () => void
+  onGoToPokja?: (pokja: PokjaItem) => void
 }
 
 const RUJUKAN_BREAKDOWN = [
@@ -66,7 +67,7 @@ const PROVINCE_DATA = [
 // sehingga tidak perlu map kompleks — cukup cocokkan p.nama === prov.nama
 
 
-export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRujukan, onViewActivities }: DashboardPusatViewProps) {
+export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRujukan, onViewActivities, onGoToPokja }: DashboardPusatViewProps) {
   const [search, setSearch] = useState("")
   const [entriesPerPage, setEntriesPerPage] = useState(10)
 
@@ -202,7 +203,11 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
               .filter((p) => p.status === "masih-diverifikasi")
               .slice(0, 5)
               .map((p) => (
-                <li key={p.id} className="px-5 py-3 flex items-center gap-3">
+                <li 
+                  key={p.id} 
+                  className="px-5 py-3 flex items-center gap-3 hover:bg-amber-100/50 cursor-pointer transition-colors"
+                  onClick={() => onGoToPokja?.(p)}
+                >
                   <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
                     <MapPin className="w-4 h-4 text-amber-600" />
                   </div>
@@ -211,9 +216,10 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
                       {(p.data?.region ?? p.nama).replace(/^Prov\.\s*/i, "")}
                     </p>
                   </div>
-                  <span className="text-xs text-amber-700 bg-amber-100 px-2 py-1 rounded-full">
+                  <span className="text-xs text-amber-700 bg-amber-100 px-2 py-1 rounded-full whitespace-nowrap">
                     Menunggu Verifikasi
                   </span>
+                  <ChevronRight className="w-4 h-4 text-amber-400 flex-shrink-0" />
                 </li>
               ))}
           </ul>

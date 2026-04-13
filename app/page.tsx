@@ -375,6 +375,10 @@ function AdminPageInner() {
                   onValidatePusat={(pokja) => setValidatingPokja(pokja)}
                   onViewSumberRujukan={() => setPusatMenu("sumber-rujukan")}
                   onViewActivities={() => setPusatMenu("k" as PusatMenu)}
+                  onGoToPokja={(pokja) => {
+                    setPusatMenu("pokja")
+                    setValidatingPokja(pokja)
+                  }}
                 />
               )}
               {pusatMenu === "pokja" && (
