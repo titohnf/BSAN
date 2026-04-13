@@ -7,7 +7,7 @@ import {
   Search, MessageCircle, Globe, Lock, Users,
   Building2, GraduationCap, HandHeart, Radio,
   ChevronRight, X, Pencil, Trash2, CheckCircle,
-  XCircle, ExternalLink, RotateCcw, Clock,
+  XCircle, ExternalLink, RotateCcw, Clock, ArrowUpDown,
 } from "lucide-react"
 import { DEFAULT_DINAS_NAMA, getDinasNamaForLogs } from "@/lib/auth-session"
 import { RUJUKAN_LOG, dinasLog, formatLogTerakhirDisplay, getStatusAfterRestore } from "@/lib/rujukan-logs"
@@ -99,8 +99,7 @@ export const SEED: SumberRujukan[] = [
     kategoriBentukDukungan: "Fasilitas Kesehatan", kategoriPenyedia: "Pemerintah Daerah",
     provinsi: "Aceh", kabupatenKota: "Banda Aceh", namaJalan: "Jl. Tgk. Daud Beureueh", nomorJalan: "No. 108",
     nomorCallCenter: "065123560", aksesInfo: "publik", status: "terverifikasi",
-    dibuatOleh: actorDinasSeed,
-    usulanDari: "dinas",
+    dibuatOleh: actorDinasSeed, usulanDari: "dinas",
     logTerakhir: dinasLog.diperbaharui(D_SEED),
   },
   {
@@ -108,8 +107,7 @@ export const SEED: SumberRujukan[] = [
     kategoriBentukDukungan: "Fasilitas Kesehatan", kategoriPenyedia: "Pemerintah Daerah",
     provinsi: "Aceh", kabupatenKota: "Banda Aceh", namaJalan: "Jl. Sri Ratu Safiatuddin",
     nomorCallCenter: "065122345", aksesInfo: "publik", status: "terverifikasi",
-    dibuatOleh: actorDinasSeed,
-    usulanDari: "dinas",
+    dibuatOleh: actorDinasSeed, usulanDari: "dinas",
     logTerakhir: dinasLog.dibuatTerverifikasi(D_SEED),
   },
   {
@@ -117,9 +115,7 @@ export const SEED: SumberRujukan[] = [
     kategoriBentukDukungan: "Konseling", kategoriPenyedia: "OMS",
     provinsi: "Aceh", kabupatenKota: "Banda Aceh", namaJalan: "Jl. Teungku Chik Ditiro", nomorJalan: "No. 26",
     nomorCallCenter: "065131456", nomorPribadi: "08127654321", aksesInfo: "terbatas", status: "menunggu",
-    dibuatOleh: "Admin Sekolah SMAN 1 Banda Aceh",
-    usulanDari: "sekolah",
-    namaSekolah: "SMAN 1 Banda Aceh",
+    dibuatOleh: "Admin Sekolah SMAN 1 Banda Aceh", usulanDari: "sekolah", namaSekolah: "SMAN 1 Banda Aceh",
     logTerakhir: RUJUKAN_LOG.dibuatSekolah("SMAN 1 Banda Aceh"),
   },
   {
@@ -127,9 +123,7 @@ export const SEED: SumberRujukan[] = [
     kategoriBentukDukungan: "Bantuan Hukum", kategoriPenyedia: "OMS",
     provinsi: "Aceh", kabupatenKota: "Banda Aceh", namaJalan: "Jl. T. Daud Syah", nomorJalan: "No. 5",
     nomorCallCenter: "065127890", aksesInfo: "publik", status: "menunggu",
-    dibuatOleh: "Admin Sekolah SMAN 2 Banda Aceh",
-    usulanDari: "sekolah",
-    namaSekolah: "SMAN 2 Banda Aceh",
+    dibuatOleh: "Admin Sekolah SMAN 2 Banda Aceh", usulanDari: "sekolah", namaSekolah: "SMAN 2 Banda Aceh",
     logTerakhir: RUJUKAN_LOG.dibuatSekolah("SMAN 2 Banda Aceh"),
   },
   {
@@ -137,39 +131,75 @@ export const SEED: SumberRujukan[] = [
     kategoriBentukDukungan: "Kepolisian", kategoriPenyedia: "Pemerintah Pusat",
     provinsi: "Aceh", kabupatenKota: "Banda Aceh", namaJalan: "Jl. Sultan Malikul Saleh",
     nomorCallCenter: "110", aksesInfo: "publik", status: "terverifikasi",
-    dibuatOleh: "Admin Pusat",
-    usulanDari: "pusat",
+    dibuatOleh: "Admin Pusat", usulanDari: "pusat",
     logTerakhir: RUJUKAN_LOG.dibuatTerverifikasiPusat,
   },
   {
     id: "sr-6",
     namaInstansi: "UPTD Dinas Sosial Kota Banda Aceh",
-    kategoriBentukDukungan: "Sosial",
-    kategoriPenyedia: "Pemerintah Daerah",
-    provinsi: "Aceh",
-    kabupatenKota: "Banda Aceh",
-    namaJalan: "Jl. T. Amir Hamzah",
-    nomorCallCenter: "065112233",
-    aksesInfo: "publik",
-    status: "terverifikasi",
-    dibuatOleh: actorDinasSeed,
-    usulanDari: "dinas",
+    kategoriBentukDukungan: "Sosial", kategoriPenyedia: "Pemerintah Daerah",
+    provinsi: "Aceh", kabupatenKota: "Banda Aceh", namaJalan: "Jl. T. Amir Hamzah",
+    nomorCallCenter: "065112233", aksesInfo: "publik", status: "terverifikasi",
+    dibuatOleh: actorDinasSeed, usulanDari: "dinas",
     logTerakhir: dinasLog.dibuatTerverifikasi(D_SEED),
   },
   {
     id: "sr-7",
     namaInstansi: "Klinik Pratama Medika (contoh arsip dihapus)",
-    kategoriBentukDukungan: "Fasilitas Kesehatan",
-    kategoriPenyedia: "Swasta",
-    provinsi: "Aceh",
-    kabupatenKota: "Banda Aceh",
-    namaJalan: "Jl. Prof. Ali Hasyimi No. 20",
-    nomorCallCenter: "065145678",
-    aksesInfo: "publik",
-    status: "dihapus",
-    dibuatOleh: actorDinasSeed,
-    usulanDari: "dinas",
+    kategoriBentukDukungan: "Fasilitas Kesehatan", kategoriPenyedia: "Swasta",
+    provinsi: "Aceh", kabupatenKota: "Banda Aceh", namaJalan: "Jl. Prof. Ali Hasyimi No. 20",
+    nomorCallCenter: "065145678", aksesInfo: "publik", status: "dihapus",
+    dibuatOleh: actorDinasSeed, usulanDari: "dinas",
     logTerakhir: dinasLog.dihapus(D_SEED),
+  },
+  // --- Seed lintas wilayah untuk demo fitur "Semua Wilayah" ---
+  {
+    id: "sr-jkt-1", namaInstansi: "RSUP Dr. Cipto Mangunkusumo",
+    kategoriBentukDukungan: "Fasilitas Kesehatan", kategoriPenyedia: "Pemerintah Pusat",
+    provinsi: "DKI Jakarta", kabupatenKota: "Jakarta Pusat", namaJalan: "Jl. Diponegoro", nomorJalan: "No. 71",
+    nomorCallCenter: "02119408991", aksesInfo: "publik", status: "terverifikasi",
+    dibuatOleh: "Admin Pusat", usulanDari: "pusat",
+    logTerakhir: RUJUKAN_LOG.dibuatTerverifikasiPusat,
+  },
+  {
+    id: "sr-jkt-2", namaInstansi: "LBH Jakarta",
+    kategoriBentukDukungan: "Bantuan Hukum", kategoriPenyedia: "OMS",
+    provinsi: "DKI Jakarta", kabupatenKota: "Jakarta Pusat", namaJalan: "Jl. Diponegoro", nomorJalan: "No. 74",
+    nomorCallCenter: "02131925276", aksesInfo: "publik", status: "terverifikasi",
+    dibuatOleh: "Admin Pusat", usulanDari: "pusat",
+    logTerakhir: RUJUKAN_LOG.dibuatTerverifikasiPusat,
+  },
+  {
+    id: "sr-jkt-3", namaInstansi: "Komnas Perempuan",
+    kategoriBentukDukungan: "Bantuan Hukum", kategoriPenyedia: "Pemerintah Pusat",
+    provinsi: "DKI Jakarta", kabupatenKota: "Jakarta Pusat", namaJalan: "Jl. Latuharhary", nomorJalan: "No. 4B",
+    nomorCallCenter: "02139007748", aksesInfo: "publik", status: "terverifikasi",
+    dibuatOleh: "Admin Pusat", usulanDari: "pusat",
+    logTerakhir: RUJUKAN_LOG.dibuatTerverifikasiPusat,
+  },
+  {
+    id: "sr-sby-1", namaInstansi: "RSUD Dr. Soetomo",
+    kategoriBentukDukungan: "Fasilitas Kesehatan", kategoriPenyedia: "Pemerintah Daerah",
+    provinsi: "Jawa Timur", kabupatenKota: "Surabaya", namaJalan: "Jl. Mayjen Prof. Dr. Moestopo", nomorJalan: "No. 6-8",
+    nomorCallCenter: "0315501078", aksesInfo: "publik", status: "terverifikasi",
+    dibuatOleh: "Admin Pusat", usulanDari: "pusat",
+    logTerakhir: RUJUKAN_LOG.dibuatTerverifikasiPusat,
+  },
+  {
+    id: "sr-mks-1", namaInstansi: "Yayasan Lembaga Konsumen Indonesia — Makassar",
+    kategoriBentukDukungan: "Konseling", kategoriPenyedia: "OMS",
+    provinsi: "Sulawesi Selatan", kabupatenKota: "Makassar", namaJalan: "Jl. AP. Pettarani",
+    nomorCallCenter: "04114119600", aksesInfo: "publik", status: "terverifikasi",
+    dibuatOleh: "Admin Pusat", usulanDari: "pusat",
+    logTerakhir: RUJUKAN_LOG.dibuatTerverifikasiPusat,
+  },
+  {
+    id: "sr-mdn-1", namaInstansi: "P2TP2A Kota Medan",
+    kategoriBentukDukungan: "Sosial", kategoriPenyedia: "Pemerintah Daerah",
+    provinsi: "Sumatera Utara", kabupatenKota: "Medan", namaJalan: "Jl. Kapten Maulana Lubis",
+    nomorCallCenter: "0618458844", aksesInfo: "publik", status: "terverifikasi",
+    dibuatOleh: "Admin Pusat", usulanDari: "pusat",
+    logTerakhir: RUJUKAN_LOG.dibuatTerverifikasiPusat,
   },
 ]
 
@@ -414,17 +444,39 @@ function DetailPanel({
 }
 
 // ---------------------------------------------------------------------------
+// Provinsi list for filter
+// ---------------------------------------------------------------------------
+const PROVINSI_LIST = [
+  "Aceh", "Sumatera Utara", "Sumatera Barat", "Riau", "Kepulauan Riau",
+  "Jambi", "Bengkulu", "Sumatera Selatan", "Kepulauan Bangka Belitung", "Lampung",
+  "DKI Jakarta", "Jawa Barat", "Banten", "Jawa Tengah", "DI Yogyakarta", "Jawa Timur",
+  "Kalimantan Barat", "Kalimantan Tengah", "Kalimantan Selatan", "Kalimantan Timur", "Kalimantan Utara",
+  "Sulawesi Utara", "Gorontalo", "Sulawesi Tengah", "Sulawesi Barat", "Sulawesi Selatan", "Sulawesi Tenggara",
+  "Bali", "Nusa Tenggara Barat", "Nusa Tenggara Timur",
+  "Maluku", "Maluku Utara", "Papua Barat", "Papua",
+]
+
+type SortMode = "relevansi" | "terbaru" | "nama_az"
+
+// ---------------------------------------------------------------------------
 // Main view
 // ---------------------------------------------------------------------------
-export function SumberRujukanView() {
+export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi: string; kabupatenKota: string } }) {
   const router = useRouter()
   const dinasNamaLog = getDinasNamaForLogs()
   const [list, setList] = useState<SumberRujukan[]>(SEED)
   const [search, setSearch] = useState("")
+  const [scope, setScope] = useState<"wilayah" | "nasional">("wilayah")
+  const [filterProvinsi, setFilterProvinsi] = useState<string>("semua")
   const [filterKategori, setFilterKategori] = useState<KategoriDukungan | "semua">("semua")
   const [filterStatus, setFilterStatus] = useState<StatusRujukan | "semua">("semua")
   const [filterPenyedia, setFilterPenyedia] = useState<KategoriPenyedia | "semua">("semua")
+  const [sortMode, setSortMode] = useState<SortMode>("relevansi")
   const [selected, setSelected] = useState<SumberRujukan | null>(null)
+
+  // Wilayah dinas dari prop atau fallback ke Aceh / Banda Aceh
+  const myProvinsi = wilayahDinas?.provinsi ?? "Aceh"
+  const myKabupatenKota = wilayahDinas?.kabupatenKota ?? "Banda Aceh"
 
   useEffect(() => {
     const loadData = () => {
@@ -457,16 +509,31 @@ export function SumberRujukanView() {
     }
   }, [])
 
-  const filtered = list.filter((item) => {
-    const matchSearch =
-      search.trim() === "" ||
-      item.namaInstansi.toLowerCase().includes(search.toLowerCase()) ||
-      item.kabupatenKota.toLowerCase().includes(search.toLowerCase())
-    const matchKategori = filterKategori === "semua" || item.kategoriBentukDukungan === filterKategori
-    const matchStatus = filterStatus === "semua" || item.status === filterStatus
-    const matchPenyedia = filterPenyedia === "semua" || item.kategoriPenyedia === filterPenyedia
-    return matchSearch && matchKategori && matchStatus && matchPenyedia
-  })
+  const filtered = list
+    .filter((item) => {
+      const matchSearch =
+        search.trim() === "" ||
+        item.namaInstansi.toLowerCase().includes(search.toLowerCase()) ||
+        item.kabupatenKota.toLowerCase().includes(search.toLowerCase()) ||
+        item.provinsi.toLowerCase().includes(search.toLowerCase())
+      const matchScope =
+        scope === "nasional" ||
+        (item.provinsi === myProvinsi && item.kabupatenKota === myKabupatenKota)
+      const matchProvinsi =
+        scope === "wilayah" || filterProvinsi === "semua" || item.provinsi === filterProvinsi
+      const matchKategori = filterKategori === "semua" || item.kategoriBentukDukungan === filterKategori
+      const matchStatus = filterStatus === "semua" || item.status === filterStatus
+      const matchPenyedia = filterPenyedia === "semua" || item.kategoriPenyedia === filterPenyedia
+      return matchSearch && matchScope && matchProvinsi && matchKategori && matchStatus && matchPenyedia
+    })
+    .sort((a, b) => {
+      if (sortMode === "nama_az") return a.namaInstansi.localeCompare(b.namaInstansi)
+      if (sortMode === "terbaru") return (b.createdAt ?? b.id).localeCompare(a.createdAt ?? a.id)
+      // relevansi: wilayah sendiri → provinsi sama → lainnya
+      const rankA = a.kabupatenKota === myKabupatenKota && a.provinsi === myProvinsi ? 0 : a.provinsi === myProvinsi ? 1 : 2
+      const rankB = b.kabupatenKota === myKabupatenKota && b.provinsi === myProvinsi ? 0 : b.provinsi === myProvinsi ? 1 : 2
+      return rankA - rankB
+    })
 
   const persistRujukanPatch = (id: string, patch: Partial<SumberRujukan> & { status?: StatusRujukan }) => {
     try {
@@ -521,6 +588,9 @@ export function SumberRujukanView() {
   const handleEdit = (id: string) => router.push(`/sumber-rujukan/form?edit=${id}`)
 
   const statKeys: KategoriDukungan[] = ["Fasilitas Kesehatan", "Konseling", "Bantuan Hukum", "Kepolisian"]
+  const scopeList = scope === "wilayah"
+    ? list.filter((i) => i.provinsi === myProvinsi && i.kabupatenKota === myKabupatenKota)
+    : list
 
   return (
     <div className="space-y-5">
@@ -534,15 +604,40 @@ export function SumberRujukanView() {
           onClick={() => router.push("/sumber-rujukan/form")}
           className="flex items-center gap-1.5 h-9 px-4 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition shrink-0"
         >
-                  <Plus className="w-4 h-4" /> Tambah Sumber Dukungan
+          <Plus className="w-4 h-4" /> Tambah Sumber Dukungan
         </button>
       </div>
 
-      {/* Stat pills */}
+      {/* Scope toggle */}
+      <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-xl w-fit">
+        <button
+          type="button"
+          onClick={() => setScope("wilayah")}
+          className={`flex items-center gap-1.5 h-8 px-4 rounded-lg text-sm font-medium transition ${scope === "wilayah" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+        >
+          <MapPin className="w-3.5 h-3.5" />
+          Wilayah Saya
+          <span className={`text-xs font-semibold px-1.5 py-0.5 rounded-full ml-0.5 ${scope === "wilayah" ? "bg-blue-100 text-blue-700" : "bg-gray-200 text-gray-500"}`}>
+            {list.filter((i) => i.provinsi === myProvinsi && i.kabupatenKota === myKabupatenKota && i.status !== "dihapus").length}
+          </span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setScope("nasional")}
+          className={`flex items-center gap-1.5 h-8 px-4 rounded-lg text-sm font-medium transition ${scope === "nasional" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+        >
+          Semua Wilayah
+          <span className={`text-xs font-semibold px-1.5 py-0.5 rounded-full ml-0.5 ${scope === "nasional" ? "bg-blue-100 text-blue-700" : "bg-gray-200 text-gray-500"}`}>
+            {list.filter((i) => i.status !== "dihapus").length}
+          </span>
+        </button>
+      </div>
+
+      {/* Stat cards — scope-aware */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {statKeys.map((key) => {
           const cfg = KATEGORI_CONFIG[key]
-          const count = list.filter((i) => i.kategoriBentukDukungan === key && i.status !== "dihapus").length
+          const count = scopeList.filter((i) => i.kategoriBentukDukungan === key && i.status !== "dihapus").length
           return (
             <div key={key} className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm flex items-center gap-3">
               <div className={`w-9 h-9 rounded-full ${cfg.bg} ${cfg.color} flex items-center justify-center flex-shrink-0`}>
@@ -557,9 +652,10 @@ export function SumberRujukanView() {
         })}
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-2 items-end">
-        <div className="relative flex-1 min-w-0">
+      {/* Filter bar */}
+      <div className="flex flex-col sm:flex-row gap-2 items-end flex-wrap">
+        {/* Search */}
+        <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             value={search}
@@ -568,10 +664,21 @@ export function SumberRujukanView() {
             className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+        {/* Provinsi — hanya saat nasional */}
+        {scope === "nasional" && (
+          <select
+            value={filterProvinsi}
+            onChange={(e) => setFilterProvinsi(e.target.value)}
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          >
+            <option value="semua">Semua Provinsi</option>
+            {PROVINSI_LIST.map((p) => <option key={p} value={p}>{p}</option>)}
+          </select>
+        )}
         <select
           value={filterKategori}
           onChange={(e) => setFilterKategori(e.target.value as KategoriDukungan | "semua")}
-          className="flex-1 min-w-0 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
         >
           <option value="semua">Semua Kategori</option>
           {(Object.keys(KATEGORI_CONFIG) as KategoriDukungan[]).map((k) => (
@@ -581,7 +688,7 @@ export function SumberRujukanView() {
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value as StatusRujukan | "semua")}
-          className="flex-1 min-w-0 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
         >
           <option value="semua">Semua Status</option>
           <option value="terverifikasi">Terverifikasi</option>
@@ -592,19 +699,32 @@ export function SumberRujukanView() {
         <select
           value={filterPenyedia}
           onChange={(e) => setFilterPenyedia(e.target.value as KategoriPenyedia | "semua")}
-          className="flex-1 min-w-0 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
         >
           <option value="semua">Semua Penyedia</option>
-          {(["Pemerintah Pusat", "Pemerintah Daerah", "Swasta", "OMS"] as KategoriPenyedia[]).map((p) => (
+          {(["Pemerintah Pusat", "Pemerintah Daerah", "Swasta", "OMS", "Lainnya"] as KategoriPenyedia[]).map((p) => (
             <option key={p} value={p}>{p}</option>
           ))}
         </select>
+        {/* Sort */}
+        <div className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 bg-white">
+          <ArrowUpDown className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+          <select
+            value={sortMode}
+            onChange={(e) => setSortMode(e.target.value as SortMode)}
+            className="text-sm focus:outline-none bg-transparent text-gray-700"
+          >
+            <option value="relevansi">Relevansi</option>
+            <option value="terbaru">Terbaru</option>
+            <option value="nama_az">Nama A–Z</option>
+          </select>
+        </div>
       </div>
 
       {/* Table */}
       {filtered.length === 0 ? (
         <div className="bg-white rounded-xl border border-dashed border-gray-300 p-10 text-center">
-          <p className="font-semibold text-gray-700 text-sm">Tidak ada sumber rujukan ditemukan</p>
+          <p className="font-semibold text-gray-700 text-sm">Tidak ada sumber dukungan ditemukan</p>
           <p className="text-gray-500 text-xs mt-1">Coba ubah filter atau kata kunci pencarian.</p>
         </div>
       ) : (
@@ -614,9 +734,11 @@ export function SumberRujukanView() {
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200 text-left">
                   <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Nama Instansi</th>
+                  {scope === "nasional" && (
+                    <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Wilayah</th>
+                  )}
                   <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Kategori Dukungan</th>
                   <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Penyedia</th>
-                  <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Dibuat Oleh</th>
                   <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Log Terakhir</th>
                   <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
                   <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide text-right">Aksi</th>
@@ -626,17 +748,33 @@ export function SumberRujukanView() {
                 {filtered.map((item) => {
                   const kategoriCfg = KATEGORI_CONFIG[item.kategoriBentukDukungan]
                   const penyediaCfg = item.kategoriPenyedia ? PENYEDIA_CONFIG[item.kategoriPenyedia] : null
+                  const isMyWilayah = item.provinsi === myProvinsi && item.kabupatenKota === myKabupatenKota
                   return (
                     <tr key={item.id} className={`hover:bg-gray-50 transition-colors ${item.status === "dihapus" ? "opacity-50" : ""}`}>
                       <td className="px-4 py-3.5">
-                        <p className="font-semibold text-gray-900 whitespace-nowrap">{item.namaInstansi}</p>
-                        {item.website && (
-                          <a href={item.website} target="_blank" rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-xs text-blue-600 hover:underline mt-0.5">
-                            <Globe className="w-3 h-3" /> Website
-                          </a>
-                        )}
+                        <div className="flex items-start gap-2">
+                          <div>
+                            <p className="font-semibold text-gray-900 whitespace-nowrap">{item.namaInstansi}</p>
+                            {item.website && (
+                              <a href={item.website} target="_blank" rel="noopener noreferrer"
+                                className="flex items-center gap-1 text-xs text-blue-600 hover:underline mt-0.5">
+                                <Globe className="w-3 h-3" /> Website
+                              </a>
+                            )}
+                          </div>
+                          {scope === "nasional" && isMyWilayah && (
+                            <span className="flex-shrink-0 text-xs font-medium px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 mt-0.5">
+                              Wilayah Saya
+                            </span>
+                          )}
+                        </div>
                       </td>
+                      {scope === "nasional" && (
+                        <td className="px-4 py-3.5">
+                          <p className="text-sm font-medium text-gray-800">{item.kabupatenKota}</p>
+                          <p className="text-xs text-gray-400">{item.provinsi}</p>
+                        </td>
+                      )}
                       <td className="px-4 py-3.5">
                         <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${kategoriCfg.bg} ${kategoriCfg.color}`}>
                           {kategoriCfg.icon}
@@ -649,9 +787,6 @@ export function SumberRujukanView() {
                             {item.kategoriPenyedia}
                           </span>
                         ) : <span className="text-gray-400 text-xs">-</span>}
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <p className="text-xs text-gray-600 max-w-[160px] leading-relaxed">{item.dibuatOleh}</p>
                       </td>
                       <td className="px-4 py-3.5">
                         <p className="text-xs text-gray-600 max-w-[220px] leading-relaxed">{formatLogTerakhirDisplay(item, dinasNamaLog)}</p>
