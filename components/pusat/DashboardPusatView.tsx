@@ -108,24 +108,21 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
   const [search, setSearch] = useState("")
   const [entriesPerPage, setEntriesPerPage] = useState(10)
 
-  // Debug: log pokjaList yang diterima
-  console.log("[v0] pokjaList received:", pokjaList.map(p => ({ id: p.id, nama: p.nama, status: p.status, region: p.data?.region })))
-
   // Hitung pokja per provinsi dari pokjaList secara dinamis
   const enrichedProvinces = PROVINCE_DATA.map((prov) => {
     const aliases = PROVINCE_REGION_MAP[prov.nama] ?? [prov.nama]
     const matching = pokjaList.filter((p) => {
-      const region = (p.data?.region ?? p.nama).trim()
-      // Exact match dulu, lalu partial match
+      // Match by data.region first (most reliable), then fall back to nama
+      const region = (p.data?.region ?? "").trim()
+      const namaFallback = p.nama.trim()
+      const haystack = region || namaFallback
       return aliases.some(a =>
-        region.toLowerCase() === a.toLowerCase() ||
-        region.toLowerCase().includes(a.toLowerCase()) ||
-        a.toLowerCase().includes(region.toLowerCase())
+        haystack.toLowerCase() === a.toLowerCase() ||
+        haystack.toLowerCase().includes(a.toLowerCase()) ||
+        a.toLowerCase().includes(haystack.toLowerCase())
       )
     })
-    if (prov.nama === "Prov. Aceh") {
-      console.log("[v0] Aceh matching pokja:", matching.map(p => ({ id: p.id, status: p.status, region: p.data?.region })))
-    }
+
     const aktifCount = matching.filter(p => p.status === "aktif").length
     const menungguCount = matching.filter(p => p.status === "masih-diverifikasi").length
     const perbaikanCount = matching.filter(p => p.status === "butuh-perbaikan").length
@@ -138,7 +135,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
 
     return {
       ...prov,
-      pokjaKabKota: matching.filter(p => p.status !== "belum-dibentuk").length,
+      pokjaKabKota: matching.filter(p => ["aktif", "masih-diverifikasi", "butuh-perbaikan"].includes(p.status)).length,
       statusProv,
       matching,
     }
@@ -402,8 +399,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
                     <MapPin className="w-4 h-4 text-amber-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-800 truncate">{p.nama}</p>
-                    <p className="text-xs text-gray-500">{p.data?.region}</p>
+                    <p className="text-sm font-medium text-gray-800 truncate">{p.data?.region ?? p.nama}</p>
                   </div>
                   <span className="text-xs text-amber-700 bg-amber-100 px-2 py-1 rounded-full">
                     Menunggu Verifikasi
