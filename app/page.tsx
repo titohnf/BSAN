@@ -36,19 +36,22 @@ const B = (id: string, nama: string): PokjaItem => ({
 })
 
 const MOCK_POKJA_LIST: PokjaItem[] = [
-  // 2 provinsi dengan data lengkap (sample aktif & butuh perbaikan)
+  // Provinsi dengan data lengkap — berbagai status
   {
     id: "p1", nama: "Prov. Jawa Timur", status: "aktif", tanggalDiverifikasi: "2024-03-15",
     validasiLog: [{ tanggal: "2024-03-15", aksi: "terima", aktor: "admin_pusat" }],
     data: {
       region: "Prov. Jawa Timur", nomorKanal: "0812xxx",
       members: {
-        ketua: { nama: "Dr. Budi Santoso, M.Si", email: "budi@jatim.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08121234567", instansi: "Dinas Pendidikan Prov. Jawa Timur", jabatan: "Ketua" },
-        wakil: { nama: "Ibu Siti Rahayu, M.Pd", email: "siti@jatim.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08121234568", instansi: "Dinas Pendidikan Prov. Jawa Timur", jabatan: "Wakil Ketua" },
-        koordinator: { nama: "Bpk. Ahmad Wijaya, S.H", email: "ahmad@jatim.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08121234569", instansi: "Sekretariat Daerah Prov. Jawa Timur", jabatan: "Koordinator" },
-        pendidikan: { nama: "Ibu Devi Kusuma, S.Pd", email: "devi@jatim.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08121234570", instansi: "Dinas Pendidikan Prov. Jawa Timur", jabatan: "Anggota" },
-        pppa: { nama: "Bpk. Hadi Prasetyo, M.H", email: "hadi@jatim.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08121234571", instansi: "DP3A Prov. Jawa Timur", jabatan: "Anggota" },
-        sosial: { nama: "Ibu Wati Susilowati, S.Sos", email: "wati@jatim.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08121234572", instansi: "Dinas Sosial Prov. Jawa Timur", jabatan: "Anggota" },
+        ketua:       { nama: "Dr. Budi Santoso, M.Si",      email: "budi@jatim.go.id",   jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08121234567", instansi: "Dinas Pendidikan Prov. Jawa Timur",  jabatan: "Ketua" },
+        wakil:       { nama: "Ibu Siti Rahayu, M.Pd",       email: "siti@jatim.go.id",   jenisKelamin: "Perempuan" as const,  noWhatsapp: "08121234568", instansi: "Dinas Pendidikan Prov. Jawa Timur",  jabatan: "Wakil Ketua" },
+        koordinator: { nama: "Bpk. Ahmad Wijaya, S.H",      email: "ahmad@jatim.go.id",  jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08121234569", instansi: "Sekretariat Daerah Prov. Jawa Timur", jabatan: "Koordinator" },
+        pendidikan:  { nama: "Ibu Devi Kusuma, S.Pd",       email: "devi@jatim.go.id",   jenisKelamin: "Perempuan" as const,  noWhatsapp: "08121234570", instansi: "Dinas Pendidikan Prov. Jawa Timur",  jabatan: "Anggota" },
+        pppa:        { nama: "Bpk. Hadi Prasetyo, M.H",     email: "hadi@jatim.go.id",   jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08121234571", instansi: "DP3A Prov. Jawa Timur",              jabatan: "Anggota" },
+        sosial:      { nama: "Ibu Wati Susilowati, S.Sos",  email: "wati@jatim.go.id",   jenisKelamin: "Perempuan" as const,  noWhatsapp: "08121234572", instansi: "Dinas Sosial Prov. Jawa Timur",      jabatan: "Anggota" },
+        kesehatan:   { nama: "Dr. Nugroho, Sp.A",           email: "nugroho@jatim.go.id",jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08121234573", instansi: "Dinas Kesehatan Prov. Jawa Timur",   jabatan: "Anggota" },
+        kominfo:     { nama: "Bpk. Firman Hermawan, S.Kom", email: "firman@jatim.go.id", jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08121234574", instansi: "Dinas Kominfo Prov. Jawa Timur",     jabatan: "Anggota" },
+        dukbangga:   { nama: "Ibu Rina Hartati, M.Acc",     email: "rina@jatim.go.id",   jenisKelamin: "Perempuan" as const,  noWhatsapp: "08121234575", instansi: "BPKAD Prov. Jawa Timur",             jabatan: "Anggota" },
       },
       sk: { file: null, nomorSK: "420/001/2024", tanggalSK: "2024-01-15", periodeMultai: "2024-01-15", periodeSelesai: "2027-01-14" }
     }
@@ -56,32 +59,70 @@ const MOCK_POKJA_LIST: PokjaItem[] = [
   {
     id: "p2", nama: "Prov. DKI Jakarta", status: "butuh-perbaikan", tanggalDiverifikasi: "2024-02-20",
     validasiLog: [
-      { tanggal: "2024-02-20", aksi: "terima", aktor: "admin_pusat" },
-      { tanggal: "2025-01-01", aksi: "sk_expired", aktor: "sistem", alasan: "SK berakhir" }
+      { tanggal: "2024-02-20", aksi: "terima",     aktor: "admin_pusat" },
+      { tanggal: "2025-01-01", aksi: "sk_expired", aktor: "sistem",      alasan: "SK berakhir" }
     ],
     data: {
       region: "Prov. DKI Jakarta", nomorKanal: "0813xxx",
       members: {
-        ketua: { nama: "Dr. Ani Kusuma, M.Si", email: "ani@dki.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08131234567", instansi: "Dinas Pendidikan DKI Jakarta", jabatan: "Ketua" },
-        wakil: { nama: "Bpk. Reza Pratama", email: "reza@dki.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08131234568", instansi: "Dinas Pendidikan DKI Jakarta", jabatan: "Wakil Ketua" },
-        koordinator: { nama: "Ibu Siti Aminah", email: "siti@dki.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08131234569", instansi: "Setda DKI Jakarta", jabatan: "Koordinator" },
-        pendidikan: { nama: "Bpk. Budi Hartono", email: "budi@dki.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08131234570", instansi: "Dinas Pendidikan DKI Jakarta", jabatan: "Anggota" },
-        pppa: { nama: "Ibu Linda Sari", email: "linda@dki.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08131234571", instansi: "DP3A DKI Jakarta", jabatan: "Anggota" },
-        sosial: { nama: "Bpk. Anton Wijaya", email: "anton@dki.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08131234572", instansi: "Dinas Sosial DKI Jakarta", jabatan: "Anggota" },
+        ketua:       { nama: "Dr. Ani Kusuma, M.Si",   email: "ani@dki.go.id",    jenisKelamin: "Perempuan" as const, noWhatsapp: "08131234567", instansi: "Dinas Pendidikan DKI Jakarta", jabatan: "Ketua" },
+        wakil:       { nama: "Bpk. Reza Pratama",      email: "reza@dki.go.id",   jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08131234568", instansi: "Dinas Pendidikan DKI Jakarta", jabatan: "Wakil Ketua" },
+        koordinator: { nama: "Ibu Siti Aminah",        email: "siti@dki.go.id",   jenisKelamin: "Perempuan" as const, noWhatsapp: "08131234569", instansi: "Setda DKI Jakarta",            jabatan: "Koordinator" },
+        pendidikan:  { nama: "Bpk. Budi Hartono",      email: "budi@dki.go.id",   jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08131234570", instansi: "Dinas Pendidikan DKI Jakarta", jabatan: "Anggota" },
+        pppa:        { nama: "Ibu Linda Sari",         email: "linda@dki.go.id",  jenisKelamin: "Perempuan" as const, noWhatsapp: "08131234571", instansi: "DP3A DKI Jakarta",             jabatan: "Anggota" },
+        sosial:      { nama: "Bpk. Anton Wijaya",      email: "anton@dki.go.id",  jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08131234572", instansi: "Dinas Sosial DKI Jakarta",     jabatan: "Anggota" },
+        kesehatan:   { nama: "Dr. Sarah Rahmawati",    email: "sarah@dki.go.id",  jenisKelamin: "Perempuan" as const, noWhatsapp: "08131234573", instansi: "Dinas Kesehatan DKI Jakarta",  jabatan: "Anggota" },
+        kominfo:     { nama: "Bpk. Rizal Fauzi, S.Kom",email: "rizal@dki.go.id",  jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08131234574", instansi: "Dinas Kominfo DKI Jakarta",    jabatan: "Anggota" },
+        dukbangga:   { nama: "Ibu Maya Kurniawati",    email: "maya@dki.go.id",   jenisKelamin: "Perempuan" as const, noWhatsapp: "08131234575", instansi: "BPKAD DKI Jakarta",            jabatan: "Anggota" },
       },
       sk: { file: null, nomorSK: "456/002/2024", tanggalSK: "2024-01-20", periodeMultai: "2024-01-20", periodeSelesai: "2024-12-31" }
     }
   },
-  // 36 provinsi lainnya — belum dibentuk
-  B("p3",  "Prov. Aceh"),
-  B("p4",  "Prov. Bali"),
-  B("p5",  "Prov. Banten"),
-  B("p6",  "Prov. Bengkulu"),
-  B("p7",  "Prov. D.I. Yogyakarta"),
-  B("p8",  "Prov. Gorontalo"),
-  B("p9",  "Prov. Jambi"),
-  B("p10", "Prov. Jawa Barat"),
-  B("p11", "Prov. Jawa Tengah"),
+  {
+    id: "p3", nama: "Prov. Jawa Barat", status: "aktif", tanggalDiverifikasi: "2024-03-15",
+    validasiLog: [
+      { tanggal: "2024-01-05", aksi: "pengajuan", aktor: "user" },
+      { tanggal: "2024-01-10", aksi: "tolak",     aktor: "admin_pusat", alasan: "Data anggota tidak lengkap" },
+      { tanggal: "2024-02-20", aksi: "perbaiki",  aktor: "user",        alasan: "Data anggota sudah diperbaiki" },
+      { tanggal: "2024-03-15", aksi: "aktivasi",  aktor: "admin_pusat" }
+    ],
+    data: {
+      region: "Prov. Jawa Barat", nomorKanal: "0814xxx",
+      members: {
+        ketua:       { nama: "Bpk. Dedi Supriadi, M.Pd",  email: "dedi@jabar.go.id",  jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08141234567", instansi: "Dinas Pendidikan Prov. Jawa Barat", jabatan: "Ketua" },
+        wakil:       { nama: "Ibu Rina Marlina, S.Pd",    email: "rina@jabar.go.id",  jenisKelamin: "Perempuan" as const,  noWhatsapp: "08141234568", instansi: "Dinas Pendidikan Prov. Jawa Barat", jabatan: "Wakil Ketua" },
+        koordinator: { nama: "Bpk. Rudi Hermawan, M.Si",  email: "rudi@jabar.go.id",  jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08141234569", instansi: "Sekretariat Daerah Prov. Jawa Barat",jabatan: "Koordinator" },
+        pendidikan:  { nama: "Ibu Siti Nurhaliza, S.Pd",  email: "siti@jabar.go.id",  jenisKelamin: "Perempuan" as const,  noWhatsapp: "08141234570", instansi: "Dinas Pendidikan Prov. Jawa Barat", jabatan: "Anggota" },
+        pppa:        { nama: "Bpk. Undang Hasan, M.H",    email: "undang@jabar.go.id",jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08141234571", instansi: "DP3A Prov. Jawa Barat",             jabatan: "Anggota" },
+        sosial:      { nama: "Ibu Yanti Kusuma, S.Sos",   email: "yanti@jabar.go.id", jenisKelamin: "Perempuan" as const,  noWhatsapp: "08141234572", instansi: "Dinas Sosial Prov. Jawa Barat",     jabatan: "Anggota" },
+      },
+      sk: { file: null, nomorSK: "789/003/2024", tanggalSK: "2024-01-05", periodeMultai: "2024-01-05", periodeSelesai: "2027-01-04" }
+    }
+  },
+  {
+    id: "p4", nama: "Prov. Jawa Tengah", status: "masih-diverifikasi",
+    validasiLog: [{ tanggal: "2024-02-01", aksi: "pengajuan", aktor: "user" }],
+    data: {
+      region: "Prov. Jawa Tengah", nomorKanal: "0815xxx",
+      members: {
+        ketua:       { nama: "Bpk. Hendra Wijanto, S.H, M.H", email: "hendra@jateng.go.id", jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08151234567", instansi: "Dinas Pendidikan Prov. Jawa Tengah", jabatan: "Ketua" },
+        wakil:       { nama: "Ibu Diana Permata, M.Pd",       email: "diana@jateng.go.id",  jenisKelamin: "Perempuan" as const,  noWhatsapp: "08151234568", instansi: "Dinas Pendidikan Prov. Jawa Tengah", jabatan: "Wakil Ketua" },
+        koordinator: { nama: "Bpk. Susanto, M.Si",            email: "susanto@jateng.go.id",jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08151234569", instansi: "Sekretariat Daerah Prov. Jawa Tengah",jabatan: "Koordinator" },
+        pendidikan:  { nama: "Ibu Maya Kumala, S.Pd",         email: "maya@jateng.go.id",   jenisKelamin: "Perempuan" as const,  noWhatsapp: "08151234570", instansi: "Dinas Pendidikan Prov. Jawa Tengah", jabatan: "Anggota" },
+        pppa:        { nama: "Bpk. Ali Akbar, M.H",           email: "ali@jateng.go.id",    jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08151234571", instansi: "DP3A Prov. Jawa Tengah",              jabatan: "Anggota" },
+        sosial:      { nama: "Ibu Ratna Sari, S.Sos",         email: "ratna@jateng.go.id",  jenisKelamin: "Perempuan" as const,  noWhatsapp: "08151234572", instansi: "Dinas Sosial Prov. Jawa Tengah",      jabatan: "Anggota" },
+      },
+      sk: { file: null, nomorSK: "101/004/2024", tanggalSK: "2024-02-01", periodeMultai: "2024-02-01", periodeSelesai: "2027-01-31" }
+    }
+  },
+  // Sisa 34 provinsi — belum dibentuk
+  B("p5",  "Prov. Aceh"),
+  B("p6",  "Prov. Bali"),
+  B("p7",  "Prov. Banten"),
+  B("p8",  "Prov. Bengkulu"),
+  B("p9",  "Prov. D.I. Yogyakarta"),
+  B("p10", "Prov. Gorontalo"),
+  B("p11", "Prov. Jambi"),
   B("p12", "Prov. Kalimantan Barat"),
   B("p13", "Prov. Kalimantan Selatan"),
   B("p14", "Prov. Kalimantan Tengah"),
