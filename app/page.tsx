@@ -208,7 +208,8 @@ function AdminPageInner() {
         const parsed = JSON.parse(stored) as PokjaItem[]
         userPokja = parsed.filter(p => !dummyIds.has(p.id))
       }
-      const seen = new Set<string>()
+      // Deduplicate by id
+      const seen = new Set<string>(["p1", "p2", "p3"])
       const uniqueUserPokja = userPokja.filter(p => {
         if (seen.has(p.id)) return false
         seen.add(p.id)
@@ -225,7 +226,12 @@ function AdminPageInner() {
     if (!mounted) return
     try {
       const dummyIds = new Set(["p1", "p2", "p3"])
-      const userPokja = pokjaList.filter(p => !dummyIds.has(p.id))
+      const seen = new Set<string>()
+      const userPokja = pokjaList.filter(p => {
+        if (dummyIds.has(p.id) || seen.has(p.id)) return false
+        seen.add(p.id)
+        return true
+      })
       localStorage.setItem("pokjaList", JSON.stringify(userPokja))
     } catch {}
   }, [pokjaList, mounted])
@@ -268,7 +274,14 @@ function AdminPageInner() {
 
       setPokjaList((prev) => {
         if (prev.some(p => p.id === newId)) return prev
-        return [...prev, newPokja]
+        // Deduplicate entire list sebelum menambah item baru
+        const seen = new Set<string>()
+        const deduped = prev.filter(p => {
+          if (seen.has(p.id)) return false
+          seen.add(p.id)
+          return true
+        })
+        return [...deduped, newPokja]
       })
 
       const url = new URL(window.location.href)

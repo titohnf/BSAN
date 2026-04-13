@@ -108,13 +108,24 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
   const [search, setSearch] = useState("")
   const [entriesPerPage, setEntriesPerPage] = useState(10)
 
+  // Debug: log pokjaList yang diterima
+  console.log("[v0] pokjaList received:", pokjaList.map(p => ({ id: p.id, nama: p.nama, status: p.status, region: p.data?.region })))
+
   // Hitung pokja per provinsi dari pokjaList secara dinamis
   const enrichedProvinces = PROVINCE_DATA.map((prov) => {
     const aliases = PROVINCE_REGION_MAP[prov.nama] ?? [prov.nama]
     const matching = pokjaList.filter((p) => {
-      const region = p.data?.region ?? p.nama
-      return aliases.some(a => region.toLowerCase().includes(a.toLowerCase()) || a.toLowerCase().includes(region.toLowerCase()))
+      const region = (p.data?.region ?? p.nama).trim()
+      // Exact match dulu, lalu partial match
+      return aliases.some(a =>
+        region.toLowerCase() === a.toLowerCase() ||
+        region.toLowerCase().includes(a.toLowerCase()) ||
+        a.toLowerCase().includes(region.toLowerCase())
+      )
     })
+    if (prov.nama === "Prov. Aceh") {
+      console.log("[v0] Aceh matching pokja:", matching.map(p => ({ id: p.id, status: p.status, region: p.data?.region })))
+    }
     const aktifCount = matching.filter(p => p.status === "aktif").length
     const menungguCount = matching.filter(p => p.status === "masih-diverifikasi").length
     const perbaikanCount = matching.filter(p => p.status === "butuh-perbaikan").length
