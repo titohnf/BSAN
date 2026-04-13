@@ -106,7 +106,7 @@ export function UsulInstansiForm({ wilayah }: UsulInstansiFormProps) {
       <div>
         <h2 className="text-xl font-bold text-gray-900">Usul Instansi / Layanan Baru</h2>
         <p className="text-xs text-gray-500 mt-0.5">
-          Ajukan penambahan instansi atau layanan sebagai Sumber Rujukan apabila belum terdaftar di sistem untuk wilayah{" "}
+          Ajukan penambahan instansi atau layanan sebagai Sumber Dukungan apabila belum terdaftar di sistem untuk wilayah{" "}
           <span className="font-medium text-gray-700">{wilayah}</span>.
         </p>
       </div>

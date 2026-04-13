@@ -22,7 +22,7 @@ export type KategoriDukungan =
   | "Fasilitas Kesehatan" | "Konseling" | "Bantuan Hukum"
   | "Kepolisian" | "Psikologi" | "Pendidikan" | "Sosial" | "Lainnya"
 
-export type KategoriPenyedia = "Pemerintah Pusat" | "Pemerintah Daerah" | "Swasta" | "OMS"
+export type KategoriPenyedia = "Pemerintah Pusat" | "Pemerintah Daerah" | "Swasta" | "OMS" | "Lainnya"
 export type StatusRujukan = "terverifikasi" | "menunggu" | "menunggu_review" | "dihapus"
 
 export interface SumberRujukan {
@@ -71,6 +71,7 @@ export const PENYEDIA_CONFIG: Record<string, { color: string; bg: string }> = {
   "Pemerintah Daerah": { color: "text-indigo-700", bg: "bg-indigo-50" },
   "Swasta":            { color: "text-amber-700",  bg: "bg-amber-50" },
   "OMS":               { color: "text-green-700",  bg: "bg-green-50" },
+  "Lainnya":           { color: "text-gray-700",   bg: "bg-gray-100" },
 }
 
 // ---------------------------------------------------------------------------
@@ -526,14 +527,14 @@ export function SumberRujukanView() {
       {/* Heading */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Sumber Rujukan</h2>
+          <h2 className="text-xl font-bold text-gray-900">Sumber Dukungan</h2>
           <p className="text-xs text-gray-500 mt-0.5">Daftar kontak layanan untuk upaya preventif permasalahan di sekolah</p>
         </div>
         <button
           onClick={() => router.push("/sumber-rujukan/form")}
           className="flex items-center gap-1.5 h-9 px-4 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition shrink-0"
         >
-          <Plus className="w-4 h-4" /> Tambah Sumber Rujukan
+                  <Plus className="w-4 h-4" /> Tambah Sumber Dukungan
         </button>
       </div>
 

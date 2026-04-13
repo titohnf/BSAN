@@ -13,7 +13,7 @@ interface SekolahSidebarProps {
 }
 
 const navItems: { id: SekolahMenu; label: string; icon: typeof BookOpenCheck }[] = [
-  { id: "sumber-rujukan", label: "Sumber Rujukan", icon: BookOpenCheck },
+  { id: "sumber-rujukan", label: "Sumber Dukungan", icon: BookOpenCheck },
   { id: "usul-instansi", label: "Usul Instansi", icon: FilePlus2 },
 ]
 
@@ -28,7 +28,7 @@ export function SekolahSidebar({ activeMenu, onMenuChange, onLogout }: SekolahSi
         </div>
         <div className="min-w-0">
           <p className="text-white font-semibold text-sm leading-tight truncate">Admin Sekolah</p>
-          <p className="text-emerald-200 text-xs leading-tight truncate">Sumber Rujukan Wilayah</p>
+          <p className="text-emerald-200 text-xs leading-tight truncate">Sumber Dukungan Wilayah</p>
         </div>
       </div>
 

@@ -371,7 +371,7 @@ export function DashboardView({
       </Panel>
 
       <Panel>
-        <PanelHeader title="Sumber Rujukan">
+        <PanelHeader title="Sumber Dukungan">
           <ViewBtn label="Kelola" onClick={onViewSumberRujukan} />
         </PanelHeader>
         <div className="px-5 py-4 grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -472,7 +472,7 @@ export function DashboardView({
             <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Kegiatan Mendatang</p>
             {[
               { tanggal: "14 Jun", judul: "Pelatihan Pokja Baru" },
-              { tanggal: "17 Jun", judul: "Verifikasi Sumber Rujukan" },
+              { tanggal: "17 Jun", judul: "Verifikasi Sumber Dukungan" },
               { tanggal: "21 Jun", judul: "Rapat Koordinasi Bulanan" },
             ].map((k, i) => (
               <div key={i} className="p-2.5 rounded-lg bg-gray-50 border border-gray-100 hover:bg-blue-50 transition-colors cursor-pointer">
@@ -497,7 +497,7 @@ export function DashboardView({
             </thead>
             <tbody className="divide-y divide-gray-100">
               {[
-                { waktu: "12:45", user: "Admin Dinas", aksi: "Verifikasi Sumber Rujukan" },
+                { waktu: "12:45", user: "Admin Dinas", aksi: "Verifikasi Sumber Dukungan" },
                 { waktu: "11:30", user: "Admin Sekolah", aksi: "Upload Dokumen POKJA" },
                 { waktu: "10:15", user: "Admin Dinas", aksi: "Menolak Pengajuan POKJA" },
               ].map((log, i) => (

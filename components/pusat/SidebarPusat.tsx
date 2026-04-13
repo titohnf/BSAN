@@ -10,7 +10,7 @@ export type PusatMenu = "dashboard" | "pokja" | "sumber-rujukan" | "kegiatan"
 const navItems = [
   { id: "dashboard" as PusatMenu, label: "Dashboard", icon: LayoutDashboard },
   { id: "pokja" as PusatMenu, label: "POKJA", icon: Users },
-  { id: "sumber-rujukan" as PusatMenu, label: "Sumber Rujukan", icon: BookOpenCheck },
+  { id: "sumber-rujukan" as PusatMenu, label: "Sumber Dukungan", icon: BookOpenCheck },
   { id: "k" as PusatMenu, label: " kegiatan", icon: CalendarDays },
 ]
 

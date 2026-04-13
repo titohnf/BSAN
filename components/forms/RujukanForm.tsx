@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import {
   ArrowLeft, MapPin, Phone, Globe, Lock, Users,
-  ChevronDown, Building2, RotateCcw,
+  ChevronDown, Building2, RotateCcw, Plus, Trash2,
 } from "lucide-react"
 import { SEED, type SumberRujukan } from "@/components/dashboard/SumberRujukanView"
 import { RUJUKAN_LOG, dinasLog, getStatusAfterRestore } from "@/lib/rujukan-logs"
@@ -28,9 +28,14 @@ type KategoriDukungan =
   | "Sosial"
   | "Lainnya"
 
-type KategoriPenyedia = "Pemerintah Pusat" | "Pemerintah Daerah" | "Swasta" | "OMS"
+type KategoriPenyedia = "Pemerintah Pusat" | "Pemerintah Daerah" | "Swasta" | "OMS" | "Lainnya"
 type AksesInfo = "publik" | "terbatas"
 type StatusRujukan = "terverifikasi" | "menunggu" | "menunggu_review" | "dihapus"
+
+interface KontakEntry {
+  nomor: string
+  tipe: "call_center" | "nomor_pribadi"
+}
 
 interface FormState {
   kategoriBentukDukungan: KategoriDukungan | ""
@@ -43,8 +48,7 @@ interface FormState {
   nomorJalan: string
   kodePos: string
   tautanGoogleMaps: string
-  nomorCallCenter: string
-  nomorPribadi: string
+  kontak: KontakEntry[]
   website: string
   kategoriPenyedia: KategoriPenyedia | ""
   aksesInfo: AksesInfo
@@ -59,7 +63,7 @@ const KATEGORI_DUKUNGAN: KategoriDukungan[] = [
   "Kepolisian", "Psikologi", "Pendidikan", "Sosial", "Lainnya",
 ]
 const KATEGORI_PENYEDIA: KategoriPenyedia[] = [
-  "Pemerintah Pusat", "Pemerintah Daerah", "Swasta", "OMS",
+  "Pemerintah Pusat", "Pemerintah Daerah", "Swasta", "OMS", "Lainnya",
 ]
 const PROVINSI_OPTIONS = [
   "Aceh", "Sumatera Utara", "Sumatera Barat", "Riau", "Kepulauan Riau",
@@ -168,8 +172,7 @@ const emptyForm = (): FormState => ({
   nomorJalan: "",
   kodePos: "",
   tautanGoogleMaps: "",
-  nomorCallCenter: "",
-  nomorPribadi: "",
+  kontak: [{ nomor: "", tipe: "call_center" }],
   website: "",
   kategoriPenyedia: "",
   aksesInfo: "publik",
@@ -244,8 +247,17 @@ function RujukanFormInner() {
         nomorJalan: (existing.nomorJalan as string) ?? "",
         kodePos: (existing.kodePos as string) ?? "",
         tautanGoogleMaps: (existing.tautanGoogleMaps as string) ?? "",
-        nomorCallCenter: (existing.nomorCallCenter as string) ?? "",
-        nomorPribadi: (existing.nomorPribadi as string) ?? "",
+        kontak: (() => {
+          // Support legacy fields nomorCallCenter / nomorPribadi as well as new kontak[]
+          const stored = existing.kontak as KontakEntry[] | undefined
+          if (Array.isArray(stored) && stored.length > 0) return stored
+          const entries: KontakEntry[] = []
+          const cc = existing.nomorCallCenter as string | undefined
+          const np = existing.nomorPribadi as string | undefined
+          if (cc) entries.push({ nomor: cc, tipe: "call_center" })
+          if (np) entries.push({ nomor: np, tipe: "nomor_pribadi" })
+          return entries.length > 0 ? entries : [{ nomor: "", tipe: "call_center" as const }]
+        })(),
         website: (existing.website as string) ?? "",
         kategoriPenyedia: (existing.kategoriPenyedia as KategoriPenyedia) ?? "",
         aksesInfo: (existing.aksesInfo as AksesInfo) ?? "publik",
@@ -304,7 +316,7 @@ function RujukanFormInner() {
     form.kategoriBentukDukungan !== "" &&
     form.namaInstansi.trim() !== "" &&
     form.kabupatenKota.trim() !== "" &&
-    form.nomorCallCenter.trim() !== "" &&
+    form.kontak.some((k) => k.nomor.trim() !== "") &&
     form.kategoriPenyedia !== ""
 
   const handleSubmit = () => {
@@ -344,8 +356,9 @@ function RujukanFormInner() {
           nomorJalan: form.nomorJalan,
           kodePos: form.kodePos,
           tautanGoogleMaps: form.tautanGoogleMaps,
-          nomorCallCenter: form.nomorCallCenter,
-          nomorPribadi: form.nomorPribadi,
+          nomorCallCenter: form.kontak.find((k) => k.tipe === "call_center")?.nomor ?? form.kontak[0]?.nomor ?? "",
+          nomorPribadi: form.kontak.filter((k) => k.tipe === "nomor_pribadi").map((k) => k.nomor).join(", ") || undefined,
+          kontak: form.kontak,
           website: form.website,
           aksesInfo: form.aksesInfo,
           status: "terverifikasi",
@@ -382,7 +395,7 @@ function RujukanFormInner() {
           <p className="text-sm text-gray-500 mt-1">
             {isEdit
               ? "Perubahan berhasil disimpan."
-              : "Sumber rujukan berhasil ditambahkan dan langsung terverifikasi."}
+              : "Sumber dukungan berhasil ditambahkan dan langsung terverifikasi."}
           </p>
         </div>
       </div>
@@ -404,7 +417,7 @@ function RujukanFormInner() {
           </button>
           <div className="flex-1 min-w-0">
             <h1 className="text-base font-bold text-gray-900">
-              {isView ? "Detail Sumber Rujukan" : isEdit ? "Edit Sumber Rujukan" : "Tambah Sumber Rujukan"}
+              {isView ? "Detail Sumber Dukungan" : isEdit ? "Edit Sumber Dukungan" : "Tambah Sumber Dukungan"}
             </h1>
             {isView ? (
               <div className="mt-1">
@@ -477,16 +490,103 @@ function RujukanFormInner() {
         </SectionCard>
 
         <SectionCard icon={<Phone className="w-4 h-4" />} title="Informasi Kontak">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <FieldLabel required={!isReadOnly}>Nomor Call Center</FieldLabel>
-              <TextInput value={form.nomorCallCenter} onChange={(v) => set("nomorCallCenter", v.replace(/\D/g, ""))} placeholder="08xxxxxxxxxx" type="tel" disabled={isReadOnly} />
+          <div className="space-y-4">
+            {/* Kontak entries */}
+            <div className="space-y-3">
+              {isReadOnly ? (
+                /* Read-only: display each kontak entry */
+                form.kontak.filter((k) => k.nomor.trim()).map((k, i) => (
+                  <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 border border-gray-200">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${k.tipe === "call_center" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}`}>
+                      <Phone className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">{k.tipe === "call_center" ? "Call Center" : "Nomor Pribadi"}</p>
+                      <p className="text-sm font-medium text-gray-900">{k.nomor}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                form.kontak.map((k, i) => (
+                  <div key={i} className="flex gap-2 items-start">
+                    {/* Nomor input */}
+                    <div className="flex-1">
+                      {i === 0 && <FieldLabel required>Nomor Kontak</FieldLabel>}
+                      <div className={i === 0 ? "mt-1.5" : ""}>
+                        <input
+                          type="tel"
+                          value={k.nomor}
+                          onChange={(e) => {
+                            const updated = form.kontak.map((c, idx) =>
+                              idx === i ? { ...c, nomor: e.target.value.replace(/\D/g, "") } : c
+                            )
+                            set("kontak", updated)
+                          }}
+                          placeholder="08xxxxxxxxxx"
+                          className="w-full h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white"
+                        />
+                      </div>
+                    </div>
+                    {/* Tipe toggle */}
+                    <div className="flex flex-col gap-1.5">
+                      {i === 0 && <span className="text-xs font-semibold text-gray-700">Tipe</span>}
+                      <div className={`flex rounded-lg border border-gray-300 overflow-hidden ${i === 0 ? "" : "mt-0"}`}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = form.kontak.map((c, idx) =>
+                              idx === i ? { ...c, tipe: "call_center" as const } : c
+                            )
+                            set("kontak", updated)
+                          }}
+                          className={`h-9 px-3 text-xs font-medium transition whitespace-nowrap ${k.tipe === "call_center" ? "bg-blue-600 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+                        >
+                          Call Center
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = form.kontak.map((c, idx) =>
+                              idx === i ? { ...c, tipe: "nomor_pribadi" as const } : c
+                            )
+                            set("kontak", updated)
+                          }}
+                          className={`h-9 px-3 text-xs font-medium transition whitespace-nowrap border-l border-gray-300 ${k.tipe === "nomor_pribadi" ? "bg-green-600 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+                        >
+                          Nomor Pribadi
+                        </button>
+                      </div>
+                    </div>
+                    {/* Remove button */}
+                    {form.kontak.length > 1 && (
+                      <div className={i === 0 ? "pt-6" : ""}>
+                        <button
+                          type="button"
+                          onClick={() => set("kontak", form.kontak.filter((_, idx) => idx !== i))}
+                          className="h-9 w-9 flex items-center justify-center rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition flex-shrink-0"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
-            <div className="flex flex-col gap-1.5">
-              <FieldLabel>Nomor Pribadi <span className="text-xs font-normal text-gray-400">(opsional)</span></FieldLabel>
-              <TextInput value={form.nomorPribadi} onChange={(v) => set("nomorPribadi", v.replace(/\D/g, ""))} placeholder="08xxxxxxxxxx" type="tel" disabled={isReadOnly} />
-            </div>
-            <div className="sm:col-span-2 flex flex-col gap-1.5">
+
+            {/* Add more button */}
+            {!isReadOnly && (
+              <button
+                type="button"
+                onClick={() => set("kontak", [...form.kontak, { nomor: "", tipe: "call_center" }])}
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 border border-blue-200 bg-blue-50 hover:bg-blue-100 rounded-lg px-3 py-2 transition"
+              >
+                <Plus className="w-3.5 h-3.5" /> Tambah Kontak
+              </button>
+            )}
+
+            {/* Website */}
+            <div className="flex flex-col gap-1.5 pt-1 border-t border-gray-100">
               <FieldLabel>Website <span className="text-xs font-normal text-gray-400">(opsional)</span></FieldLabel>
               <div className="relative">
                 {!isReadOnly && <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />}
@@ -505,7 +605,7 @@ function RujukanFormInner() {
 
         <SectionCard icon={<Lock className="w-4 h-4" />} title="Akses Informasi">
           <div className="space-y-3">
-            <p className="text-xs text-gray-500">Tentukan siapa yang dapat melihat informasi sumber rujukan ini.</p>
+            <p className="text-xs text-gray-500">Tentukan siapa yang dapat melihat informasi sumber dukungan ini.</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {([
                 { value: "publik" as AksesInfo, label: "Publik", desc: "Dapat dilihat oleh semua orang tanpa perlu login", icon: <Users className="w-4 h-4" />, color: "border-green-400 bg-green-50", iconBg: "bg-green-100 text-green-700" },
@@ -592,7 +692,7 @@ function RujukanFormInner() {
               disabled={!canSubmit}
               className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
-              {isEdit ? "Simpan Perubahan" : "Simpan Sumber Rujukan"}
+              {isEdit ? "Simpan Perubahan" : "Simpan Sumber Dukungan"}
             </button>
           </div>
         )}

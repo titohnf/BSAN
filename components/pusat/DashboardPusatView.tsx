@@ -362,10 +362,10 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
         </div>
       </div>
 
-      {/* Sumber Rujukan */}
+      {/* Sumber Dukungan */}
       <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-gray-800">Sumber Rujukan</h3>
+          <h3 className="text-sm font-semibold text-gray-800">Sumber Dukungan</h3>
           {onViewSumberRujukan && (
             <button onClick={onViewSumberRujukan} className="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1">
               Kelola <ChevronRight className="w-3.5 h-3.5" />
