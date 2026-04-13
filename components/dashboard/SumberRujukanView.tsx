@@ -7,7 +7,7 @@ import {
   Search, MessageCircle, Globe, Lock, Users,
   Building2, GraduationCap, HandHeart, Radio,
   ChevronRight, X, Pencil, Trash2, CheckCircle,
-  XCircle, ExternalLink, RotateCcw, Clock, ArrowUpDown,
+  XCircle, ExternalLink, RotateCcw, Clock, ArrowUpDown, Download,
 } from "lucide-react"
 import { DEFAULT_DINAS_NAMA, getDinasNamaForLogs } from "@/lib/auth-session"
 import { RUJUKAN_LOG, dinasLog, formatLogTerakhirDisplay, getStatusAfterRestore } from "@/lib/rujukan-logs"
@@ -587,6 +587,39 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
 
   const handleEdit = (id: string) => router.push(`/sumber-rujukan/form?edit=${id}`)
 
+  const exportToCSV = () => {
+    const headers = [
+      "Nama Instansi", "Kategori Dukungan", "Kategori Penyedia",
+      "Provinsi", "Kabupaten/Kota", "Alamat",
+      "Nomor Call Center", "Nomor Pribadi", "Website",
+      "Akses Informasi", "Status", "Dibuat Oleh",
+    ]
+    const rows = filtered.map((item) => [
+      item.namaInstansi,
+      item.kategoriBentukDukungan,
+      item.kategoriPenyedia ?? "",
+      item.provinsi ?? "",
+      item.kabupatenKota ?? "",
+      [item.namaJalan, item.nomorJalan, item.kodePos].filter(Boolean).join(" "),
+      item.nomorCallCenter ?? "",
+      item.nomorPribadi ?? "",
+      item.website ?? "",
+      item.aksesInfo === "publik" ? "Publik" : "Terbatas",
+      item.status,
+      item.dibuatOleh ?? "",
+    ])
+    const escape = (v: string) => `"${v.replace(/"/g, '""')}"`
+    const csv = [headers, ...rows].map((row) => row.map(escape).join(",")).join("\n")
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    const scopeLabel = scope === "wilayah" ? myKabupatenKota.replace(/\s+/g, "-") : "Nasional"
+    a.href = url
+    a.download = `Sumber-Dukungan-${scopeLabel}-${new Date().toISOString().slice(0, 10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   const statKeys: KategoriDukungan[] = ["Fasilitas Kesehatan", "Konseling", "Bantuan Hukum", "Kepolisian"]
   const scopeList = scope === "wilayah"
     ? list.filter((i) => i.provinsi === myProvinsi && i.kabupatenKota === myKabupatenKota)
@@ -600,12 +633,22 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
           <h2 className="text-xl font-bold text-gray-900">Sumber Dukungan</h2>
           <p className="text-xs text-gray-500 mt-0.5">Daftar kontak layanan untuk upaya preventif permasalahan di sekolah</p>
         </div>
-        <button
-          onClick={() => router.push("/sumber-rujukan/form")}
-          className="flex items-center gap-1.5 h-9 px-4 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition shrink-0"
-        >
-          <Plus className="w-4 h-4" /> Tambah Sumber Dukungan
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={exportToCSV}
+            disabled={filtered.length === 0}
+            className="flex items-center gap-1.5 h-9 px-4 rounded-lg text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Download className="w-4 h-4" /> Export CSV
+          </button>
+          <button
+            onClick={() => router.push("/sumber-rujukan/form")}
+            className="flex items-center gap-1.5 h-9 px-4 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition shrink-0"
+          >
+            <Plus className="w-4 h-4" /> Tambah Sumber Dukungan
+          </button>
+        </div>
       </div>
 
       {/* Scope toggle */}
