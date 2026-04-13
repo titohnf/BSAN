@@ -344,12 +344,7 @@ export function DashboardView({
                     </div>
                   )}
 
-                  {/* Catatan batas maksimal */}
-                  <div className="pt-3 border-t border-gray-200">
-                    <p className="text-xs text-gray-500 italic">
-                      Admin Dinas hanya dapat membentuk 1 POKJA per wilayah. POKJA di atas adalah POKJA aktif untuk wilayah {region}.
-                    </p>
-                  </div>
+
                 </div>
               )
             })}

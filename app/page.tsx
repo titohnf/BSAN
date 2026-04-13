@@ -345,10 +345,17 @@ function AdminPageInner() {
 
       const parsed = JSON.parse(raw) as Omit<PokjaData, "sk"> & {
         sk: Omit<PokjaData["sk"], "file"> & { file: string | null }
+        prevStatus?: string
       }
 
       const today = new Date().toISOString().slice(0, 10)
-      const logPerbaiki = { tanggal: today, aksi: "perbaiki", aktor: "user", alasan: "Data diperbaiki dan diajukan kembali" }
+      const isEdit = parsed.prevStatus === "aktif"
+      const logPerbaiki = {
+        tanggal: today,
+        aksi: isEdit ? "edit" : "perbaiki",
+        aktor: "user",
+        alasan: isEdit ? "Data POKJA diperbarui dan diajukan ulang untuk verifikasi" : "Data diperbaiki dan diajukan kembali",
+      }
 
       setPokjaList((prev) => {
         const seen = new Set<string>()
@@ -380,10 +387,11 @@ function AdminPageInner() {
     router.push("/buat-pokja")
   }
 
-  // Handler: admin dinas klik "Perbaiki Data" dari banner penolakan
+  // Handler: admin dinas klik "Edit" atau "Perbaiki Data" dari detail/beranda
   const handlePerbaikiPokja = (pokja: PokjaItem) => {
     try {
       sessionStorage.setItem("perbaikanPokjaData", JSON.stringify({
+        prevStatus: pokja.status,
         nomorKanal: pokja.data?.nomorKanal ?? "",
         members: pokja.data?.members ?? {},
         sk: {

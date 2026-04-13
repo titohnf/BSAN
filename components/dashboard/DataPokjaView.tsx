@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   FileText,
+  Pencil,
 } from "lucide-react"
 import { Button } from "@/components/ds/Button"
 import { Badge } from "@/components/ds/Badge"
@@ -330,6 +331,16 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                   <p className="text-sm text-gray-500">Wilayah: {pokja.data.region}</p>
                 )}
               </div>
+              {!isAdminPusat && (pokja.status === "aktif" || pokja.status === "masih-diverifikasi") && (
+                <button
+                  type="button"
+                  onClick={() => onPerbaikiPokja?.(pokja)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex-shrink-0"
+                >
+                  <Pencil className="w-4 h-4" />
+                  Edit Data POKJA
+                </button>
+              )}
             </div>
 
             {/* Banner penolakan — hanya tampil untuk admin dinas saat status butuh-perbaikan */}
@@ -579,8 +590,9 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                           terima:     { label: "Diterima",           color: "text-green-700 bg-green-50 border-green-200",    dot: "bg-green-500"  },
                           aktivasi:   { label: "Diaktivasi",         color: "text-green-700 bg-green-50 border-green-200",    dot: "bg-green-500"  },
                           tolak:      { label: "Ditolak",            color: "text-red-700 bg-red-50 border-red-200",          dot: "bg-red-500"    },
-                          perbaiki:   { label: "Perbaikan Diajukan", color: "text-amber-700 bg-amber-50 border-amber-200",    dot: "bg-amber-500"  },
-                          sk_expired: { label: "SK Kedaluwarsa",     color: "text-orange-700 bg-orange-50 border-orange-200", dot: "bg-orange-500" },
+                          perbaiki:   { label: "Perbaikan Diajukan", color: "text-amber-700 bg-amber-50 border-amber-200",    dot: "bg-amber-500"   },
+                          edit:       { label: "Data Diperbarui",    color: "text-indigo-700 bg-indigo-50 border-indigo-200", dot: "bg-indigo-500"  },
+                          sk_expired: { label: "SK Kedaluwarsa",     color: "text-orange-700 bg-orange-50 border-orange-200", dot: "bg-orange-500"  },
                         }
                         const aktorLabel: Record<string, string> = {
                           user:        "Admin Dinas",
