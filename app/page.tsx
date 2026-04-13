@@ -28,144 +28,128 @@ const REGION = "Prov. Aceh"
 
 const emptyMember = () => ({ nama: "", email: "", jenisKelamin: "" as "", noWhatsapp: "", instansi: "", jabatan: "" })
 
+const E = emptyMember
+const SK0 = { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" }
+const B = (id: string, nama: string): PokjaItem => ({
+  id, nama, status: "belum-dibentuk",
+  data: { region: nama, nomorKanal: "", members: { catatan: E() }, sk: SK0 }
+})
+
 const MOCK_POKJA_LIST: PokjaItem[] = [
-  { 
-    id: "p1", 
-    nama: "Prov. Jawa Timur", 
-    status: "aktif", 
-    tanggalDiverifikasi: "2024-03-15",
-    validasiLog: [
-      { tanggal: "2024-03-15", aksi: "terima", aktor: "admin_pusat" }
-    ],
-    data: { 
-      region: "Jawa Timur", 
-      nomorKanal: "0812xxx", 
-      members: { 
-        ketua: { nama: "Dr. Budi Santoso, M.Si", email: "budi@jatim.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08121234567", instansi: "Dinas Pendidikan Prov. Jawa Timur", jabatan: "Ket" },
-        wakil: { nama: "Ibu Siti Rahayu, M.Pd", email: "siti@jatim.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08121234568", instansi: "Dinas Pendidikan Prov. Jawa Timur", jabatan: "Wakil" },
-        koordinator: { nama: "Bpk. Ahmad Wijaya, S.H", email: "ahmad@jatim.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08121234569", instansi: "Sekretariat Daerah Prov. Jawa Timur", jabatan: "Koordinator" },
-        pendidikan: { nama: "Ibu Devi Kusuma, S.Pd", email: "devi@jatim.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08121234570", instansi: "Dinas Pendidikan Prov. Jawa Timur", jabatan: "Anggota" },
-        pppa: { nama: "Bpk. Hadi Prasetyo, M.H", email: "hadi@jatim.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08121234571", instansi: "DP3A Prov. Jawa Timur", jabatan: "Anggota" },
-        sosial: { nama: "Ibu Wati Susilowati, S.Sos", email: "wati@jatim.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08121234572", instansi: "Dinas Sosial Prov. Jawa Timur", jabatan: "Anggota" },
-        kesehatan: { nama: "Dr. Nugroho, Sp.A", email: "nugroho@jatim.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08121234573", instansi: "Dinas Kesehatan Prov. Jawa Timur", jabatan: "Anggota" },
-        kominfo: { nama: "Bpk. Firman Hermawan, S.Kom", email: "firman@jatim.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08121234574", instância: "Dinas Kominfo Prov. Jawa Timur", jabatan: "Anggota" },
-        dukbangga: { nama: "Ibu Rina Hartati, M.Acc", email: "rina@jatim.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08121234575", instância: "BPKAD Prov. Jawa Timur", jabatan: "Anggota" },
-      }, 
-      sk: { file: null, nomorSK: "420/001/2024", tanggalSK: "2024-01-15", periodeMultai: "2024-01-15", periodeSelesai: "2027-01-14" } 
-    } 
+  // Provinsi dengan data lengkap — berbagai status
+  {
+    id: "p1", nama: "Prov. Jawa Timur", status: "aktif", tanggalDiverifikasi: "2024-03-15",
+    validasiLog: [{ tanggal: "2024-03-15", aksi: "terima", aktor: "admin_pusat" }],
+    data: {
+      region: "Prov. Jawa Timur", nomorKanal: "0812xxx",
+      members: {
+        ketua:       { nama: "Dr. Budi Santoso, M.Si",      email: "budi@jatim.go.id",   jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08121234567", instansi: "Dinas Pendidikan Prov. Jawa Timur",  jabatan: "Ketua" },
+        wakil:       { nama: "Ibu Siti Rahayu, M.Pd",       email: "siti@jatim.go.id",   jenisKelamin: "Perempuan" as const,  noWhatsapp: "08121234568", instansi: "Dinas Pendidikan Prov. Jawa Timur",  jabatan: "Wakil Ketua" },
+        koordinator: { nama: "Bpk. Ahmad Wijaya, S.H",      email: "ahmad@jatim.go.id",  jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08121234569", instansi: "Sekretariat Daerah Prov. Jawa Timur", jabatan: "Koordinator" },
+        pendidikan:  { nama: "Ibu Devi Kusuma, S.Pd",       email: "devi@jatim.go.id",   jenisKelamin: "Perempuan" as const,  noWhatsapp: "08121234570", instansi: "Dinas Pendidikan Prov. Jawa Timur",  jabatan: "Anggota" },
+        pppa:        { nama: "Bpk. Hadi Prasetyo, M.H",     email: "hadi@jatim.go.id",   jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08121234571", instansi: "DP3A Prov. Jawa Timur",              jabatan: "Anggota" },
+        sosial:      { nama: "Ibu Wati Susilowati, S.Sos",  email: "wati@jatim.go.id",   jenisKelamin: "Perempuan" as const,  noWhatsapp: "08121234572", instansi: "Dinas Sosial Prov. Jawa Timur",      jabatan: "Anggota" },
+        kesehatan:   { nama: "Dr. Nugroho, Sp.A",           email: "nugroho@jatim.go.id",jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08121234573", instansi: "Dinas Kesehatan Prov. Jawa Timur",   jabatan: "Anggota" },
+        kominfo:     { nama: "Bpk. Firman Hermawan, S.Kom", email: "firman@jatim.go.id", jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08121234574", instansi: "Dinas Kominfo Prov. Jawa Timur",     jabatan: "Anggota" },
+        dukbangga:   { nama: "Ibu Rina Hartati, M.Acc",     email: "rina@jatim.go.id",   jenisKelamin: "Perempuan" as const,  noWhatsapp: "08121234575", instansi: "BPKAD Prov. Jawa Timur",             jabatan: "Anggota" },
+      },
+      sk: { file: null, nomorSK: "420/001/2024", tanggalSK: "2024-01-15", periodeMultai: "2024-01-15", periodeSelesai: "2027-01-14" }
+    }
   },
-  { 
-    id: "p2", 
-    nama: "Prov. DKI Jakarta", 
-    status: "butuh-perbaikan", 
-    tanggalDiverifikasi: "2024-02-20",
+  {
+    id: "p2", nama: "Prov. DKI Jakarta", status: "butuh-perbaikan", tanggalDiverifikasi: "2024-02-20",
     validasiLog: [
-      { tanggal: "2024-02-20", aksi: "terima", aktor: "admin_pusat" },
-      { tanggal: "2025-01-01", aksi: "sk_expired", aktor: "sistem", alasan: "SK berakhir" }
+      { tanggal: "2024-02-20", aksi: "terima",     aktor: "admin_pusat" },
+      { tanggal: "2025-01-01", aksi: "sk_expired", aktor: "sistem",      alasan: "SK berakhir" }
     ],
-    data: { 
-      region: "DKI Jakarta", 
-      nomorKanal: "0813xxx",
-      members: { 
-        ketua: { nama: "Dr. Ani Kusuma, M.Si", email: "ani@dki.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08131234567", instansi: "Dinas Pendidikan DKI Jakarta", jabatan: "Ketua" },
-        wakil: { nama: "Bpk. Jakarta", email: "jakarta@dki.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08131234568", instansi: "Dinas Pendidikan DKI Jakarta", jabatan: "Wakil" },
-        koordinator: { nama: "Ibu Siti", email: "siti@dki.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08131234569", instansi: "Setda DKI Jakarta", jabatan: "Koordinator" },
-        pendidikan: { nama: "Bpk. Budi", email: "budi@dki.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08131234570", instansi: "Dinas Pendidikan DKI Jakarta", jabatan: "Anggota" },
-        pppa: { nama: "Ibu Linda", email: "linda@dki.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08131234571", instância: "DP3A DKI Jakarta", jabatan: "Anggota" },
-        sosial: { nama: "Bpk. Anton", email: "anton@dki.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08131234572", instância: "Dinas Sosial DKI Jakarta", jabatan: "Anggota" },
-        kesehatan: { nama: "Dr. Sarah", email: "sarah@dki.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08131234573", instansi: "Dinas Kesehatan DKI Jakarta", jabatan: "Anggota" },
-        kominfo: { nama: "Bpk. Rizal", email: "rizal@dki.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08131234574", instansi: "Dinas Kominfo DKI Jakarta", jabatan: "Anggota" },
-        dukbangga: { nama: "Ibu Maya", email: "maya@dki.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08131234575", instância: "BPKAD DKI Jakarta", jabatan: "Anggota" },
-      }, 
-      sk: { file: null, nomorSK: "456/002/2024", tanggalSK: "2024-01-20", periodeMultai: "2024-01-20", periodeSelesai: "2024-12-31" } 
-    } 
+    data: {
+      region: "Prov. DKI Jakarta", nomorKanal: "0813xxx",
+      members: {
+        ketua:       { nama: "Dr. Ani Kusuma, M.Si",   email: "ani@dki.go.id",    jenisKelamin: "Perempuan" as const, noWhatsapp: "08131234567", instansi: "Dinas Pendidikan DKI Jakarta", jabatan: "Ketua" },
+        wakil:       { nama: "Bpk. Reza Pratama",      email: "reza@dki.go.id",   jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08131234568", instansi: "Dinas Pendidikan DKI Jakarta", jabatan: "Wakil Ketua" },
+        koordinator: { nama: "Ibu Siti Aminah",        email: "siti@dki.go.id",   jenisKelamin: "Perempuan" as const, noWhatsapp: "08131234569", instansi: "Setda DKI Jakarta",            jabatan: "Koordinator" },
+        pendidikan:  { nama: "Bpk. Budi Hartono",      email: "budi@dki.go.id",   jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08131234570", instansi: "Dinas Pendidikan DKI Jakarta", jabatan: "Anggota" },
+        pppa:        { nama: "Ibu Linda Sari",         email: "linda@dki.go.id",  jenisKelamin: "Perempuan" as const, noWhatsapp: "08131234571", instansi: "DP3A DKI Jakarta",             jabatan: "Anggota" },
+        sosial:      { nama: "Bpk. Anton Wijaya",      email: "anton@dki.go.id",  jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08131234572", instansi: "Dinas Sosial DKI Jakarta",     jabatan: "Anggota" },
+        kesehatan:   { nama: "Dr. Sarah Rahmawati",    email: "sarah@dki.go.id",  jenisKelamin: "Perempuan" as const, noWhatsapp: "08131234573", instansi: "Dinas Kesehatan DKI Jakarta",  jabatan: "Anggota" },
+        kominfo:     { nama: "Bpk. Rizal Fauzi, S.Kom",email: "rizal@dki.go.id",  jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08131234574", instansi: "Dinas Kominfo DKI Jakarta",    jabatan: "Anggota" },
+        dukbangga:   { nama: "Ibu Maya Kurniawati",    email: "maya@dki.go.id",   jenisKelamin: "Perempuan" as const, noWhatsapp: "08131234575", instansi: "BPKAD DKI Jakarta",            jabatan: "Anggota" },
+      },
+      sk: { file: null, nomorSK: "456/002/2024", tanggalSK: "2024-01-20", periodeMultai: "2024-01-20", periodeSelesai: "2024-12-31" }
+    }
   },
-  { 
-    id: "p3", 
-    nama: "Kab. Bandung", 
-    status: "aktif", 
-    tanggalDiverifikasi: "2024-03-15",
+  {
+    id: "p3", nama: "Prov. Jawa Barat", status: "aktif", tanggalDiverifikasi: "2024-03-15",
     validasiLog: [
       { tanggal: "2024-01-05", aksi: "pengajuan", aktor: "user" },
-      { tanggal: "2024-01-10", aksi: "tolak", aktor: "admin_pusat", alasan: "Data anggota tidak lengkap" },
-      { tanggal: "2024-02-20", aksi: "perbaiki", aktor: "user", alasan: "Data anggota sudah diperbaiki" },
-      { tanggal: "2024-03-15", aksi: "aktivasi", aktor: "admin_pusat" }
+      { tanggal: "2024-01-10", aksi: "tolak",     aktor: "admin_pusat", alasan: "Data anggota tidak lengkap" },
+      { tanggal: "2024-02-20", aksi: "perbaiki",  aktor: "user",        alasan: "Data anggota sudah diperbaiki" },
+      { tanggal: "2024-03-15", aksi: "aktivasi",  aktor: "admin_pusat" }
     ],
-    data: { 
-      region: "Jawa Barat", 
-      nomorKanal: "0814xxx", 
-      members: { 
-        ketua: { nama: "Bpk. Dedi Supriadi, M.Pd", email: "dedi@bandung.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08141234567", instansi: "Dinas Pendidikan Kab. Bandung", jabatan: "Ketua" },
-        wakil: { nama: "Ibu Rina Marlina, S.Pd", email: "rina@bandung.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08141234568", instância: "Dinas Pendidikan Kab. Bandung", jabatan: "Wakil Ketua" },
-        koordinator: { nama: "Bpk. Rudi Hermawan, M.Si", email: "rudi@bandung.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08141234569", instância: "Sekretariat Daerah Kab. Bandung", jabatan: "Koordinator" },
-        pendidikan: { nama: "Ibu Siti Nurhaliza, S.Pd", email: "siti@bandung.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08141234570", instância: "Dinas Pendidikan Kab. Bandung", jabatan: "Anggota" },
-        pppa: { nama: "Bpk. Undang Hasan, M.H", email: "undang@bandung.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08141234571", instância: "DP3A Kab. Bandung", jabatan: "Anggota" },
-        sosial: { nama: "Ibu Yanti Kusuma, S.Sos", email: "yanti@bandung.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08141234572", instansi: "Dinas Sosial Kab. Bandung", jabatan: "Anggota" },
-        kesehatan: { nama: "Dr. Budi Santoso", email: "budi@bandung.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08141234573", instância: "Dinas Kesehatan Kab. Bandung", jabatan: "Anggota" },
-        kominfo: { nama: "Bpk. Adi Wijaya, S.Kom", email: "adi@bandung.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08141234574", instância: "Dinas Kominfo Kab. Bandung", jabatan: "Anggota" },
-        dukbangga: { nama: "Ibu Diah Permata, M.Acc", email: "diah@bandung.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08141234575", instância: "BPKAD Kab. Bandung", jabatan: "Anggota" },
-      }, 
-      sk: { file: null, nomorSK: "789/003/2024", tanggalSK: "2024-01-05", periodeMultai: "2024-01-05", periodeSelesai: "2027-01-04" } 
-    } 
+    data: {
+      region: "Prov. Jawa Barat", nomorKanal: "0814xxx",
+      members: {
+        ketua:       { nama: "Bpk. Dedi Supriadi, M.Pd",  email: "dedi@jabar.go.id",  jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08141234567", instansi: "Dinas Pendidikan Prov. Jawa Barat", jabatan: "Ketua" },
+        wakil:       { nama: "Ibu Rina Marlina, S.Pd",    email: "rina@jabar.go.id",  jenisKelamin: "Perempuan" as const,  noWhatsapp: "08141234568", instansi: "Dinas Pendidikan Prov. Jawa Barat", jabatan: "Wakil Ketua" },
+        koordinator: { nama: "Bpk. Rudi Hermawan, M.Si",  email: "rudi@jabar.go.id",  jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08141234569", instansi: "Sekretariat Daerah Prov. Jawa Barat",jabatan: "Koordinator" },
+        pendidikan:  { nama: "Ibu Siti Nurhaliza, S.Pd",  email: "siti@jabar.go.id",  jenisKelamin: "Perempuan" as const,  noWhatsapp: "08141234570", instansi: "Dinas Pendidikan Prov. Jawa Barat", jabatan: "Anggota" },
+        pppa:        { nama: "Bpk. Undang Hasan, M.H",    email: "undang@jabar.go.id",jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08141234571", instansi: "DP3A Prov. Jawa Barat",             jabatan: "Anggota" },
+        sosial:      { nama: "Ibu Yanti Kusuma, S.Sos",   email: "yanti@jabar.go.id", jenisKelamin: "Perempuan" as const,  noWhatsapp: "08141234572", instansi: "Dinas Sosial Prov. Jawa Barat",     jabatan: "Anggota" },
+      },
+      sk: { file: null, nomorSK: "789/003/2024", tanggalSK: "2024-01-05", periodeMultai: "2024-01-05", periodeSelesai: "2027-01-04" }
+    }
   },
-  { 
-    id: "p4", 
-    nama: "Kota Surabaya", 
-    status: "masih-diverifikasi", 
-    validasiLog: [
-      { tanggal: "2024-02-01", aksi: "pengajuan", aktor: "user" }
-    ],
-    data: { 
-      region: "Jawa Timur", 
-      nomorKanal: "0815xxx", 
-      members: { 
-        ketua: { nama: "Bpk. Hendra Wijanto, S.H, M.H", email: "hendra@surabaya.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08151234567", instansi: "Dinas Pendidikan Kota Surabaya", jabatan: "Ketua" },
-        wakil: { nama: "Ibu Diana Permata, M.Pd", email: "diana@surabaya.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08151234568", instansi: "Dinas Pendidikan Kota Surabaya", jabatan: "Wakil Ketua" },
-        koordinator: { nama: "Bpk. Susanto, M.Si", email: "susanto@surabaya.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08151234569", instância: "Sekretariat Daerah Kota Surabaya", jabatan: "Koordinator" },
-        pendidikan: { nama: "Ibu Maya Kumala, S.Pd", email: "maya@surabaya.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08151234570", instansi: "Dinas Pendidikan Kota Surabaya", jabatan: "Anggota" },
-        pppa: { nama: "Bpk. Ali Akbar, M.H", email: "ali@surabaya.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08151234571", instansi: "DP3A Kota Surabaya", jabatan: "Anggota" },
-        sosial: { nama: "Ibu Ratna Sari, S.Sos", email: "ratna@surabaya.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08151234572", instância: "Dinas Sosial Kota Surabaya", jabatan: "Anggota" },
-        kesehatan: { nama: "Dr. Wahyu Nugroho", email: "wahyu@surabaya.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08151234573", instansi: "Dinas Kesehatan Kota Surabaya", jabatan: "Anggota" },
-        kominfo: { nama: "Bpk. Dimaz Prasetyo, S.Kom", email: "dimaz@surabaya.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08151234574", instância: "Dinas Kominfo Kota Surabaya", jabatan: "Anggota" },
-        dukbangga: { nama: "Ibu Sinta Wahyuni, M.Acc", email: "sinta@surabaya.go.id", jenisKelamin: "Perempuan" as const, noWhatsapp: "08151234575", instância: "BPKAD Kota Surabaya", jabatan: "Anggota" },
-      }, 
-      sk: { file: null, nomorSK: "101/004/2024", tanggalSK: "2024-02-01", periodeMultai: "2024-02-01", periodeSelesai: "2027-01-31" } 
-    } 
+  {
+    id: "p4", nama: "Prov. Jawa Tengah", status: "masih-diverifikasi",
+    validasiLog: [{ tanggal: "2024-02-01", aksi: "pengajuan", aktor: "user" }],
+    data: {
+      region: "Prov. Jawa Tengah", nomorKanal: "0815xxx",
+      members: {
+        ketua:       { nama: "Bpk. Hendra Wijanto, S.H, M.H", email: "hendra@jateng.go.id", jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08151234567", instansi: "Dinas Pendidikan Prov. Jawa Tengah", jabatan: "Ketua" },
+        wakil:       { nama: "Ibu Diana Permata, M.Pd",       email: "diana@jateng.go.id",  jenisKelamin: "Perempuan" as const,  noWhatsapp: "08151234568", instansi: "Dinas Pendidikan Prov. Jawa Tengah", jabatan: "Wakil Ketua" },
+        koordinator: { nama: "Bpk. Susanto, M.Si",            email: "susanto@jateng.go.id",jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08151234569", instansi: "Sekretariat Daerah Prov. Jawa Tengah",jabatan: "Koordinator" },
+        pendidikan:  { nama: "Ibu Maya Kumala, S.Pd",         email: "maya@jateng.go.id",   jenisKelamin: "Perempuan" as const,  noWhatsapp: "08151234570", instansi: "Dinas Pendidikan Prov. Jawa Tengah", jabatan: "Anggota" },
+        pppa:        { nama: "Bpk. Ali Akbar, M.H",           email: "ali@jateng.go.id",    jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08151234571", instansi: "DP3A Prov. Jawa Tengah",              jabatan: "Anggota" },
+        sosial:      { nama: "Ibu Ratna Sari, S.Sos",         email: "ratna@jateng.go.id",  jenisKelamin: "Perempuan" as const,  noWhatsapp: "08151234572", instansi: "Dinas Sosial Prov. Jawa Tengah",      jabatan: "Anggota" },
+      },
+      sk: { file: null, nomorSK: "101/004/2024", tanggalSK: "2024-02-01", periodeMultai: "2024-02-01", periodeSelesai: "2027-01-31" }
+    }
   },
-  { 
-    id: "p4a", 
-    nama: "Kab. Bekasi", 
-    status: "butuh-perbaikan", 
-    tanggalDiverifikasi: "2024-02-10",
-    validasiLog: [
-      { tanggal: "2024-02-01", aksi: "pengajuan", aktor: "user" },
-      { tanggal: "2024-02-10", aksi: "tolak", aktor: "admin_pusat", alasan: "SK tidak valid" }
-    ],
-    data: { 
-      region: "Jawa Barat", 
-      nomorKanal: "0816xxx", 
-      members: { 
-        catatan: { nama: "Bpk. Herman, M.Pd", email: "herman@bekasi.go.id", jenisKelamin: "Laki-Laki" as const, noWhatsapp: "08161234567", instância: "Dinas Pendidikan Kab. Bekasi", jabatan: "Ketua" },
-      }, 
-      sk: { file: null, nomorSK: "456/005/2024", tanggalSK: "2024-02-01", periodeMultai: "2024-02-01", periodeSelesai: "2027-02-01" } 
-    } 
-  },
-  { id: "p5", nama: "Prov. Aceh", status: "belum-dibentuk", data: { region: "Aceh", nomorKanal: "", members: { catatan: emptyMember() }, sk: { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" } } },
-  { id: "p6", nama: "Prov. Bali", status: "belum-dibentuk", data: { region: "Bali", nomorKanal: "", members: { catatan: emptyMember() }, sk: { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" } } },
-  { id: "p7", nama: "Prov. Banten", status: "belum-dibentuk", data: { region: "Banten", nomorKanal: "", members: { catatan: emptyMember() }, sk: { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" } } },
-  { id: "p8", nama: "Prov. Bengkulu", status: "belum-dibentuk", data: { region: "Bengkulu", nomorKanal: "", members: { catatan: emptyMember() }, sk: { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" } } },
-  { id: "p9", nama: "Prov. D.I. Yogyakarta", status: "belum-dibentuk", data: { region: "Yogyakarta", nomorKanal: "", members: { catatan: emptyMember() }, sk: { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" } } },
-  { id: "p10", nama: "Prov. Gorontalo", status: "belum-dibentuk", data: { region: "Gorontalo", nomorKanal: "", members: { catatan: emptyMember() }, sk: { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" } } },
-  { id: "p11", nama: "Prov. Jambi", status: "belum-dibentuk", data: { region: "Jambi", nomorKanal: "", members: { catatan: emptyMember() }, sk: { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" } } },
-  { id: "p12", nama: "Prov. Jawa Barat", status: "belum-dibentuk", data: { region: "Jawa Barat", nomorKanal: "", members: { catatan: emptyMember() }, sk: { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" } } },
-  { id: "p13", nama: "Prov. Jawa Tengah", status: "belum-dibentuk", data: { region: "Jawa Tengah", nomorKanal: "", members: { catatan: emptyMember() }, sk: { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" } } },
-  { id: "p14", nama: "Prov. Kalimantan Barat", status: "belum-dibentuk", data: { region: "Kalimantan Barat", nomorKanal: "", members: { catatan: emptyMember() }, sk: { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" } } },
-  { id: "p15", nama: "Prov. Kalimantan Selatan", status: "belum-dibentuk", data: { region: "Kalimantan Selatan", nomorKanal: "", members: { catatan: emptyMember() }, sk: { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" } } },
-  { id: "p16", nama: "Prov. Kalimantan Tengah", status: "belum-dibentuk", data: { region: "Kalimantan Tengah", nomorKanal: "", members: { catatan: emptyMember() }, sk: { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" } } },
-  { id: "p17", nama: "Prov. Kalimantan Timur", status: "belum-dibentuk", data: { region: "Kalimantan Timur", nomorKanal: "", members: { catatan: emptyMember() }, sk: { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" } } },
-  { id: "p18", nama: "Prov. Lampung", status: "belum-dibentuk", data: { region: "Lampung", nomorKanal: "", members: { catatan: emptyMember() }, sk: { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" } } },
-  { id: "p19", nama: "Prov. Maluku", status: "belum-dibentuk", data: { region: "Maluku", nomorKanal: "", members: { catatan: emptyMember() }, sk: { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" } } },
-  { id: "p20", nama: "Prov. Nusa Tenggara Barat", status: "belum-dibentuk", data: { region: "Nusa Tenggara Barat", nomorKanal: "", members: { catatan: emptyMember() }, sk: { file: null, nomorSK: "", tanggalSK: "", periodeMultai: "", periodeSelesai: "" } } },
+  // Sisa 34 provinsi — belum dibentuk
+  B("p5",  "Prov. Aceh"),
+  B("p6",  "Prov. Bali"),
+  B("p7",  "Prov. Banten"),
+  B("p8",  "Prov. Bengkulu"),
+  B("p9",  "Prov. D.I. Yogyakarta"),
+  B("p10", "Prov. Gorontalo"),
+  B("p11", "Prov. Jambi"),
+  B("p12", "Prov. Kalimantan Barat"),
+  B("p13", "Prov. Kalimantan Selatan"),
+  B("p14", "Prov. Kalimantan Tengah"),
+  B("p15", "Prov. Kalimantan Timur"),
+  B("p16", "Prov. Kalimantan Utara"),
+  B("p17", "Prov. Kepulauan Bangka Belitung"),
+  B("p18", "Prov. Kepulauan Riau"),
+  B("p19", "Prov. Lampung"),
+  B("p20", "Prov. Maluku"),
+  B("p21", "Prov. Maluku Utara"),
+  B("p22", "Prov. Nusa Tenggara Barat"),
+  B("p23", "Prov. Nusa Tenggara Timur"),
+  B("p24", "Prov. Papua"),
+  B("p25", "Prov. Papua Barat"),
+  B("p26", "Prov. Papua Barat Daya"),
+  B("p27", "Prov. Papua Pegunungan"),
+  B("p28", "Prov. Papua Selatan"),
+  B("p29", "Prov. Papua Tengah"),
+  B("p30", "Prov. Riau"),
+  B("p31", "Prov. Sulawesi Barat"),
+  B("p32", "Prov. Sulawesi Selatan"),
+  B("p33", "Prov. Sulawesi Tengah"),
+  B("p34", "Prov. Sulawesi Tenggara"),
+  B("p35", "Prov. Sulawesi Utara"),
+  B("p36", "Prov. Sumatera Barat"),
+  B("p37", "Prov. Sumatera Selatan"),
+  B("p38", "Prov. Sumatera Utara"),
 ]
 
 function AdminPageInner() {
@@ -202,19 +186,50 @@ function AdminPageInner() {
   useEffect(() => {
     try {
       const stored = localStorage.getItem("pokjaList")
-      const dummyIds = new Set(["p1", "p2", "p3"])
-      let userPokja: PokjaItem[] = []
+      const mockIds  = new Set(MOCK_POKJA_LIST.map(p => p.id))
+      const mockNames = new Map(MOCK_POKJA_LIST.map(p => [p.nama.trim().toLowerCase(), p.id]))
+
+      // Start with a fresh mutable copy of MOCK
+      const merged: PokjaItem[] = MOCK_POKJA_LIST.map(p => ({ ...p }))
+
       if (stored) {
         const parsed = JSON.parse(stored) as PokjaItem[]
-        userPokja = parsed.filter(p => !dummyIds.has(p.id))
+        const seen = new Set<string>()
+        for (const p of parsed) {
+          if (seen.has(p.id)) continue
+          seen.add(p.id)
+
+          if (mockIds.has(p.id)) {
+            // Entri MOCK yang berubah — update status, data, dan validasiLog
+            const idx = merged.findIndex(m => m.id === p.id)
+            if (idx !== -1) merged[idx] = { ...merged[idx], status: p.status, data: p.data, validasiLog: p.validasiLog }
+            continue
+          }
+
+          const key = p.nama.trim().toLowerCase()
+          if (mockNames.has(key)) {
+            // Entri lama dengan id berbeda tapi nama sama — update MOCK entry
+            const idx = merged.findIndex(m => m.nama.trim().toLowerCase() === key)
+            if (idx !== -1) merged[idx] = { ...merged[idx], status: p.status, data: p.data, validasiLog: p.validasiLog }
+          } else {
+            // Genuinely new entry — append
+            merged.push(p)
+          }
+        }
       }
-      const seen = new Set<string>()
-      const uniqueUserPokja = userPokja.filter(p => {
-        if (seen.has(p.id)) return false
-        seen.add(p.id)
+
+      // Re-persist: MOCK entries yang berubah (status OR validasiLog), plus entri genuinely baru
+      const mockDefaults = new Map(MOCK_POKJA_LIST.map(p => [p.id, { status: p.status, hasLog: false }]))
+      const toSave = merged.filter(p => {
+        const def = mockDefaults.get(p.id)
+        if (def) {
+          // Save MOCK entry jika statusnya berubah ATAU punya validasiLog
+          return p.status !== def.status || (p.validasiLog && p.validasiLog.length > 0)
+        }
         return true
       })
-      setPokjaList([...MOCK_POKJA_LIST, ...uniqueUserPokja])
+      localStorage.setItem("pokjaList", JSON.stringify(toSave))
+      setPokjaList(merged)
     } catch {
       setPokjaList(MOCK_POKJA_LIST)
     }
@@ -224,9 +239,18 @@ function AdminPageInner() {
   useEffect(() => {
     if (!mounted) return
     try {
-      const dummyIds = new Set(["p1", "p2", "p3"])
-      const userPokja = pokjaList.filter(p => !dummyIds.has(p.id))
-      localStorage.setItem("pokjaList", JSON.stringify(userPokja))
+      const mockDefaults = new Map(MOCK_POKJA_LIST.map(p => [p.id, p.status]))
+      const seen = new Set<string>()
+      const toSave = pokjaList.filter(p => {
+        if (seen.has(p.id)) return false
+        seen.add(p.id)
+        // MOCK entry: simpan jika status berubah ATAU punya validasiLog
+        if (mockDefaults.has(p.id)) {
+          return p.status !== mockDefaults.get(p.id) || (p.validasiLog && p.validasiLog.length > 0)
+        }
+        return true
+      })
+      localStorage.setItem("pokjaList", JSON.stringify(toSave))
     } catch {}
   }, [pokjaList, mounted])
 
@@ -256,10 +280,14 @@ function AdminPageInner() {
         newId = `pokja-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
       }
 
+      const today = new Date().toISOString().slice(0, 10)
+      const newLog = { tanggal: today, aksi: "pengajuan", aktor: isPusat ? "admin_pusat" : "user" }
+
       const newPokja: PokjaItem = {
         id: newId,
-        nama: `POKJA Budaya Sekolah – ${parsed.region}`,
+        nama: parsed.region,
         status: isPusat ? "aktif" : "masih-diverifikasi",
+        validasiLog: [newLog],
         data: {
           ...parsed,
           sk: { ...parsed.sk, file: null, periodeMultai: parsed.sk.periodeMultai ?? "" },
@@ -267,8 +295,30 @@ function AdminPageInner() {
       }
 
       setPokjaList((prev) => {
-        if (prev.some(p => p.id === newId)) return prev
-        return [...prev, newPokja]
+        // Deduplicate entire list
+        const seen = new Set<string>()
+        const deduped = prev.filter(p => {
+          if (seen.has(p.id)) return false
+          seen.add(p.id)
+          return true
+        })
+        // Jika sudah ada pokja dengan nama sama, update statusnya — jangan tambah baru
+        const sameRegionIdx = deduped.findIndex(p =>
+          p.nama.trim().toLowerCase() === newPokja.nama.trim().toLowerCase()
+        )
+        if (sameRegionIdx !== -1) {
+          const updated = [...deduped]
+          const existing = updated[sameRegionIdx]
+          updated[sameRegionIdx] = {
+            ...existing,
+            status: newPokja.status,
+            data: newPokja.data,
+            validasiLog: [...(existing.validasiLog ?? []), newLog],
+          }
+          return updated
+        }
+        if (deduped.some(p => p.id === newId)) return deduped
+        return [...deduped, newPokja]
       })
 
       const url = new URL(window.location.href)
@@ -280,7 +330,82 @@ function AdminPageInner() {
     }
   }, [mounted, searchParams])
 
+  // Handler: perbaikan pokja dari admin dinas setelah ditolak
+  const hasProcessedPerbaikan = useRef(false)
+  useEffect(() => {
+    if (!mounted) return
+    if (searchParams.get("pokjaPerbaikan") !== "1") return
+    if (hasProcessedPerbaikan.current) return
+    hasProcessedPerbaikan.current = true
+
+    try {
+      const raw = sessionStorage.getItem("perbaikanSubmitData")
+      if (!raw) return
+      sessionStorage.removeItem("perbaikanSubmitData")
+
+      const parsed = JSON.parse(raw) as Omit<PokjaData, "sk"> & {
+        sk: Omit<PokjaData["sk"], "file"> & { file: string | null }
+        prevStatus?: string
+        deskripsiPerbaikan?: string
+      }
+
+      const today = new Date().toISOString().slice(0, 10)
+      const isEdit = parsed.prevStatus === "aktif"
+      const defaultAlasan = isEdit
+        ? "Data POKJA diperbarui dan diajukan ulang untuk verifikasi"
+        : "Data diperbaiki dan diajukan kembali"
+      const logPerbaiki = {
+        tanggal: today,
+        aksi: isEdit ? "edit" : "perbaiki",
+        aktor: "user",
+        alasan: parsed.deskripsiPerbaikan?.trim() || defaultAlasan,
+      }
+
+      setPokjaList((prev) => {
+        const seen = new Set<string>()
+        const deduped = prev.filter(p => { if (seen.has(p.id)) return false; seen.add(p.id); return true })
+        const idx = deduped.findIndex(p =>
+          p.nama.trim().toLowerCase() === parsed.region.trim().toLowerCase()
+        )
+        if (idx === -1) return deduped
+        const updated = [...deduped]
+        const existing = updated[idx]
+        updated[idx] = {
+          ...existing,
+          status: "masih-diverifikasi",
+          data: { ...parsed, sk: { ...parsed.sk, file: null, periodeMultai: parsed.sk.periodeMultai ?? "" } },
+          validasiLog: [...(existing.validasiLog ?? []), logPerbaiki],
+        }
+        return updated
+      })
+
+      const url = new URL(window.location.href)
+      url.searchParams.delete("pokjaPerbaikan")
+      window.history.replaceState({}, "", url.toString())
+    } catch (e) {
+      console.error("Failed to process pokja perbaikan", e)
+    }
+  }, [mounted, searchParams])
+
   const navigateToBuatPokja = () => {
+    router.push("/buat-pokja")
+  }
+
+  // Handler: admin dinas klik "Edit" atau "Perbaiki Data" dari detail/beranda
+  const handlePerbaikiPokja = (pokja: PokjaItem) => {
+    try {
+      sessionStorage.setItem("perbaikanPokjaData", JSON.stringify({
+        prevStatus: pokja.status,
+        nomorKanal: pokja.data?.nomorKanal ?? "",
+        members: pokja.data?.members ?? {},
+        sk: {
+          nomorSK: pokja.data?.sk?.nomorSK ?? "",
+          tanggalSK: pokja.data?.sk?.tanggalSK ?? "",
+          periodeMulai: pokja.data?.sk?.periodeMultai ?? "",
+          periodeSelesai: pokja.data?.sk?.periodeSelesai ?? "",
+        },
+      }))
+    } catch {}
     router.push("/buat-pokja")
   }
 
@@ -306,9 +431,11 @@ function AdminPageInner() {
               {dinasMenu === "dashboard" && (
                 <DashboardView
                   pokjaList={pokjaList.filter((p) => p.data.region === REGION)}
+                  onBuatPokja={navigateToBuatPokja}
                   onViewDataPokja={() => setDinasMenu("data-pokja")}
                   onViewSumberRujukan={() => setDinasMenu("sumber-rujukan")}
                   onViewActivities={() => setDinasMenu("kActivities")}
+                  onPerbaikiPokja={handlePerbaikiPokja}
                 />
               )}
               {dinasMenu === "data-pokja" && (
@@ -317,6 +444,7 @@ function AdminPageInner() {
                   onBuatPokja={navigateToBuatPokja}
                   isAdminPusat={false}
                   onValidatePusat={(p) => setValidatingPokja(p)}
+                  onPerbaikiPokja={handlePerbaikiPokja}
                 />
               )}
               {dinasMenu === "sumber-rujukan" && <SumberRujukanView />}
@@ -339,6 +467,10 @@ function AdminPageInner() {
                   onValidatePusat={(pokja) => setValidatingPokja(pokja)}
                   onViewSumberRujukan={() => setPusatMenu("sumber-rujukan")}
                   onViewActivities={() => setPusatMenu("k" as PusatMenu)}
+                  onGoToPokja={(pokja) => {
+                    setPusatMenu("pokja")
+                    setValidatingPokja(pokja)
+                  }}
                 />
               )}
               {pusatMenu === "pokja" && (

@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Bell, ChevronDown, LogOut, UserCircle2 } from "lucide-react"
+import { ChevronDown, LogOut, UserCircle2 } from "lucide-react"
+import { NotificationBell } from "@/components/ui/NotificationBell"
 
 interface SekolahHeaderProps {
   userName: string
@@ -23,13 +24,7 @@ export function SekolahHeader({ userName, onLogout }: SekolahHeaderProps) {
   return (
     <header className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 md:px-6 py-3 flex items-center justify-end shadow-sm">
       <div className="flex items-center gap-3">
-        <button
-          type="button"
-          className="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
-          aria-label="Notifikasi"
-        >
-          <Bell className="w-4 h-4" />
-        </button>
+        <NotificationBell />
 
         <div className="relative" ref={wrapRef}>
           <button

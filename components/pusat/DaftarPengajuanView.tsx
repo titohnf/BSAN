@@ -3,8 +3,6 @@ import { Search, MapPin, Clock, CheckCircle2, XCircle, AlertCircle, Filter, Buil
 import { useState, useMemo } from "react"
 import type { PokjaItem, PokjaStatus } from "@/types/pokja"
 
-type WilayahTipe = "provinsi" | "kabupaten" | "kota" | "semua"
-
 interface DaftarPengajuanViewProps {
   pokjaList: PokjaItem[]
   onSelect: (item: PokjaItem) => void
@@ -25,20 +23,6 @@ const STATUS_FILTER_OPTIONS: { value: PokjaStatus | "semua"; label: string }[] =
   { value: "butuh-perbaikan", label: "Butuh Perbaikan" },
 ]
 
-const TIPE_FILTER_OPTIONS: { value: WilayahTipe; label: string }[] = [
-  { value: "semua", label: "Semua Tipe" },
-  { value: "provinsi", label: "Provinsi" },
-  { value: "kabupaten", label: "Kabupaten" },
-  { value: "kota", label: "Kota" },
-]
-
-function getWilayahTipe(wilayah: string): WilayahTipe {
-  const lower = wilayah.toLowerCase()
-  if (lower.includes("kab.") || lower.includes("kabupaten")) return "kabupaten"
-  if (lower.includes("kota") || lower.includes("kota ") || lower === "kota") return "kota"
-  if (lower.startsWith("prov") || lower.startsWith("prov.")) return "provinsi"
-  return "kabupaten"
-}
 
 function isSkExpired(periodeSelesai: string): boolean {
   if (!periodeSelesai) return false
@@ -56,9 +40,18 @@ function formatDate(dateStr: string): string {
 export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanViewProps) {
   const [search, setSearch] = useState("")
   const [filterStatus, setFilterStatus] = useState<PokjaStatus | "semua">("semua")
-  const [filterTipe, setFilterTipe] = useState<WilayahTipe>("semua")
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value)
+    setCurrentPage(1)
+  }
+
+  const handleFilterChange = (value: PokjaStatus | "semua") => {
+    setFilterStatus(value)
+    setCurrentPage(1)
+  }
 
   const processedPokja = useMemo(() => {
     return pokjaList.map(p => {
@@ -69,13 +62,18 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
     })
   }, [pokjaList])
 
-  const filtered = processedPokja.filter((p) => {
-    const matchSearch = p.nama.toLowerCase().includes(search.toLowerCase()) || 
-                        p.data?.region?.toLowerCase().includes(search.toLowerCase())
-    const matchStatus = filterStatus === "semua" || p.effectiveStatus === filterStatus
-    const matchTipe = filterTipe === "semua" || getWilayahTipe(p.nama) === filterTipe
-    return matchSearch && matchStatus && matchTipe
-  })
+  const filtered = processedPokja
+    .filter((p) => {
+      const matchSearch = p.nama.toLowerCase().includes(search.toLowerCase()) ||
+                          p.data?.region?.toLowerCase().includes(search.toLowerCase())
+      const matchStatus = filterStatus === "semua" || p.effectiveStatus === filterStatus
+      return matchSearch && matchStatus
+    })
+    .sort((a, b) => {
+      const nameA = (a.data?.region ?? a.nama).replace(/^Prov\.\s*/i, "")
+      const nameB = (b.data?.region ?? b.nama).replace(/^Prov\.\s*/i, "")
+      return nameA.localeCompare(nameB, "id")
+    })
 
   const totalPages = Math.ceil(filtered.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
@@ -101,7 +99,7 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
           <input
             type="search"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="Cari wilayah..."
             className="w-full h-9 pl-9 pr-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-600 focus:border-slate-600 transition"
           />
@@ -110,7 +108,7 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
           <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
           <select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value as PokjaStatus | "semua")}
+            onChange={(e) => handleFilterChange(e.target.value as PokjaStatus | "semua")}
             className="h-9 pl-9 pr-8 text-sm border border-gray-300 rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-slate-600 focus:border-slate-600 transition text-gray-700"
           >
             {STATUS_FILTER_OPTIONS.map((o) => (
@@ -152,8 +150,10 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
                           <MapPin className="w-4 h-4 text-gray-500" />
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900 leading-tight">{p.nama}</p>
-                          <p className="text-xs text-gray-400 mt-0.5">{p.data?.region}</p>
+                          <p className="font-medium text-gray-900 leading-tight">
+                            {(p.data?.region ?? p.nama).replace(/^Prov\.\s*/i, "")}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-0.5">Provinsi</p>
                         </div>
                       </div>
                     </td>

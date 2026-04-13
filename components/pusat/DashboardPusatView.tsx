@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import { ClipboardList, CheckCircle2, XCircle, Clock, MapPin, Users, Plus, ChevronRight, AlertTriangle, Building2, MapPinned, TrendingUp } from "lucide-react"
-import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts"
+import { PieChart, Pie, Cell } from "recharts"
 import type { PokjaItem } from "@/types/pokja"
 
 interface DashboardPusatViewProps {
@@ -9,6 +9,7 @@ interface DashboardPusatViewProps {
   onValidatePusat?: (pokja: PokjaItem) => void
   onViewSumberRujukan?: () => void
   onViewActivities?: () => void
+  onGoToPokja?: (pokja: PokjaItem) => void
 }
 
 const RUJUKAN_BREAKDOWN = [
@@ -62,26 +63,56 @@ const PROVINCE_DATA = [
   { nama: "Prov. Sumatra Utara", totalKabKota: 33, pokjaKabKota: 0 },
 ]
 
-export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRujukan, onViewActivities }: DashboardPusatViewProps) {
+// Matching menggunakan exact match pada p.nama (yang kini seragam "Prov. X")
+// sehingga tidak perlu map kompleks — cukup cocokkan p.nama === prov.nama
+
+
+export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRujukan, onViewActivities, onGoToPokja }: DashboardPusatViewProps) {
   const [search, setSearch] = useState("")
   const [entriesPerPage, setEntriesPerPage] = useState(10)
 
+  // Hitung pokja per provinsi dari pokjaList secara dinamis
+  // p.nama dan prov.nama sekarang keduanya menggunakan format "Prov. X" — exact match
+  const enrichedProvinces = PROVINCE_DATA.map((prov) => {
+    const matching = pokjaList.filter((p) =>
+      p.nama.trim().toLowerCase() === prov.nama.trim().toLowerCase()
+    )
+
+    const aktifCount = matching.filter(p => p.status === "aktif").length
+    const menungguCount = matching.filter(p => p.status === "masih-diverifikasi").length
+    const perbaikanCount = matching.filter(p => p.status === "butuh-perbaikan").length
+
+    // Status provinsi: ambil status paling relevan
+    let statusProv: "aktif" | "menunggu" | "perbaikan" | "belum" = "belum"
+    if (aktifCount > 0) statusProv = "aktif"
+    else if (menungguCount > 0) statusProv = "menunggu"
+    else if (perbaikanCount > 0) statusProv = "perbaikan"
+
+    return {
+      ...prov,
+      pokjaKabKota: matching.filter(p => ["aktif", "masih-diverifikasi", "butuh-perbaikan"].includes(p.status)).length,
+      statusProv,
+      matching,
+    }
+  })
+
+  // Variabel agregat dari pokjaList (digunakan di bagian bawah komponen)
   const aktif = pokjaList.filter((p) => p.status === "aktif").length
   const menunggu = pokjaList.filter((p) => p.status === "masih-diverifikasi").length
-  const butuhPerbaikan = pokjaList.filter((p) => p.status === "butuh-perbaikan").length
+  const ditolak = pokjaList.filter((p) => p.status === "ditolak").length
   const total = pokjaList.length
 
   // Hitung total provinsi, kab/kota, dan pokja kab/kota yang terbentuk
   const totalProvinsi = PROVINCE_DATA.length
   const totalKabKota = PROVINCE_DATA.reduce((sum, p) => sum + p.totalKabKota, 0)
-  const totalPokjaKabKota = PROVINCE_DATA.reduce((sum, p) => sum + p.pokjaKabKota, 0)
+  const totalPokjaKabKota = enrichedProvinces.reduce((sum, p) => sum + p.pokjaKabKota, 0)
   const persentaseNasional = totalKabKota > 0 ? ((totalPokjaKabKota / totalKabKota) * 100).toFixed(1) : "0.0"
-  
-  // Hitung provinsi yang sudah terbentuk (punya minimal 1 pokja kab/kota)
-  const provinsiTerbentuk = PROVINCE_DATA.filter(p => p.pokjaKabKota > 0).length
+
+  // Hitung provinsi yang sudah terbentuk (punya minimal 1 pokja)
+  const provinsiTerbentuk = enrichedProvinces.filter(p => p.pokjaKabKota > 0).length
 
   // Filter data berdasarkan search
-  const filteredProvinces = PROVINCE_DATA.filter(p => 
+  const filteredProvinces = enrichedProvinces.filter(p =>
     p.nama.toLowerCase().includes(search.toLowerCase())
   )
 
@@ -121,6 +152,12 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
 
   return (
     <div className="space-y-6">
+      {/* Title */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard Admin Pusat</h1>
+        <p className="text-sm text-gray-500 mt-1">Pantau status pembentukan POKJA di seluruh Indonesia</p>
+      </div>
+
       {/* Header Stats - 3 cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {headerStats.map((stat) => {
@@ -148,6 +185,46 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
           )
         })}
       </div>
+
+      {/* Daftar pokja menunggu verifikasi */}
+      {menunggu > 0 && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50/50 overflow-hidden">
+          <div className="px-5 py-4 border-b border-amber-100 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-600" />
+              <h3 className="text-sm font-semibold text-gray-800">POKJA Menunggu Verifikasi</h3>
+              <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-amber-200 text-amber-800 text-xs font-bold">
+                {menunggu}
+              </span>
+            </div>
+          </div>
+          <ul className="divide-y divide-amber-100">
+            {pokjaList
+              .filter((p) => p.status === "masih-diverifikasi")
+              .slice(0, 5)
+              .map((p) => (
+                <li 
+                  key={p.id} 
+                  className="px-5 py-3 flex items-center gap-3 hover:bg-amber-100/50 cursor-pointer transition-colors"
+                  onClick={() => onGoToPokja?.(p)}
+                >
+                  <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-4 h-4 text-amber-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-800 truncate">
+                      {(p.data?.region ?? p.nama).replace(/^Prov\.\s*/i, "")}
+                    </p>
+                  </div>
+                  <span className="text-xs text-amber-700 bg-amber-100 px-2 py-1 rounded-full whitespace-nowrap">
+                    Menunggu Verifikasi
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                </li>
+              ))}
+          </ul>
+        </div>
+      )}
 
       {/* Tabel Provinsi dengan Header */}
       <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
@@ -209,11 +286,6 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
                 </th>
                 <th className="px-4 py-3 text-left">
                   <button className="flex items-center gap-1 text-xs font-semibold text-gray-600 uppercase tracking-wide hover:text-gray-900">
-                    Lihat Pokja
-                  </button>
-                </th>
-                <th className="px-4 py-3 text-left">
-                  <button className="flex items-center gap-1 text-xs font-semibold text-gray-600 uppercase tracking-wide hover:text-gray-900">
                     Status Pokja
                   </button>
                 </th>
@@ -237,33 +309,25 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
             <tbody className="divide-y divide-gray-100">
               {filteredProvinces.slice(0, entriesPerPage).map((prov, idx) => {
                 const persentase = prov.totalKabKota > 0 ? ((prov.pokjaKabKota / prov.totalKabKota) * 100).toFixed(0) : 0
-                const status = prov.pokjaKabKota > 0 ? "Ada" : "Belum Ada"
-                const statusPokja = prov.pokjaKabKota > 0 ? "Ada" : "Belum"
-                
+                const lihatPokja = prov.pokjaKabKota > 0 ? "Ada" : "Belum Ada"
+
+                const statusConfig = {
+                  aktif:    { label: "Aktif",              cls: "bg-green-100 border border-green-300 text-green-700" },
+                  menunggu: { label: "Menunggu Verifikasi", cls: "bg-amber-100 border border-amber-300 text-amber-700" },
+                  perbaikan:{ label: "Butuh Perbaikan",     cls: "bg-red-100 border border-red-300 text-red-700" },
+                  belum:    { label: "Belum",               cls: "bg-gray-100 border border-gray-200 text-gray-500" },
+                }
+                const sc = statusConfig[prov.statusProv]
+
                 return (
                   <tr key={prov.nama} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3.5 text-gray-500">{idx + 1}</td>
-                    <td className="px-4 py-3.5">
-                      <a href="#" className="text-blue-600 hover:text-blue-800 font-medium hover:underline">
-                        {prov.nama}
-                      </a>
+                    <td className="px-4 py-3.5 font-medium text-gray-900">
+                      {prov.nama.replace(/^Prov\.\s*/i, "")}
                     </td>
                     <td className="px-4 py-3.5">
-                      <span className={`inline-block px-3 py-1 rounded-md text-xs font-medium ${
-                        status === "Ada" 
-                          ? "bg-white border border-gray-300 text-gray-700" 
-                          : "bg-gray-100 border border-gray-200 text-gray-500"
-                      }`}>
-                        {status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3.5">
-                      <span className={`inline-block px-3 py-1 rounded-md text-xs font-medium ${
-                        statusPokja === "Ada" 
-                          ? "bg-white border border-gray-300 text-gray-700" 
-                          : "bg-gray-100 border border-gray-200 text-gray-500"
-                      }`}>
-                        {statusPokja}
+                      <span className={`inline-block px-3 py-1 rounded-md text-xs font-medium ${sc.cls}`}>
+                        {sc.label}
                       </span>
                     </td>
                     <td className="px-4 py-3.5 text-center text-gray-900 font-medium">
@@ -280,7 +344,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
               })}
               {/* Total Row */}
               <tr className="bg-gray-100 border-t-2 border-gray-300 font-bold">
-                <td colSpan={4} className="px-4 py-3.5 text-center text-gray-900 uppercase tracking-wide">
+                <td colSpan={3} className="px-4 py-3.5 text-center text-gray-900 uppercase tracking-wide">
                   Total Nasional
                 </td>
                 <td className="px-4 py-3.5 text-center text-gray-900">
@@ -298,44 +362,10 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
         </div>
       </div>
 
-      {/* Daftar pokja menunggu verifikasi */}
-      {menunggu > 0 && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50/50 overflow-hidden">
-          <div className="px-5 py-4 border-b border-amber-100 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-600" />
-              <h3 className="text-sm font-semibold text-gray-800">POKJA Menunggu Verifikasi</h3>
-              <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-amber-200 text-amber-800 text-xs font-bold">
-                {menunggu}
-              </span>
-            </div>
-          </div>
-          <ul className="divide-y divide-amber-100">
-            {pokjaList
-              .filter((p) => p.status === "masih-diverifikasi")
-              .slice(0, 5)
-              .map((p) => (
-                <li key={p.id} className="px-5 py-3 flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-4 h-4 text-amber-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-800 truncate">{p.nama}</p>
-                    <p className="text-xs text-gray-500">{p.data?.region}</p>
-                  </div>
-                  <span className="text-xs text-amber-700 bg-amber-100 px-2 py-1 rounded-full">
-                    Menunggu Verifikasi
-                  </span>
-                </li>
-              ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Sumber Rujukan */}
+      {/* Sumber Dukungan */}
       <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-gray-800">Sumber Rujukan</h3>
+          <h3 className="text-sm font-semibold text-gray-800">Sumber Dukungan</h3>
           {onViewSumberRujukan && (
             <button onClick={onViewSumberRujukan} className="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1">
               Kelola <ChevronRight className="w-3.5 h-3.5" />
@@ -345,13 +375,11 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
         <div className="px-5 py-4 grid grid-cols-1 lg:grid-cols-2 gap-5">
           <div className="flex flex-col items-center justify-center gap-4">
             <div className="relative w-44 h-44 flex-shrink-0">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
+              <PieChart width={176} height={176}>
                   <Pie data={RUJUKAN_BREAKDOWN} cx="50%" cy="50%" innerRadius={54} outerRadius={80} dataKey="count" startAngle={90} endAngle={-270} stroke="none">
                     {RUJUKAN_BREAKDOWN.map((_, i) => <Cell key={`cell-${i}`} fill={RUJUKAN_COLORS[i]} />)}
                   </Pie>
                 </PieChart>
-              </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <p className="text-2xl font-bold text-gray-900">{RUJUKAN_BREAKDOWN.reduce((a,b)=>a+b.count,0)}</p>
                 <p className="text-xs text-gray-500">Total</p>

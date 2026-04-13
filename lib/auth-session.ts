@@ -8,7 +8,7 @@ export type AuthSession = {
   role: AuthRole
   wilayah?: string
   namaSekolah?: string
-  /** Diset saat login admin dinas; dipakai di log sumber rujukan ("oleh Admin {namaDinas}"). */
+  /** Diset saat login admin dinas; dipakai di log sumber dukungan ("oleh Admin {namaDinas}"). */
   namaDinas?: string
 }
 

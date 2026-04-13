@@ -25,7 +25,7 @@ const navItems = [
   },
   {
     id: "sumber-rujukan" as ActiveMenu,
-    label: "Sumber Rujukan",
+    label: "Sumber Dukungan",
     icon: BookOpenCheck,
   },
   {

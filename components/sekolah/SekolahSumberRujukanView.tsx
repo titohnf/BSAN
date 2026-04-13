@@ -259,7 +259,7 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
     <div className="space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Sumber Rujukan di Wilayah Anda</h2>
+          <h2 className="text-xl font-bold text-gray-900">Sumber Dukungan di Wilayah Anda</h2>
           <p className="text-xs text-gray-500 mt-0.5">
             Cari, lihat detail, dan unduh daftar untuk kebutuhan sekolah — wilayah: <span className="font-medium text-gray-700">{wilayah}</span>
           </p>

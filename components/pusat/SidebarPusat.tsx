@@ -10,7 +10,7 @@ export type PusatMenu = "dashboard" | "pokja" | "sumber-rujukan" | "kegiatan"
 const navItems = [
   { id: "dashboard" as PusatMenu, label: "Dashboard", icon: LayoutDashboard },
   { id: "pokja" as PusatMenu, label: "POKJA", icon: Users },
-  { id: "sumber-rujukan" as PusatMenu, label: "Sumber Rujukan", icon: BookOpenCheck },
+  { id: "sumber-rujukan" as PusatMenu, label: "Sumber Dukungan", icon: BookOpenCheck },
   { id: "k" as PusatMenu, label: " kegiatan", icon: CalendarDays },
 ]
 
@@ -57,20 +57,6 @@ export function SidebarPusat({ activeMenu, onMenuChange }: SidebarPusatProps) {
           )
         })}
       </nav>
-
-      <div className="px-3 pb-2">
-        <button
-          type="button"
-          onClick={() => {
-            router.push("/sumber-rujukan/form")
-            setMobileOpen(false)
-          }}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-100 bg-white/10 hover:bg-white/15 hover:text-white transition-colors"
-        >
-          <BookOpenCheck className="w-4 h-4 flex-shrink-0" />
-          Tambah Sumber Rujukan
-        </button>
-      </div>
 
       {/* Logout */}
       <div className="px-3 py-4 border-t border-slate-700">

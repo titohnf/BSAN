@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { ChevronRight, AlertTriangle, CheckCircle2 } from "lucide-react"
-import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts"
+import { PieChart, Pie, Cell } from "recharts"
 
 export type { PokjaStatus, PokjaItem } from "@/types/pokja"
 import type { PokjaItem } from "@/types/pokja"
@@ -29,6 +29,7 @@ type Props = {
   kegiatanStatus?: { total: number; berlangsung: number; menunggu: number; selesai: number }
   isAdminPusat?: boolean
   onValidatePusat?: (pokja: PokjaItem) => void
+  onPerbaikiPokja?: (pokja: PokjaItem) => void
 }
 
 function Panel({ children }: { children: React.ReactNode }) {
@@ -151,6 +152,7 @@ export function DashboardView({
   onViewActivities,
   isAdminPusat,
   onValidatePusat,
+  onPerbaikiPokja,
 }: Props) {
   const [mounted, setMounted] = useState(false)
   const [selectedItem, setSelectedItem] = useState<{ nama: string; jenis: string; kontak: string } | null>(null)
@@ -158,11 +160,12 @@ export function DashboardView({
 
   useEffect(() => { setMounted(true) }, [])
 
-  const total    = pokjaList.length
-  const aktif    = pokjaList.filter((p) => p.status === "aktif").length
-  const menunggu = pokjaList.filter((p) => p.status === "masih-diverifikasi").length
-  const butuhPerbaikan = pokjaList.filter((p) => p.status === "butuh-perbaikan").length
-  const draf     = pokjaList.filter((p) => p.status === "belum-dibentuk").length
+  // Abaikan entry placeholder "belum-dibentuk" dari MOCK — dinas dianggap belum punya pokja
+  const activePokjaList = pokjaList.filter((p) => p.status !== "belum-dibentuk")
+  const total    = activePokjaList.length
+  const aktif    = activePokjaList.filter((p) => p.status === "aktif").length
+  const menunggu = activePokjaList.filter((p) => p.status === "masih-diverifikasi").length
+  const butuhPerbaikan = activePokjaList.filter((p) => p.status === "butuh-perbaikan").length
   const pending  = sumberRujukanStatus.menungguVerifikasi
 
   const pendingData = [
@@ -181,7 +184,7 @@ export function DashboardView({
       <Panel>
         <PanelHeader title="POKJA">
           {/* Tampilkan tombol Buat POKJA jika: Admin Pusat (bisa banyak) atau Dinas belum punya */}
-          {(isAdminPusat || total === 0) && <ViewBtn label="Buat POKJA" onClick={onBuatPokja} />}
+          {total === 0 && <ViewBtn label="Buat POKJA" onClick={onBuatPokja} />}
         </PanelHeader>
         
         {/* Jika belum ada pokja, tampilkan empty state */}
@@ -200,7 +203,7 @@ export function DashboardView({
         ) : (
           /* Jika sudah ada pokja, tampilkan informasi detail pokja */
           <div className="px-5 py-4">
-            {pokjaList.map((pokja) => {
+            {activePokjaList.map((pokja) => {
               const statusConfig = {
                 "aktif": { 
                   bg: "bg-green-50", 
@@ -298,38 +301,68 @@ export function DashboardView({
 
                   {/* Info tambahan untuk status tertentu */}
                   {pokja.status === "masih-diverifikasi" && (
-                    <div className="flex items-start gap-2 p-3 bg-amber-100/50 rounded-lg border border-amber-300">
-                      <AlertTriangle className="w-4 h-4 text-amber-700 flex-shrink-0 mt-0.5" />
-                      <p className="text-xs text-amber-800">
-                        <strong>Menunggu Verifikasi:</strong> POKJA Anda sedang dalam proses verifikasi oleh admin pusat. Mohon tunggu konfirmasi lebih lanjut.
-                      </p>
+                    <div className="space-y-2">
+                      <div className="flex items-start gap-2 p-3 bg-amber-100/50 rounded-lg border border-amber-300">
+                        <AlertTriangle className="w-4 h-4 text-amber-700 flex-shrink-0 mt-0.5" />
+                        <p className="text-xs text-amber-800">
+                          <strong>Menunggu Verifikasi:</strong> POKJA Anda sedang dalam proses verifikasi oleh admin pusat. Mohon tunggu konfirmasi lebih lanjut.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => onPerbaikiPokja?.(pokja)}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        Edit Data POKJA
+                      </button>
                     </div>
                   )}
 
-                  {pokja.status === "butuh-perbaikan" && (
-                    <div className="flex items-start gap-2 p-3 bg-red-100/50 rounded-lg border border-red-300">
-                      <AlertTriangle className="w-4 h-4 text-red-700 flex-shrink-0 mt-0.5" />
-                      <p className="text-xs text-red-800">
-                        <strong>Butuh Perbaikan:</strong> POKJA Anda perlu diperbaiki. Silakan hubungi admin pusat untuk informasi lebih lanjut.
-                      </p>
-                    </div>
-                  )}
+                  {pokja.status === "butuh-perbaikan" && (() => {
+                    const logTolak = [...(pokja.validasiLog ?? [])].reverse().find(l => l.aksi === "tolak")
+                    return (
+                      <div className="rounded-xl border border-red-200 bg-red-50 p-4 space-y-3">
+                        <div className="flex items-start gap-2">
+                          <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold text-red-800">Pengajuan Ditolak oleh Admin Pusat</p>
+                            {logTolak?.alasan && (
+                              <p className="text-xs text-red-700 mt-1 bg-red-100 rounded px-2 py-1.5 border border-red-200">
+                                <span className="font-medium">Alasan: </span>{logTolak.alasan}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => onPerbaikiPokja?.(pokja)}
+                          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors"
+                        >
+                          Perbaiki Data POKJA
+                        </button>
+                      </div>
+                    )
+                  })()}
 
                   {pokja.status === "aktif" && (
-                    <div className="flex items-start gap-2 p-3 bg-green-100/50 rounded-lg border border-green-300">
-                      <CheckCircle2 className="w-4 h-4 text-green-700 flex-shrink-0 mt-0.5" />
-                      <p className="text-xs text-green-800">
-                        <strong>POKJA Aktif:</strong> POKJA Anda telah diverifikasi dan aktif. Anda dapat mengelola kegiatan dan sumber rujukan.
-                      </p>
+                    <div className="space-y-2">
+                      <div className="flex items-start gap-2 p-3 bg-green-100/50 rounded-lg border border-green-300">
+                        <CheckCircle2 className="w-4 h-4 text-green-700 flex-shrink-0 mt-0.5" />
+                        <p className="text-xs text-green-800">
+                          <strong>POKJA Aktif:</strong> POKJA Anda telah diverifikasi dan aktif. Anda dapat mengelola kegiatan dan sumber rujukan.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => onPerbaikiPokja?.(pokja)}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        Edit Data POKJA
+                      </button>
                     </div>
                   )}
 
-                  {/* Catatan batas maksimal */}
-                  <div className="pt-3 border-t border-gray-200">
-                    <p className="text-xs text-gray-500 italic">
-                      Admin Dinas hanya dapat membentuk 1 POKJA per wilayah. POKJA di atas adalah POKJA aktif untuk wilayah {region}.
-                    </p>
-                  </div>
+
                 </div>
               )
             })}
@@ -338,14 +371,13 @@ export function DashboardView({
       </Panel>
 
       <Panel>
-        <PanelHeader title="Sumber Rujukan">
+        <PanelHeader title="Sumber Dukungan">
           <ViewBtn label="Kelola" onClick={onViewSumberRujukan} />
         </PanelHeader>
         <div className="px-5 py-4 grid grid-cols-1 lg:grid-cols-2 gap-5">
           <div className="flex flex-col items-center justify-center gap-4">
             <div className="relative w-44 h-44 flex-shrink-0">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
+              <PieChart width={176} height={176}>
                   <Pie
                     data={RUJUKAN_BREAKDOWN}
                     cx="50%"
@@ -369,7 +401,6 @@ export function DashboardView({
                     ))}
                   </Pie>
                 </PieChart>
-              </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                 {hoveredRujukan ? (
                   <div className="text-center px-2">
@@ -441,7 +472,7 @@ export function DashboardView({
             <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Kegiatan Mendatang</p>
             {[
               { tanggal: "14 Jun", judul: "Pelatihan Pokja Baru" },
-              { tanggal: "17 Jun", judul: "Verifikasi Sumber Rujukan" },
+              { tanggal: "17 Jun", judul: "Verifikasi Sumber Dukungan" },
               { tanggal: "21 Jun", judul: "Rapat Koordinasi Bulanan" },
             ].map((k, i) => (
               <div key={i} className="p-2.5 rounded-lg bg-gray-50 border border-gray-100 hover:bg-blue-50 transition-colors cursor-pointer">
@@ -466,7 +497,7 @@ export function DashboardView({
             </thead>
             <tbody className="divide-y divide-gray-100">
               {[
-                { waktu: "12:45", user: "Admin Dinas", aksi: "Verifikasi Sumber Rujukan" },
+                { waktu: "12:45", user: "Admin Dinas", aksi: "Verifikasi Sumber Dukungan" },
                 { waktu: "11:30", user: "Admin Sekolah", aksi: "Upload Dokumen POKJA" },
                 { waktu: "10:15", user: "Admin Dinas", aksi: "Menolak Pengajuan POKJA" },
               ].map((log, i) => (

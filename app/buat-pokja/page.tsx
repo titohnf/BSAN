@@ -86,10 +86,9 @@ function MemberSection({ label, value, onChange }: {
         </div>
         <span className="text-sm font-semibold text-gray-800">{label}</span>
       </div>
+      {/* Order: Nama, Jenis Kelamin, Instansi, Jabatan, Email, No. WhatsApp */}
       <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
         <InputField label="Nama" required placeholder="Nama lengkap" value={value.nama} onChange={(v) => onChange("nama", v)} />
-        <InputField label="Email" required type="email" placeholder="nama@dinas.go.id" value={value.email} onChange={(v) => onChange("email", v)} />
-        <InputField label="Jabatan" required placeholder="Contoh: Kepala Bidang, Staff, dll" value={value.jabatan} onChange={(v) => onChange("jabatan", v)} />
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-gray-600">Jenis Kelamin <span className="text-red-500">*</span></label>
           <div className="relative">
@@ -105,6 +104,9 @@ function MemberSection({ label, value, onChange }: {
             <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
           </div>
         </div>
+        <InputField label="Instansi" required placeholder="Nama instansi" value={value.instansi} onChange={(v) => onChange("instansi", v)} />
+        <InputField label="Jabatan" placeholder="Contoh: Kepala Bidang, Staff, dll" value={value.jabatan ?? ""} onChange={(v) => onChange("jabatan", v)} />
+        <InputField label="Email" required type="email" placeholder="nama@dinas.go.id" value={value.email} onChange={(v) => onChange("email", v)} />
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-gray-600">No. WhatsApp <span className="text-red-500">*</span></label>
           <div className="relative">
@@ -117,7 +119,6 @@ function MemberSection({ label, value, onChange }: {
             />
           </div>
         </div>
-        <InputField label="Instansi" required placeholder="Nama instansi" value={value.instansi} onChange={(v) => onChange("instansi", v)} />
       </div>
     </div>
   )
@@ -137,19 +138,9 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue }: {
         </div>
         <span className="text-sm font-semibold text-gray-800">{label}</span>
       </div>
+      {/* Order: Nama, Jenis Kelamin, Bidang, Instansi, Jabatan, Email, No. WhatsApp */}
       <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
         <InputField label="Nama" required placeholder="Nama lengkap" value={value.nama} onChange={(v) => onChange("nama", v)} />
-        <InputField label="Email" required type="email" placeholder="nama@dinas.go.id" value={value.email} onChange={(v) => onChange("email", v)} />
-        <InputField label="Jabatan" required placeholder="Contoh: Kepala Bidang, Staff, dll" value={value.jabatan} onChange={(v) => onChange("jabatan", v)} />
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-gray-600">Bidang <span className="text-red-500">*</span></label>
-          <input
-            type="text"
-            value={bidangValue}
-            disabled
-            className="w-full h-9 px-3 text-sm border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
-          />
-        </div>
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-gray-600">Jenis Kelamin <span className="text-red-500">*</span></label>
           <div className="relative">
@@ -166,6 +157,18 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue }: {
           </div>
         </div>
         <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-gray-600">Bidang <span className="text-red-500">*</span></label>
+          <input
+            type="text"
+            value={bidangValue}
+            disabled
+            className="w-full h-9 px-3 text-sm border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+          />
+        </div>
+        <InputField label="Instansi" required placeholder="Nama instansi" value={value.instansi} onChange={(v) => onChange("instansi", v)} />
+        <InputField label="Jabatan" placeholder="Contoh: Kepala Bidang, Staff, dll" value={value.jabatan ?? ""} onChange={(v) => onChange("jabatan", v)} />
+        <InputField label="Email" required type="email" placeholder="nama@dinas.go.id" value={value.email} onChange={(v) => onChange("email", v)} />
+        <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-gray-600">No. WhatsApp <span className="text-red-500">*</span></label>
           <div className="relative">
             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
@@ -177,7 +180,6 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue }: {
             />
           </div>
         </div>
-        <InputField label="Instansi" required placeholder="Nama instansi" value={value.instansi} onChange={(v) => onChange("instansi", v)} />
       </div>
     </div>
   )
@@ -206,10 +208,11 @@ function ReviewMemberCard({ label, member }: { label: string; member: MemberFiel
       {!isEmpty && (
         <div className="px-3 py-2 grid grid-cols-2 gap-x-4 gap-y-1.5">
           <ReviewRow label="Nama" value={member.nama} />
-          <ReviewRow label="Email" value={member.email} />
           <ReviewRow label="Jenis Kelamin" value={member.jenisKelamin} />
-          <ReviewRow label="No. WhatsApp" value={member.noWhatsapp} />
           <ReviewRow label="Instansi" value={member.instansi} />
+          {member.jabatan && <ReviewRow label="Jabatan" value={member.jabatan} />}
+          <ReviewRow label="Email" value={member.email} />
+          <ReviewRow label="No. WhatsApp" value={member.noWhatsapp} />
         </div>
       )}
     </div>
@@ -284,6 +287,8 @@ export default function BuatPokjaPage() {
 
   const [step, setStep] = useState(1)
   const [submitted, setSubmitted] = useState(false)
+  const [isPerbaikanMode, setIsPerbaikanMode] = useState(false)
+  const [deskripsiPerbaikan, setDeskripsiPerbaikan] = useState("")
 
   // Step 1
   const [kanalPengaduan, setKanalPengaduan] = useState("")
@@ -310,6 +315,34 @@ export default function BuatPokjaPage() {
   const [skFile, setSkFile] = useState<File | null>(null)
   const [fileError, setFileError] = useState("")
   const [skDetail, setSkDetail] = useState({ nomorSK: "", tanggalSK: "", periodeMulai: "", periodeSelesai: "" })
+
+  // ---------------------------------------------------------------------------
+  // Mount: baca perbaikanPokjaData dari sessionStorage untuk mode perbaikan
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("perbaikanPokjaData")
+      if (!raw) return
+      const parsed = JSON.parse(raw) as {
+        nomorKanal: string
+        members: Members
+        sk: { nomorSK: string; tanggalSK: string; periodeMulai: string; periodeSelesai: string }
+      }
+      setIsPerbaikanMode(true)
+      setKanalPengaduan(parsed.nomorKanal ?? "")
+      if (parsed.members) setMembers(parsed.members)
+      if (parsed.sk) {
+        setSkDetail({
+          nomorSK: parsed.sk.nomorSK ?? "",
+          tanggalSK: parsed.sk.tanggalSK ?? "",
+          periodeMulai: parsed.sk.periodeMulai ?? "",
+          periodeSelesai: parsed.sk.periodeSelesai ?? "",
+        })
+      }
+      // Hapus setelah dibaca agar tidak terbawa ke sesi lain
+      sessionStorage.removeItem("perbaikanPokjaData")
+    } catch {}
+  }, [])
 
   // ---------------------------------------------------------------------------
   // Auto-fill dummy data
@@ -351,22 +384,25 @@ export default function BuatPokjaPage() {
   const handleBack = () => setStep((s) => Math.max(s - 1, 1))
 
   const handleSubmit = () => {
-    setSubmitted(true)
     const payload: PokjaData = {
       region: REGION,
       nomorKanal: kanalPengaduan,
       members,
       sk: { file: skFile, nomorSK: skDetail.nomorSK, tanggalSK: skDetail.tanggalSK, periodeMultai: skDetail.periodeMulai, periodeSelesai: skDetail.periodeSelesai },
     }
-    // Store in sessionStorage so page.tsx can pick it up on navigate-back
     try {
-      const serialisable = { ...payload, sk: { ...payload.sk, file: payload.sk.file?.name ?? null } }
-      sessionStorage.setItem("newPokjaData", JSON.stringify(serialisable))
+      const serialisable = {
+        ...payload,
+        sk: { ...payload.sk, file: payload.sk.file?.name ?? null },
+        ...(isPerbaikanMode && { deskripsiPerbaikan: deskripsiPerbaikan.trim() }),
+      }
+      const key = isPerbaikanMode ? "perbaikanSubmitData" : "newPokjaData"
+      sessionStorage.setItem(key, JSON.stringify(serialisable))
     } catch {}
     setSubmitted(true)
   }
 
-  // Navigate after success screen using window.location to avoid router initialization issues
+  // Navigate after success screen
   useEffect(() => {
     if (!submitted) return
     const t = setTimeout(() => {
@@ -375,15 +411,16 @@ export default function BuatPokjaPage() {
           return JSON.parse(sessionStorage.getItem("auth") || "{}").role
         } catch { return null }
       })()
-      
-      if (role === "pusat") {
+      if (isPerbaikanMode) {
+        window.location.href = "/?pokjaPerbaikan=1"
+      } else if (role === "pusat") {
         window.location.href = "/?pokjaCreated=1"
       } else {
         window.location.href = "/?pokjaSubmitted=1"
       }
     }, 1800)
     return () => clearTimeout(t)
-  }, [submitted])
+  }, [submitted, isPerbaikanMode])
 
   // ---------------------------------------------------------------------------
   // Success screen
@@ -403,12 +440,18 @@ export default function BuatPokjaPage() {
             <CheckCircle2 className="w-8 h-8 text-green-600" />
           </div>
           <h3 className="text-xl font-bold text-gray-900">
-            {isPusat ? "POKJA Berhasil Dibuat!" : "Data Pokja Berhasil Dikirim!"}
+            {isPerbaikanMode
+              ? "Perbaikan Berhasil Dikirim!"
+              : isPusat
+                ? "POKJA Berhasil Dibuat!"
+                : "Data Pokja Berhasil Dikirim!"}
           </h3>
           <p className="text-sm text-gray-500 leading-relaxed">
-            {isPusat 
-              ? `POKJA untuk wilayah ${REGION} telah dibuat dan aktif.`
-              : `Data Pokja wilayah ${REGION} sedang menunggu verifikasi dari Admin Pusat.`
+            {isPerbaikanMode
+              ? `Perbaikan data POKJA wilayah ${REGION} telah dikirim dan kembali menunggu verifikasi Admin Pusat.`
+              : isPusat
+                ? `POKJA untuk wilayah ${REGION} telah dibuat dan aktif.`
+                : `Data Pokja wilayah ${REGION} sedang menunggu verifikasi dari Admin Pusat.`
             }
           </p>
           <p className="text-xs text-gray-400">Mengalihkan ke dashboard...</p>
@@ -434,7 +477,14 @@ export default function BuatPokjaPage() {
               Kembali
             </button>
             <span className="text-gray-300">/</span>
-            <h1 className="text-sm font-semibold text-gray-900">Pembentukan POKJA — {REGION}</h1>
+            <h1 className="text-sm font-semibold text-gray-900">
+              {isPerbaikanMode ? "Perbaikan Data POKJA" : "Pembentukan POKJA"} — {REGION}
+            </h1>
+            {isPerbaikanMode && (
+              <span className="text-xs font-medium text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">
+                Mode Perbaikan
+              </span>
+            )}
           </div>
 
           {/* Auto-fill button */}
@@ -752,6 +802,23 @@ export default function BuatPokjaPage() {
                     <ReviewRow label="Periode" value={skDetail.periodeMulai && skDetail.periodeSelesai ? `${skDetail.periodeMulai} s/d ${skDetail.periodeSelesai}` : "-"} />
                   </div>
                 </div>
+
+                {/* Deskripsi perubahan — hanya mode perbaikan/edit */}
+                {isPerbaikanMode && (
+                  <div>
+                    <div className="mb-3">
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Catatan Perubahan</p>
+                      <p className="text-xs text-gray-400 mt-0.5">Jelaskan perubahan apa saja yang Anda lakukan pada data POKJA ini.</p>
+                    </div>
+                    <textarea
+                      value={deskripsiPerbaikan}
+                      onChange={(e) => setDeskripsiPerbaikan(e.target.value)}
+                      placeholder="Contoh: Memperbarui nomor SK, mengganti anggota koordinator, dan memperpanjang periode berlaku..."
+                      rows={4}
+                      className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    />
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -783,7 +850,8 @@ export default function BuatPokjaPage() {
               onClick={handleSubmit}
               className="flex items-center gap-2 px-6 py-2 text-sm font-semibold bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
             >
-              <CheckCircle2 className="w-4 h-4" /> Submit Pengajuan
+              <CheckCircle2 className="w-4 h-4" />
+              {isPerbaikanMode ? "Kirim Perbaikan" : "Submit Pengajuan"}
             </button>
           )}
         </div>
