@@ -256,6 +256,7 @@ function AdminPageInner() {
 
   useEffect(() => {
     if (!mounted) return
+    if (!authChecked) return
     if (searchParams.get("pokjaCreated") !== "1" && searchParams.get("pokjaSubmitted") !== "1") return
     if (hasProcessedSubmit.current) return
     hasProcessedSubmit.current = true
@@ -322,12 +323,13 @@ function AdminPageInner() {
     } catch (e) {
       console.error("Failed to process pokja submission", e)
     }
-  }, [mounted, searchParams, role])
+  }, [mounted, authChecked, searchParams, role])
 
   // Handler: perbaikan pokja dari admin dinas setelah ditolak
   const hasProcessedPerbaikan = useRef(false)
   useEffect(() => {
     if (!mounted) return
+    if (!authChecked) return
     if (searchParams.get("pokjaPerbaikan") !== "1") return
     if (hasProcessedPerbaikan.current) return
     hasProcessedPerbaikan.current = true
@@ -379,7 +381,7 @@ function AdminPageInner() {
     } catch (e) {
       console.error("Failed to process pokja perbaikan", e)
     }
-  }, [mounted, searchParams])
+  }, [mounted, authChecked, searchParams])
 
   const navigateToBuatPokja = () => {
     router.push("/buat-pokja")
