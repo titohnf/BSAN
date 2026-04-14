@@ -268,12 +268,6 @@ function AdminPageInner() {
         sk: Omit<PokjaData["sk"], "file"> & { file: string | null }
       }
 
-      const isPusat = (() => {
-        try {
-          return JSON.parse(sessionStorage.getItem("auth") || "{}").role === "pusat"
-        } catch { return false }
-      })()
-
       const existingIds = new Set(pokjaList.map(p => p.id))
       let newId = `pokja-${Date.now()}`
       while (existingIds.has(newId)) {
@@ -281,12 +275,12 @@ function AdminPageInner() {
       }
 
       const today = new Date().toISOString().slice(0, 10)
-      const newLog = { tanggal: today, aksi: "pengajuan", aktor: isPusat ? "admin_pusat" : "user" }
+      const newLog = { tanggal: today, aksi: "pengajuan", aktor: role === "pusat" ? "admin_pusat" : "user" }
 
       const newPokja: PokjaItem = {
         id: newId,
         nama: parsed.region,
-        status: isPusat ? "aktif" : "masih-diverifikasi",
+        status: role === "pusat" ? "aktif" : "masih-diverifikasi",
         validasiLog: [newLog],
         data: {
           ...parsed,
@@ -328,7 +322,7 @@ function AdminPageInner() {
     } catch (e) {
       console.error("Failed to process pokja submission", e)
     }
-  }, [mounted, searchParams])
+  }, [mounted, searchParams, role])
 
   // Handler: perbaikan pokja dari admin dinas setelah ditolak
   const hasProcessedPerbaikan = useRef(false)
