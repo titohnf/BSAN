@@ -311,11 +311,13 @@ function AdminPageInner() {
         if (sameRegionIdx !== -1) {
           const updated = [...deduped]
           const existing = updated[sameRegionIdx]
+          // Pengajuan baru: replace log lama sepenuhnya — jangan append
+          // agar tidak muncul duplikasi log dari seed / entry sebelumnya
           updated[sameRegionIdx] = {
             ...existing,
             status: newPokja.status,
             data: newPokja.data,
-            validasiLog: [...(existing.validasiLog ?? []), newLog],
+            validasiLog: [newLog],
           }
           return updated
         }
