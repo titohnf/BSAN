@@ -50,7 +50,7 @@ export function formatLogTerakhirDisplay(item: RujukanLogSource, dinasNama: stri
   const t = item.logTerakhir?.trim()
 
   if (item.status === "dihapus") {
-    if (!t || LEGACY_LOG_DIHAPUS_DINAS.test(t)) return dinasLog.dihapus(d)
+    if (!t || LEGACY_LOG_DIHAPUS_DINAS.test(t)) return item.usulanDari === "pusat" ? RUJUKAN_LOG.dihapusPusat : dinasLog.dihapus(d)
     return t
   }
 
@@ -60,9 +60,17 @@ export function formatLogTerakhirDisplay(item: RujukanLogSource, dinasNama: stri
     if (item.usulanDari === "sekolah" && item.namaSekolah?.trim()) {
       return RUJUKAN_LOG.dibuatSekolah(item.namaSekolah.trim())
     }
+    if (item.usulanDari === "pusat") {
+      return RUJUKAN_LOG.dibuatTerverifikasiPusat
+    }
     return dinasLog.dibuat(d)
   }
   if (item.status === "menunggu_review") return dinasLog.menungguReview(d)
-  if (item.status === "terverifikasi") return dinasLog.diverifikasi(d)
+  if (item.status === "terverifikasi") {
+    if (item.usulanDari === "pusat") {
+      return RUJUKAN_LOG.diverifikasiPusat
+    }
+    return dinasLog.diverifikasi(d)
+  }
   return "—"
 }
