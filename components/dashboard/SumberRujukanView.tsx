@@ -9,7 +9,7 @@ import {
   ChevronRight, X, Pencil, Trash2, CheckCircle,
   XCircle, ExternalLink, RotateCcw, Clock, ArrowUpDown, Download,
 } from "lucide-react"
-import { DEFAULT_DINAS_NAMA, getDinasNamaForLogs } from "@/lib/auth-session"
+import { DEFAULT_DINAS_NAMA, getDinasNamaForLogs, readAuthSession } from "@/lib/auth-session"
 import { RUJUKAN_LOG, dinasLog, formatLogTerakhirDisplay, getStatusAfterRestore } from "@/lib/rujukan-logs"
 
 const D_SEED = DEFAULT_DINAS_NAMA
@@ -551,7 +551,8 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
   }
 
   const handleVerify = (id: string) => {
-    const log = dinasLog.diverifikasi(dinasNamaLog)
+    const isPusat = readAuthSession()?.role === "pusat"
+    const log = isPusat ? RUJUKAN_LOG.diverifikasiPusat : dinasLog.diverifikasi(dinasNamaLog)
     persistRujukanPatch(id, { status: "terverifikasi", logTerakhir: log })
     setList((prev) => prev.map((i) =>
       i.id === id ? { ...i, status: "terverifikasi" as StatusRujukan, logTerakhir: log } : i
@@ -559,7 +560,8 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
   }
 
   const handleUnverify = (id: string) => {
-    const log = dinasLog.batalkanVerifikasi(dinasNamaLog)
+    const isPusat = readAuthSession()?.role === "pusat"
+    const log = isPusat ? RUJUKAN_LOG.batalkanVerifikasiPusat : dinasLog.batalkanVerifikasi(dinasNamaLog)
     persistRujukanPatch(id, { status: "menunggu", logTerakhir: log })
     setList((prev) => prev.map((i) =>
       i.id === id ? { ...i, status: "menunggu" as StatusRujukan, logTerakhir: log } : i
@@ -567,7 +569,8 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
   }
 
   const handleDelete = (id: string) => {
-    const log = dinasLog.dihapus(dinasNamaLog)
+    const isPusat = readAuthSession()?.role === "pusat"
+    const log = isPusat ? RUJUKAN_LOG.dihapusPusat : dinasLog.dihapus(dinasNamaLog)
     persistRujukanPatch(id, { status: "dihapus", logTerakhir: log })
     setList((prev) => prev.map((i) =>
       i.id === id ? { ...i, status: "dihapus" as StatusRujukan, logTerakhir: log } : i
@@ -578,7 +581,8 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
     const item = list.find((i) => i.id === id)
     if (!item) return
     const nextStatus = getStatusAfterRestore(item.usulanDari)
-    const logTerakhir = dinasLog.dipulihkan(dinasNamaLog)
+    const isPusat = readAuthSession()?.role === "pusat"
+    const logTerakhir = isPusat ? RUJUKAN_LOG.dipulihkanPusat : dinasLog.dipulihkan(dinasNamaLog)
     persistRujukanPatch(id, { status: nextStatus, logTerakhir })
     setList((prev) => prev.map((i) =>
       i.id === id ? { ...i, status: nextStatus, logTerakhir } : i
