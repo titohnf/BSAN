@@ -200,9 +200,16 @@ function AdminPageInner() {
           seen.add(p.id)
 
           if (mockIds.has(p.id)) {
-            // Entri MOCK yang berubah — update status, data, dan validasiLog
+            // Entri MOCK yang berubah — update semua field yang bisa berubah
             const idx = merged.findIndex(m => m.id === p.id)
-            if (idx !== -1) merged[idx] = { ...merged[idx], status: p.status, data: p.data, validasiLog: p.validasiLog }
+            if (idx !== -1) merged[idx] = {
+              ...merged[idx],
+              status: p.status,
+              data: p.data,
+              validasiLog: p.validasiLog,
+              alasanPenolakan: p.alasanPenolakan,
+              tanggalDiverifikasi: p.tanggalDiverifikasi,
+            }
             continue
           }
 
@@ -210,7 +217,14 @@ function AdminPageInner() {
           if (mockNames.has(key)) {
             // Entri lama dengan id berbeda tapi nama sama — update MOCK entry
             const idx = merged.findIndex(m => m.nama.trim().toLowerCase() === key)
-            if (idx !== -1) merged[idx] = { ...merged[idx], status: p.status, data: p.data, validasiLog: p.validasiLog }
+            if (idx !== -1) merged[idx] = {
+              ...merged[idx],
+              status: p.status,
+              data: p.data,
+              validasiLog: p.validasiLog,
+              alasanPenolakan: p.alasanPenolakan,
+              tanggalDiverifikasi: p.tanggalDiverifikasi,
+            }
           } else {
             // Genuinely new entry — append
             merged.push(p)
@@ -223,12 +237,13 @@ function AdminPageInner() {
       const toSave = merged.filter(p => {
         const def = mockDefaults.get(p.id)
         if (def) {
-          // Save MOCK entry jika statusnya berubah ATAU punya validasiLog
-          return p.status !== def.status || (p.validasiLog && p.validasiLog.length > 0)
+          // Save MOCK entry jika statusnya berubah, punya validasiLog, atau punya alasan penolakan
+          return p.status !== def.status || (p.validasiLog && p.validasiLog.length > 0) || !!p.alasanPenolakan
         }
         return true
       })
       localStorage.setItem("pokjaList", JSON.stringify(toSave))
+      console.log("[v0] merged pokjaList on load", merged.filter(p => p.data?.region === REGION || p.nama === REGION).map(p => ({ id: p.id, nama: p.nama, status: p.status, alasan: p.alasanPenolakan })))
       setPokjaList(merged)
     } catch {
       setPokjaList(MOCK_POKJA_LIST)
@@ -244,9 +259,9 @@ function AdminPageInner() {
       const toSave = pokjaList.filter(p => {
         if (seen.has(p.id)) return false
         seen.add(p.id)
-        // MOCK entry: simpan jika status berubah ATAU punya validasiLog
+        // MOCK entry: simpan jika status berubah, punya validasiLog, atau punya alasan penolakan
         if (mockDefaults.has(p.id)) {
-          return p.status !== mockDefaults.get(p.id) || (p.validasiLog && p.validasiLog.length > 0)
+          return p.status !== mockDefaults.get(p.id) || (p.validasiLog && p.validasiLog.length > 0) || !!p.alasanPenolakan
         }
         return true
       })
@@ -419,7 +434,12 @@ function AdminPageInner() {
   }
 
   const handleSavePokjaValidation = (updated: PokjaItem) => {
-    setPokjaList((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))
+    console.log("[v0] handleSavePokjaValidation called", { id: updated.id, status: updated.status, alasan: updated.alasanPenolakan })
+    setPokjaList((prev) => {
+      const next = prev.map((p) => (p.id === updated.id ? updated : p))
+      console.log("[v0] pokjaList after save", next.filter(p => p.data?.region === REGION).map(p => ({ id: p.id, status: p.status })))
+      return next
+    })
     setValidatingPokja(null)
   }
 
