@@ -396,8 +396,12 @@ export default function BuatPokjaPage() {
         sk: { ...payload.sk, file: payload.sk.file?.name ?? null },
         ...(isPerbaikanMode && { deskripsiPerbaikan: deskripsiPerbaikan.trim() }),
       }
+      const role = (() => {
+        try { return JSON.parse(sessionStorage.getItem("auth") || "{}").role } catch { return null }
+      })()
+      const pokjaStatus = isPerbaikanMode ? undefined : (role === "pusat" ? "aktif" : "masih-diverifikasi")
       const key = isPerbaikanMode ? "perbaikanSubmitData" : "newPokjaData"
-      sessionStorage.setItem(key, JSON.stringify(serialisable))
+      sessionStorage.setItem(key, JSON.stringify({ ...serialisable, ...(pokjaStatus ? { pokjaStatus } : {}) }))
     } catch {}
     setSubmitted(true)
   }
