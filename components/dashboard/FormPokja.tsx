@@ -18,6 +18,7 @@ import {
   Eye,
 } from "lucide-react"
 import { Button } from "@/components/ds/Button"
+import { Plus } from "lucide-react"
 import {
   MemberField,
   Members,
@@ -392,6 +393,8 @@ export function FormPokja({ region, onClose, onSubmit }: FormPokjaProps) {
     kominfo: emptyMember(),
     dukbangga: emptyMember(),
   })
+  const [additionalCount, setAdditionalCount] = useState(0)
+  const addAdditionalMember = () => setAdditionalCount(prev => prev + 1)
   const excelInputRef = useRef<HTMLInputElement>(null)
 
   // Step 3 state
@@ -630,11 +633,11 @@ export function FormPokja({ region, onClose, onSubmit }: FormPokjaProps) {
               <div className="space-y-3">
                 <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Anggota per Bidang</p>
                 
-                {/* 3 Anggota Wajib dengan bidang disabled */}
-                {console.log("[v0] Rendering Step 2 - Anggota per Bidang section with mandatory fields")}
+                {/* 6 Anggota Wajib Bidang */}
+                {console.log("[v0] Rendering Step 2 - 6 Anggota Wajib Bidang")}
                 <MemberSection
                   key="pendidikan"
-                  label="Anggota Wajib 1 (Bidang Pendidikan)"
+                  label="Anggota Wajib (Bidang Pendidikan)"
                   value={members.pendidikan}
                   onChange={(field, val) => updateMember("pendidikan", field, val)}
                   bidangValue="Pendidikan"
@@ -642,7 +645,7 @@ export function FormPokja({ region, onClose, onSubmit }: FormPokjaProps) {
                 />
                 <MemberSection
                   key="pppa"
-                  label="Anggota Wajib 2 (Bidang PPPA)"
+                  label="Anggota Wajib (Bidang PPPA)"
                   value={members.pppa}
                   onChange={(field, val) => updateMember("pppa", field, val)}
                   bidangValue="PPPA"
@@ -650,23 +653,64 @@ export function FormPokja({ region, onClose, onSubmit }: FormPokjaProps) {
                 />
                 <MemberSection
                   key="sosial"
-                  label="Anggota Wajib 3 (Bidang Sosial)"
+                  label="Anggota Wajib (Bidang Sosial)"
                   value={members.sosial}
                   onChange={(field, val) => updateMember("sosial", field, val)}
                   bidangValue="Sosial"
                   bidangDisabled={true}
                 />
+                <MemberSection
+                  key="kesehatan"
+                  label="Anggota Wajib (Bidang Kesehatan)"
+                  value={members.kesehatan}
+                  onChange={(field, val) => updateMember("kesehatan", field, val)}
+                  bidangValue="Kesehatan"
+                  bidangDisabled={true}
+                />
+                <MemberSection
+                  key="dukbangga"
+                  label="Anggota Wajib (Bidang Dukbangga)"
+                  value={members.dukbangga}
+                  onChange={(field, val) => updateMember("dukbangga", field, val)}
+                  bidangValue="Dukbangga"
+                  bidangDisabled={true}
+                />
+                <MemberSection
+                  key="kominfo"
+                  label="Anggota Wajib (Bidang Kominfo)"
+                  value={members.kominfo}
+                  onChange={(field, val) => updateMember("kominfo", field, val)}
+                  bidangValue="Kominfo"
+                  bidangDisabled={true}
+                />
 
-                {/* Anggota Tambahan (opsional) */}
-                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest pt-2">Anggota Tambahan (Opsional)</p>
-                {BIDANG_ROLES.filter(r => !["pendidikan", "pppa", "sosial"].includes(r.key)).map((r) => (
-                  <MemberSection
-                    key={r.key}
-                    label={r.label}
-                    value={members[r.key]}
-                    onChange={(field, val) => updateMember(r.key, field, val)}
-                  />
-                ))}
+                {/* Anggota Lainnya (_opsional) */}
+                {additionalCount > 0 && (
+                  <p className="text-xs font-bold text-gray-500 uppercase tracking-widest pt-2">Anggota Lainnya (Opsional)</p>
+                )}
+                {Array.from({ length: additionalCount }).map((_, idx) => {
+                  const roleKey = `additional_${idx}` as RoleKey
+                  return (
+                    <MemberSection
+                      key={roleKey}
+                      label={`Anggota Lainnya ${idx + 1}`}
+                      value={members[roleKey] || emptyMember()}
+                      onChange={(field, val) => {
+                        setMembers(prev => ({ ...prev, [roleKey]: { ...prev[roleKey] || emptyMember(), [field]: val } }))
+                      }}
+                    />
+                  )
+                })}
+                {additionalCount < 3 && (
+                  <button
+                    type="button"
+                    onClick={addAdditionalMember}
+                    className="flex items-center justify-center gap-2 w-full py-2.5 mt-2 rounded-lg border-2 border-dashed border-gray-300 text-sm font-medium text-gray-500 hover:border-blue-400 hover:text-blue-600 transition"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Tambah Anggota Lainnya
+                  </button>
+                )}
               </div>
             </div>
           )}
