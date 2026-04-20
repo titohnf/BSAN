@@ -836,7 +836,7 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
           )}
           <button
             onClick={() => setShowWilayahModal(true)}
-            className="text-blue-600 hover:text-blue-800 font-medium text-sm underline underline-offset-2"
+            className="text-blue-600 hover:bg-blue-50 font-medium text-sm px-2 py-1 rounded-md transition"
           >
             Ganti
           </button>
