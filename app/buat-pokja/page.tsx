@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import {
   ArrowLeft, Wand2, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight,
-  User, Upload, X, AlertCircle, Phone, Building2, Download, Eye, FileText,
+  User, Upload, X, AlertCircle, Phone, Building2, Download, Eye, FileText, Plus,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
@@ -579,13 +579,13 @@ export default function BuatPokjaPage() {
                     <MemberSection key={r.key} label={r.label} value={members[r.key]} onChange={(f, v) => updateMember(r.key, f, v)} />
                   ))}
                 </div>
-                {/* Anggota per Bidang - 3 Wajib */}
+                {/* Anggota per Bidang - 6 Wajib */}
                 <div className="flex flex-col gap-4">
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Anggota per Bidang</p>
                   
                   {/* Anggota Wajib 1: Pendidikan */}
                   <MandatoryMemberSection 
-                    label="Anggota Wajib 1 (Bidang Pendidikan)" 
+                    label="Anggota Wajib (Bidang Pendidikan)" 
                     value={members.pendidikan} 
                     onChange={(f, v) => updateMember("pendidikan", f, v)}
                     bidangValue="Bidang Pendidikan"
@@ -593,7 +593,7 @@ export default function BuatPokjaPage() {
 
                   {/* Anggota Wajib 2: PPPA */}
                   <MandatoryMemberSection 
-                    label="Anggota Wajib 2 (Bidang PPPA)" 
+                    label="Anggota Wajib (Bidang PPPA)" 
                     value={members.pppa} 
                     onChange={(f, v) => updateMember("pppa", f, v)}
                     bidangValue="Bidang PPPA"
@@ -601,16 +601,42 @@ export default function BuatPokjaPage() {
 
                   {/* Anggota Wajib 3: Sosial */}
                   <MandatoryMemberSection 
-                    label="Anggota Wajib 3 (Bidang Sosial)" 
+                    label="Anggota Wajib (Bidang Sosial)" 
                     value={members.sosial} 
                     onChange={(f, v) => updateMember("sosial", f, v)}
                     bidangValue="Bidang Sosial"
                   />
+
+                  {/* Anggota Wajib 4: Kesehatan */}
+                  <MandatoryMemberSection 
+                    label="Anggota Wajib (Bidang Kesehatan)" 
+                    value={members.kesehatan} 
+                    onChange={(f, v) => updateMember("kesehatan", f, v)}
+                    bidangValue="Bidang Kesehatan"
+                  />
+
+                  {/* Anggota Wajib 5: Dukbangga */}
+                  <MandatoryMemberSection 
+                    label="Anggota Wajib (Bidang Dukbangga)" 
+                    value={members.dukbangga} 
+                    onChange={(f, v) => updateMember("dukbangga", f, v)}
+                    bidangValue="Bidang Dukbangga"
+                  />
+
+                  {/* Anggota Wajib 6: Kominfo */}
+                  <MandatoryMemberSection 
+                    label="Anggota Wajib (Bidang Kominfo)" 
+                    value={members.kominfo} 
+                    onChange={(f, v) => updateMember("kominfo", f, v)}
+                    bidangValue="Bidang Kominfo"
+                  />
                 </div>
 
-                {/* Anggota Tambahan (Dinamis) */}
+                {/* Anggota Lainnya (Dinamis) */}
                 <div className="flex flex-col gap-4">
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Anggota Tambahan (Opsional)</p>
+                  {anggotaList.length > 0 && (
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Anggota Lainnya (Opsional)</p>
+                  )}
                   
                   {anggotaList.map((anggota, index) => (
                     <div key={index} className="rounded-xl border border-gray-200 bg-white overflow-hidden">
@@ -720,9 +746,10 @@ export default function BuatPokjaPage() {
                   
                   <button
                     onClick={addAnggota}
-                    className="flex items-center justify-center gap-2 w-full py-2.5 border-2 border-dashed border-blue-300 rounded-xl text-sm font-medium text-blue-600 hover:bg-blue-50 hover:border-blue-400 transition"
+                    type="button"
+                    className="flex items-center justify-center gap-2 w-full py-2.5 mt-2 border-2 border-dashed border-gray-300 rounded-lg text-sm font-medium text-gray-500 hover:border-blue-400 hover:text-blue-600 transition"
                   >
-                    <span className="text-lg leading-none">+</span> Tambah Anggota Lainnya
+                    <Plus className="w-4 h-4" /> Tambah Anggota Lainnya
                   </button>
                 </div>
               </div>
