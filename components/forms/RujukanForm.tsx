@@ -214,6 +214,7 @@ function RujukanFormInner() {
   const isEdit = !!editId
   const isView = !!viewId
   const isReadOnly = isView
+  const isPusat = readAuthSession()?.role === "pusat"
 
   const [form, setForm] = useState<FormState>(emptyForm)
   const [submitted, setSubmitted] = useState(false)
@@ -431,6 +432,18 @@ function RujukanFormInner() {
           </div>
         </div>
       </div>
+
+      {/* Bulk upload info banner - only show for new creation, and only for non-pusat roles */}
+      {isPusat === false && !isEdit && !isView && (
+        <div className="max-w-2xl mx-auto px-4 pt-4">
+          <div className="rounded-lg bg-blue-50 border border-blue-100 px-3 py-2.5">
+            <p className="text-xs text-blue-700">
+              <span className="font-semibold">Informasi:</span> Untuk melakukan bulk upload data sumber dukungan, hubungi nomor kontak person Puspeka di{" "}
+              <a href="https://wa.me/6282127282918" target="_blank" rel="noopener noreferrer" className="font-medium underline hover:text-blue-800">082127282918</a> (WhatsApp).
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Form body */}
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">

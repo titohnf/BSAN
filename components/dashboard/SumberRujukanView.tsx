@@ -6,8 +6,10 @@ import {
   Heart, Scale, Shield, Phone, MapPin, Plus,
   Search, MessageCircle, Globe, Lock, Users,
   Building2, GraduationCap, HandHeart, Radio,
-  ChevronRight, X, Pencil, Trash2, CheckCircle,
+  ChevronRight, ChevronLeft, ChevronsLeft, ChevronsRight,
+  X, Pencil, Trash2, CheckCircle,
   XCircle, ExternalLink, RotateCcw, Clock, ArrowUpDown, Download,
+  Upload, FileSpreadsheet, AlertCircle,
 } from "lucide-react"
 import { DEFAULT_DINAS_NAMA, getDinasNamaForLogs, readAuthSession } from "@/lib/auth-session"
 import { RUJUKAN_LOG, dinasLog, formatLogTerakhirDisplay, getStatusAfterRestore } from "@/lib/rujukan-logs"
@@ -262,14 +264,9 @@ function DetailPanel({
   const alamat = [item.namaJalan, item.nomorJalan, item.kelurahan, item.kecamatan, item.kabupatenKota, item.provinsi, item.kodePos]
     .filter(Boolean).join(", ")
 
-  return (
-    <>
-      {/* Backdrop */}
-      <div className="fixed inset-0 z-40 bg-black/40" onClick={onClose} />
-
-      {/* Panel */}
-      <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white shadow-2xl flex flex-col">
-        {/* Header */}
+return (
+    <div className="fixed inset-0 z-40 bg-black/40" onClick={onClose}>
+      <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white shadow-2xl flex flex-col" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className={`w-9 h-9 rounded-full ${kategoriCfg.bg} ${kategoriCfg.color} flex items-center justify-center flex-shrink-0`}>
@@ -285,9 +282,7 @@ function DetailPanel({
           </button>
         </div>
 
-        {/* Body */}
         <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5">
-          {/* Kategori & Penyedia */}
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-gray-50 rounded-lg p-3">
               <p className="text-xs text-gray-500 mb-1">Kategori Dukungan</p>
@@ -305,7 +300,6 @@ function DetailPanel({
             </div>
           </div>
 
-          {/* Alamat */}
           <div>
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Alamat</p>
             <div className="bg-gray-50 rounded-lg p-3 flex items-start gap-2">
@@ -320,7 +314,6 @@ function DetailPanel({
             )}
           </div>
 
-          {/* Kontak */}
           <div>
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Kontak</p>
             <div className="space-y-2">
@@ -352,97 +345,11 @@ function DetailPanel({
               )}
             </div>
           </div>
-
-          {/* Akses & Meta */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-gray-50 rounded-lg p-3">
-              <p className="text-xs text-gray-500 mb-1">Akses Informasi</p>
-              {item.aksesInfo === "publik" ? (
-                <span className="inline-flex items-center gap-1 text-xs font-medium text-green-700">
-                  <Users className="w-3.5 h-3.5" /> Publik
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-700">
-                  <Lock className="w-3.5 h-3.5" /> Terbatas
-                </span>
-              )}
-            </div>
-            <div className="bg-gray-50 rounded-lg p-3">
-              <p className="text-xs text-gray-500 mb-1">Dibuat Oleh</p>
-              <p className="text-xs font-medium text-gray-800 leading-snug">{item.dibuatOleh}</p>
-            </div>
-          </div>
-
-          {/* Log Terakhir */}
-          <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-xs text-gray-500 mb-1">Log Terakhir</p>
-            <p className="text-xs text-gray-700">{formatLogTerakhirDisplay(item, dinasNamaForLog)}</p>
-          </div>
-        </div>
-
-        {/* Footer actions – depend on status */}
-        <div className="flex-shrink-0 border-t border-gray-200 px-5 py-4 space-y-2 bg-white">
-          {item.status === "dihapus" ? (
-            <div className="flex flex-col sm:flex-row gap-2">
-              <button
-                type="button"
-                onClick={() => { onRestore(item.id); onClose() }}
-                className="flex-1 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition flex items-center justify-center gap-2"
-              >
-                <RotateCcw className="w-4 h-4" /> Pulihkan
-              </button>
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 py-2.5 rounded-lg border border-gray-300 text-gray-800 text-sm font-semibold hover:bg-gray-50 transition"
-              >
-                Tutup
-              </button>
-            </div>
-          ) : (
-            <>
-              {(item.status === "menunggu" || item.status === "menunggu_review") && (
-                <button
-                  type="button"
-                  onClick={() => { onVerify(item.id); onClose() }}
-                  className="w-full py-2.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-semibold transition flex items-center justify-center gap-2"
-                >
-                  <CheckCircle className="w-4 h-4" /> Verifikasi
-                </button>
-              )}
-              {item.status === "terverifikasi" && (
-                <button
-                  type="button"
-                  onClick={() => { onUnverify(item.id); onClose() }}
-                  className="w-full py-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold transition flex items-center justify-center gap-2"
-                >
-                  <XCircle className="w-4 h-4" /> Batalkan Verifikasi
-                </button>
-              )}
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => { onEdit(item.id); onClose() }}
-                  className="py-2.5 rounded-lg border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-50 transition flex items-center justify-center gap-2"
-                >
-                  <Pencil className="w-4 h-4" /> Edit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { onDelete(item.id); onClose() }}
-                  className="py-2.5 rounded-lg border border-red-200 text-red-600 text-sm font-medium hover:bg-red-50 transition flex items-center justify-center gap-2"
-                >
-                  <Trash2 className="w-4 h-4" /> Hapus
-                </button>
-              </div>
-            </>
-          )}
         </div>
       </div>
-    </>
+    </div>
   )
 }
-
 // ---------------------------------------------------------------------------
 // Provinsi list for filter
 // ---------------------------------------------------------------------------
@@ -464,19 +371,24 @@ type SortMode = "relevansi" | "terbaru" | "nama_az"
 export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi: string; kabupatenKota: string } }) {
   const router = useRouter()
   const dinasNamaLog = getDinasNamaForLogs()
+
+  // Wilayah dinas dari prop atau fallback ke Aceh / Banda Aceh
+  const myProvinsi = wilayahDinas?.provinsi ?? "Aceh"
+  const myKabupatenKota = wilayahDinas?.kabupatenKota ?? "Banda Aceh"
+  const auth = readAuthSession()
+  const isPusat = auth?.role === "pusat"
+
   const [list, setList] = useState<SumberRujukan[]>(SEED)
   const [search, setSearch] = useState("")
-  const [scope, setScope] = useState<"wilayah" | "nasional">("wilayah")
-  const [filterProvinsi, setFilterProvinsi] = useState<string>("semua")
+  const [filterWilayah, setFilterWilayah] = useState<{ province: string; kabupaten: string } | null>(isPusat ? null : { province: myProvinsi, kabupaten: myKabupatenKota })
   const [filterKategori, setFilterKategori] = useState<KategoriDukungan | "semua">("semua")
   const [filterStatus, setFilterStatus] = useState<StatusRujukan | "semua">("semua")
   const [filterPenyedia, setFilterPenyedia] = useState<KategoriPenyedia | "semua">("semua")
   const [sortMode, setSortMode] = useState<SortMode>("relevansi")
   const [selected, setSelected] = useState<SumberRujukan | null>(null)
-
-  // Wilayah dinas dari prop atau fallback ke Aceh / Banda Aceh
-  const myProvinsi = wilayahDinas?.provinsi ?? "Aceh"
-  const myKabupatenKota = wilayahDinas?.kabupatenKota ?? "Banda Aceh"
+  const [currentPage, setCurrentPage] = useState(1)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [showWilayahModal, setShowWilayahModal] = useState(false)
 
   useEffect(() => {
     const loadData = () => {
@@ -509,6 +421,11 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
     }
   }, [])
 
+  // Reset pagination when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [search, filterWilayah, filterKategori, filterStatus, filterPenyedia, sortMode])
+
   const filtered = list
     .filter((item) => {
       const matchSearch =
@@ -516,15 +433,12 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
         item.namaInstansi.toLowerCase().includes(search.toLowerCase()) ||
         item.kabupatenKota.toLowerCase().includes(search.toLowerCase()) ||
         item.provinsi.toLowerCase().includes(search.toLowerCase())
-      const matchScope =
-        scope === "nasional" ||
-        (item.provinsi === myProvinsi && item.kabupatenKota === myKabupatenKota)
-      const matchProvinsi =
-        scope === "wilayah" || filterProvinsi === "semua" || item.provinsi === filterProvinsi
+      const matchWilayah = !filterWilayah || 
+        (filterWilayah.province === item.provinsi && (!filterWilayah.kabupaten || item.kabupatenKota === filterWilayah.kabupaten))
       const matchKategori = filterKategori === "semua" || item.kategoriBentukDukungan === filterKategori
       const matchStatus = filterStatus === "semua" || item.status === filterStatus
       const matchPenyedia = filterPenyedia === "semua" || item.kategoriPenyedia === filterPenyedia
-      return matchSearch && matchScope && matchProvinsi && matchKategori && matchStatus && matchPenyedia
+      return matchSearch && matchWilayah && matchKategori && matchStatus && matchPenyedia
     })
     .sort((a, b) => {
       if (sortMode === "nama_az") return a.namaInstansi.localeCompare(b.namaInstansi)
@@ -534,6 +448,13 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
       const rankB = b.kabupatenKota === myKabupatenKota && b.provinsi === myProvinsi ? 0 : b.provinsi === myProvinsi ? 1 : 2
       return rankA - rankB
     })
+
+  // Pagination calculations
+  const totalRows = filtered.length
+  const totalPages = Math.ceil(totalRows / rowsPerPage)
+  const startIndex = (currentPage - 1) * rowsPerPage
+  const endIndex = Math.min(startIndex + rowsPerPage, totalRows)
+  const paginatedData = filtered.slice(startIndex, endIndex)
 
   const persistRujukanPatch = (id: string, patch: Partial<SumberRujukan> & { status?: StatusRujukan }) => {
     try {
@@ -617,17 +538,229 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
     const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
-    const scopeLabel = scope === "wilayah" ? myKabupatenKota.replace(/\s+/g, "-") : "Nasional"
+    const scopeLabel = filterProvinsi !== "semua" || filterKabupaten !== "semua"
+      ? [filterKabupaten !== "semua" ? filterKabupaten : null, filterProvinsi !== "semua" ? filterProvinsi : null].filter(Boolean).join("-").replace(/\s+/g, "-")
+      : "Semua"
     a.href = url
     a.download = `Sumber-Dukungan-${scopeLabel}-${new Date().toISOString().slice(0, 10)}.csv`
     a.click()
     URL.revokeObjectURL(url)
   }
 
-  const statKeys: KategoriDukungan[] = ["Fasilitas Kesehatan", "Konseling", "Bantuan Hukum", "Kepolisian"]
-  const scopeList = scope === "wilayah"
-    ? list.filter((i) => i.provinsi === myProvinsi && i.kabupatenKota === myKabupatenKota)
-    : list
+  const PROVINSI_OPTIONS = [
+    "Aceh", "Sumatera Utara", "Sumatera Barat", "Riau", "Kepulauan Riau",
+    "Jambi", "Sumatera Selatan", "Kepulauan Bangka Belitung", "Bengkulu",
+    "Lampung", "DKI Jakarta", "Jawa Barat", "Banten", "Jawa Tengah",
+    "DI Yogyakarta", "Jawa Timur", "Bali", "Nusa Tenggara Barat",
+    "Nusa Tenggara Timur", "Kalimantan Barat", "Kalimantan Tengah",
+    "Kalimantan Selatan", "Kalimantan Timur", "Kalimantan Utara",
+    "Sulawesi Utara", "Gorontalo", "Sulawesi Tengah", "Sulawesi Barat",
+    "Sulawesi Selatan", "Sulawesi Tenggara", "Maluku", "Maluku Utara",
+    "Papua Barat", "Papua",
+  ]
+  const KATEGORI_DUKUNGAN_OPTIONS: KategoriDukungan[] = [
+    "Fasilitas Kesehatan", "Konseling", "Bantuan Hukum",
+    "Kepolisian", "Psikologi", "Pendidikan", "Sosial", "Lainnya",
+  ]
+  const KATEGORI_PENYEDIA_OPTIONS: KategoriPenyedia[] = [
+    "Pemerintah Pusat", "Pemerintah Daerah", "Swasta", "OMS", "Lainnya",
+  ]
+
+  const downloadTemplate = () => {
+    const headers = [
+      "Nama Instansi", "Kategori Dukungan", "Kategori Penyedia",
+      "Provinsi", "Kabupaten/Kota", "Kecamatan",
+      "Kelurahan", "Nama Jalan", "Nomor Jalan", "Kode Pos",
+      "Tautan Google Maps", "Nomor Call Center", "Nomor Pribadi",
+      "Website", "Akses Informasi",
+    ]
+    const sampleRows = [
+      ["RSUD示例", "Fasilitas Kesehatan", "Pemerintah Daerah", "Aceh", "Banda Aceh", "", "", "", "", "", "", "", "0651123456", "", "", "Publik"],
+      ["Puskesmas示例", "Fasilitas Kesehatan", "Pemerintah Daerah", "Aceh", "Banda Aceh", "Baiturrahman", "Peunayong", "Jl. Sri Ratu", "", "", "", "0651987654", "", "", "Publik"],
+      ["LBH示例", "Bantuan Hukum", "OMS", "Aceh", "Banda Aceh", "", "", "Jl. T. Daud", "No. 5", "", "", "", "0651123456", "0812xxxx", "www.example.org", "Terbatas"],
+    ]
+    const escape = (v: string) => `"${v.replace(/"/g, '""')}"`
+    const csv = [headers, ...sampleRows].map((row) => row.map(escape).join(",")).join("\n")
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "template-sumber-dukungan.csv"
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const parseCSV = (text: string): { headers: string[]; rows: string[][] } => {
+    const lines = text.split(/\r?\n/).filter((line) => line.trim() !== "")
+    if (lines.length === 0) return { headers: [], rows: [] }
+    const parseRow = (row: string): string[] => {
+      const result: string[] = []
+      let current = ""
+      let inQuotes = false
+      for (let i = 0; i < row.length; i++) {
+        const char = row[i]
+        if (char === '"') {
+          if (inQuotes && row[i + 1] === '"') {
+            current += '"'
+            i++
+          } else {
+            inQuotes = !inQuotes
+          }
+        } else if (char === "," && !inQuotes) {
+          result.push(current.trim())
+          current = ""
+        } else {
+          current += char
+        }
+      }
+      result.push(current.trim())
+      return result
+    }
+    const headers = parseRow(lines[0])
+    const rows = lines.slice(1).map(parseRow).filter((row) => row.some((cell) => cell !== ""))
+    return { headers, rows }
+  }
+
+  const validateRow = (row: string[], rowIndex: number): { valid: boolean; errors: string[]; data: Partial<SumberRujukan> } => {
+    const errors: string[] = []
+    const h = row
+    const get = (idx: number) => h[idx] ?? ""
+
+    const namaInstansi = get(0).trim()
+    const kategoriDukungan = get(1).trim() as KategoriDukungan
+    const kategoriPenyedia = get(2).trim() as KategoriPenyedia
+    const provinsi = get(3).trim()
+    const kabupatenKota = get(4).trim()
+    const kecamatan = get(5).trim()
+    const kelurahan = get(6).trim()
+    const namaJalan = get(7).trim()
+    const nomorJalan = get(8).trim()
+    const kodePos = get(9).trim()
+    const tautanGoogleMaps = get(10).trim()
+    const nomorCallCenter = get(11).trim()
+    const nomorPribadi = get(12).trim()
+    const website = get(13).trim()
+    const aksesInfoRaw = get(14).trim()
+    const aksesInfo: "publik" | "terbatas" = aksesInfoRaw === "Terbatas" ? "terbatas" : "publik"
+
+    if (!namaInstansi) errors.push(`Baris ${rowIndex + 1}: "Nama Instansi" wajib diisi`)
+    if (!kategoriDukungan || !KATEGORI_DUKUNGAN_OPTIONS.includes(kategoriDukungan)) {
+      errors.push(`Baris ${rowIndex + 1}: "Kategori Dukungan" tidak valid (gunakan: ${KATEGORI_DUKUNGAN_OPTIONS.join(", ")})`)
+    }
+    if (!kategoriPenyedia || !KATEGORI_PENYEDIA_OPTIONS.includes(kategoriPenyedia)) {
+      errors.push(`Baris ${rowIndex + 1}: "Kategori Penyedia" tidak valid (gunakan: ${KATEGORI_PENYEDIA_OPTIONS.join(", ")})`)
+    }
+    if (!provinsi || !PROVINSI_OPTIONS.includes(provinsi)) {
+      errors.push(`Baris ${rowIndex + 1}: "Provinsi" tidak valid`)
+    }
+    if (!kabupatenKota) errors.push(`Baris ${rowIndex + 1}: "Kabupaten/Kota" wajib diisi`)
+    if (!nomorCallCenter) errors.push(`Baris ${rowIndex + 1}: "Nomor Call Center" wajib diisi`)
+
+    return {
+      valid: errors.length === 0,
+      errors,
+      data: {
+        namaInstansi,
+        kategoriBentukDukungan: kategoriDukungan as KategoriDukungan,
+        kategoriPenyedia: kategoriPenyedia as KategoriPenyedia,
+        provinsi,
+        kabupatenKota,
+        kecamatan,
+        kelurahan,
+        namaJalan,
+        nomorJalan,
+        kodePos,
+        tautanGoogleMaps,
+        nomorCallCenter,
+        nomorPribadi,
+        website,
+        aksesInfo,
+      },
+    }
+  }
+
+  const importExcel = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      try {
+        const text = event.target?.result as string
+        const { headers, rows } = parseCSV(text)
+
+        if (headers.length === 0 || rows.length === 0) {
+          setImportError({ show: true, message: "File tidak valid atau kosong", errors: [] })
+          return
+        }
+
+        const validItems: SumberRujukan[] = []
+        const allErrors: string[] = []
+
+        rows.forEach((row, idx) => {
+          const { valid, errors, data } = validateRow(row, idx)
+          if (valid) {
+            const newItem: SumberRujukan = {
+              id: `sr-${Date.now()}-${idx}`,
+              namaInstansi: data.namaInstansi!,
+              kategoriBentukDukungan: data.kategoriBentukDukungan!,
+              kategoriPenyedia: data.kategoriPenyedia!,
+              provinsi: data.provinsi!,
+              kabupatenKota: data.kabupatenKota!,
+              kecamatan: data.kecamatan,
+              kelurahan: data.kelurahan,
+              namaJalan: data.namaJalan,
+              nomorJalan: data.nomorJalan,
+              kodePos: data.kodePos,
+              tautanGoogleMaps: data.tautanGoogleMaps,
+              nomorCallCenter: data.nomorCallCenter!,
+              nomorPribadi: data.nomorPribadi,
+              website: data.website,
+              aksesInfo: data.aksesInfo ?? "publik",
+              status: "terverifikasi",
+              dibuatOleh: "Admin Pusat",
+              logTerakhir: RUJUKAN_LOG.dibuatTerverifikasiPusat,
+              usulanDari: "pusat",
+              createdAt: new Date().toISOString(),
+            }
+            validItems.push(newItem)
+          } else {
+            allErrors.push(...errors)
+          }
+        })
+
+        if (validItems.length > 0) {
+          try {
+            const stored = JSON.parse(sessionStorage.getItem("rujukanList") ?? "[]") as Array<Record<string, unknown>>
+            sessionStorage.setItem("rujukanList", JSON.stringify([...stored, ...validItems]))
+            window.dispatchEvent(new CustomEvent("rujukanUpdated"))
+          } catch { /* ignore */ }
+        }
+
+        if (allErrors.length > 0) {
+          setImportError({ show: true, message: `${validItems.length} berhasil, ${allErrors.length} gagal`, errors: allErrors })
+        } else if (validItems.length === 0) {
+          setImportError({ show: true, message: "Tidak ada data yang valid", errors: allErrors })
+        } else {
+          setImportSuccess({ show: true, count: validItems.length })
+        }
+      } catch {
+        setImportError({ show: true, message: "Gagal membaca file", errors: [] })
+      }
+    }
+    reader.readAsText(file)
+    e.target.value = ""
+  }
+
+  const [importError, setImportError] = useState<{ show: boolean; message: string; errors: string[] }>({ show: false, message: "", errors: [] })
+  const [importSuccess, setImportSuccess] = useState<{ show: boolean; count: number }>({ show: false, count: 0 })
+
+  const statKeys: KategoriDukungan[] = [
+    "Fasilitas Kesehatan", "Konseling", "Bantuan Hukum", "Kepolisian",
+    "Psikologi", "Pendidikan", "Sosial", "Lainnya"
+  ]
+  const statList = isPusat 
+    ? list 
+    : list.filter((i) => i.provinsi === myProvinsi && i.kabupatenKota === myKabupatenKota)
 
   return (
     <div className="space-y-5">
@@ -638,6 +771,23 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
           <p className="text-xs text-gray-500 mt-0.5">Daftar kontak layanan untuk upaya preventif permasalahan di sekolah</p>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Template & Import - only for Admin Pusat */}
+          {isPusat && (
+            <>
+              <button
+                type="button"
+                onClick={downloadTemplate}
+                className="flex items-center gap-1.5 h-9 px-4 rounded-lg text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition"
+              >
+                <FileSpreadsheet className="w-4 h-4" /> Template
+              </button>
+              <label className="flex items-center gap-1.5 h-9 px-4 rounded-lg text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition cursor-pointer">
+                <Upload className="w-4 h-4" /> Import
+                <input type="file" accept=".csv,.xlsx,.xls" onChange={importExcel} className="hidden" />
+              </label>
+            </>
+          )}
+          {/* Export CSV */}
           <button
             type="button"
             onClick={exportToCSV}
@@ -646,45 +796,21 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
           >
             <Download className="w-4 h-4" /> Export CSV
           </button>
+          {/* Add New - Primary Action */}
           <button
             onClick={() => router.push("/sumber-rujukan/form")}
             className="flex items-center gap-1.5 h-9 px-4 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition"
           >
-            <Plus className="w-4 h-4" /> Tambah Sumber Dukungan
+            <Plus className="w-4 h-4" /> Tambah
           </button>
         </div>
       </div>
 
-      {/* Scope toggle */}
-      <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-xl w-fit">
-        <button
-          type="button"
-          onClick={() => setScope("wilayah")}
-          className={`flex items-center gap-1.5 h-8 px-4 rounded-lg text-sm font-medium transition ${scope === "wilayah" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-        >
-          <MapPin className="w-3.5 h-3.5" />
-          Wilayah Saya
-          <span className={`text-xs font-semibold px-1.5 py-0.5 rounded-full ml-0.5 ${scope === "wilayah" ? "bg-blue-100 text-blue-700" : "bg-gray-200 text-gray-500"}`}>
-            {list.filter((i) => i.provinsi === myProvinsi && i.kabupatenKota === myKabupatenKota && i.status !== "dihapus").length}
-          </span>
-        </button>
-        <button
-          type="button"
-          onClick={() => setScope("nasional")}
-          className={`flex items-center gap-1.5 h-8 px-4 rounded-lg text-sm font-medium transition ${scope === "nasional" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-        >
-          Semua Wilayah
-          <span className={`text-xs font-semibold px-1.5 py-0.5 rounded-full ml-0.5 ${scope === "nasional" ? "bg-blue-100 text-blue-700" : "bg-gray-200 text-gray-500"}`}>
-            {list.filter((i) => i.status !== "dihapus").length}
-          </span>
-        </button>
-      </div>
-
-      {/* Stat cards — scope-aware */}
+      {/* Stat cards - 8 cards: 4 per row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {statKeys.map((key) => {
           const cfg = KATEGORI_CONFIG[key]
-          const count = scopeList.filter((i) => i.kategoriBentukDukungan === key && i.status !== "dihapus").length
+          const count = filtered.filter((i) => i.kategoriBentukDukungan === key && i.status !== "dihapus").length
           return (
             <div key={key} className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm flex items-center gap-3">
               <div className={`w-9 h-9 rounded-full ${cfg.bg} ${cfg.color} flex items-center justify-center flex-shrink-0`}>
@@ -711,17 +837,19 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
             className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        {/* Provinsi — hanya saat nasional */}
-        {scope === "nasional" && (
-          <select
-            value={filterProvinsi}
-            onChange={(e) => setFilterProvinsi(e.target.value)}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-          >
-            <option value="semua">Semua Provinsi</option>
-            {PROVINSI_LIST.map((p) => <option key={p} value={p}>{p}</option>)}
-          </select>
-        )}
+        {/* Filter Wilayah - Single Button with Modal */}
+        <button
+          onClick={() => setShowWilayahModal(true)}
+          className="flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white hover:bg-gray-50 min-w-[180px] justify-between"
+        >
+          <span className="truncate">
+            {filterWilayah 
+              ? filterWilayah.kabupaten 
+                ? `${filterWilayah.province} - ${filterWilayah.kabupaten}` 
+                : `${filterWilayah.provinsi}` : "Semua Wilayah"}
+          </span>
+          <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
+        </button>
         <select
           value={filterKategori}
           onChange={(e) => setFilterKategori(e.target.value as KategoriDukungan | "semua")}
@@ -769,21 +897,20 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
       </div>
 
       {/* Table */}
-      {filtered.length === 0 ? (
+      {totalRows === 0 ? (
         <div className="bg-white rounded-xl border border-dashed border-gray-300 p-10 text-center">
           <p className="font-semibold text-gray-700 text-sm">Tidak ada sumber dukungan ditemukan</p>
           <p className="text-gray-500 text-xs mt-1">Coba ubah filter atau kata kunci pencarian.</p>
         </div>
       ) : (
+        <>
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[700px]">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200 text-left">
                   <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Nama Instansi</th>
-                  {scope === "nasional" && (
-                    <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Wilayah</th>
-                  )}
+                  <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Wilayah</th>
                   <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Kategori Dukungan</th>
                   <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Penyedia</th>
                   <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Log Terakhir</th>
@@ -792,10 +919,9 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filtered.map((item) => {
+                {paginatedData.map((item) => {
                   const kategoriCfg = KATEGORI_CONFIG[item.kategoriBentukDukungan]
                   const penyediaCfg = item.kategoriPenyedia ? PENYEDIA_CONFIG[item.kategoriPenyedia] : null
-                  const isMyWilayah = item.provinsi === myProvinsi && item.kabupatenKota === myKabupatenKota
                   return (
                     <tr key={item.id} className={`hover:bg-gray-50 transition-colors ${item.status === "dihapus" ? "opacity-50" : ""}`}>
                       <td className="px-4 py-3.5">
@@ -809,19 +935,12 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
                               </a>
                             )}
                           </div>
-                          {scope === "nasional" && isMyWilayah && (
-                            <span className="flex-shrink-0 text-xs font-medium px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 mt-0.5">
-                              Wilayah Saya
-                            </span>
-                          )}
                         </div>
                       </td>
-                      {scope === "nasional" && (
-                        <td className="px-4 py-3.5">
-                          <p className="text-sm font-medium text-gray-800">{item.kabupatenKota}</p>
-                          <p className="text-xs text-gray-400">{item.provinsi}</p>
-                        </td>
-                      )}
+                      <td className="px-4 py-3.5">
+                        <p className="text-sm font-medium text-gray-800">{item.kabupatenKota}</p>
+                        <p className="text-xs text-gray-400">{item.provinsi}</p>
+                      </td>
                       <td className="px-4 py-3.5">
                         <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${kategoriCfg.bg} ${kategoriCfg.color}`}>
                           {kategoriCfg.icon}
@@ -856,6 +975,66 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
             </table>
           </div>
         </div>
+
+        {totalRows > 0 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 bg-white border-t border-gray-200">
+            {/* Info & Rows per page */}
+            <div className="flex items-center gap-3 text-sm text-gray-500">
+              <span>
+                Menampilkan {startIndex + 1}-{endIndex} dari {totalRows}
+              </span>
+              <select
+                value={rowsPerPage}
+                onChange={(e) => { setRowsPerPage(Number(e.target.value)); setCurrentPage(1) }}
+                className="rounded-lg border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+              <span className="hidden sm:inline">baris/halaman</span>
+            </div>
+            {/* Page Navigation */}
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setCurrentPage(1)}
+                disabled={currentPage === 1}
+                className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                title="Halaman pertama"
+              >
+                <ChevronsLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                title="Halaman sebelumnya"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="px-3 text-sm text-gray-600">
+                {currentPage} / {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                title="Halaman berikutnya"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={currentPage === totalPages}
+                className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                title="Halaman terakhir"
+              >
+                <ChevronsRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
+        </>
       )}
 
       {/* Detail slide-over */}
@@ -870,6 +1049,170 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
           onDelete={handleDelete}
           onRestore={handleRestore}
         />
+      )}
+
+      {/* Import Error Modal */}
+      {importError.show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setImportError({ show: false, message: "", errors: [] })} />
+          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col">
+            <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-200">
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                <AlertCircle className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-gray-900">Import Gagal</h3>
+                <p className="text-xs text-gray-500">{importError.message}</p>
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto px-5 py-4">
+              <div className="space-y-2">
+                {importError.errors.slice(0, 20).map((err, idx) => (
+                  <p key={idx} className="text-xs text-red-600 bg-red-50 px-3 py-2 rounded-lg">{err}</p>
+                ))}
+                {importError.errors.length > 20 && (
+                  <p className="text-xs text-gray-500 text-center py-2">...dan {importError.errors.length - 20} error lainnya</p>
+                )}
+              </div>
+            </div>
+            <div className="px-5 py-4 border-t border-gray-200">
+              <button
+                onClick={() => setImportError({ show: false, message: "", errors: [] })}
+                className="w-full py-2.5 rounded-lg text-sm font-semibold text-white bg-gray-900 hover:bg-gray-800 transition"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Import Success Modal */}
+      {importSuccess.show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setImportSuccess({ show: false, count: 0 })} />
+          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-sm">
+            <div className="flex flex-col items-center gap-3 px-5 py-6 text-center">
+              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                <CheckCircle className="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-gray-900">Import Berhasil</h3>
+                <p className="text-sm text-gray-500 mt-1">{importSuccess.count} data sumber dukungan berhasil ditambahkan</p>
+              </div>
+            </div>
+            <div className="px-5 py-4 border-t border-gray-200">
+              <button
+                onClick={() => setImportSuccess({ show: false, count: 0 })}
+                className="w-full py-2.5 rounded-lg text-sm font-semibold text-white bg-green-600 hover:bg-green-700 transition"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Wilayah Modal - 2 columns */}
+      {showWilayahModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowWilayahModal(false)} />
+          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
+              <h3 className="text-base font-bold text-gray-900">Filter Wilayah</h3>
+              <button onClick={() => setShowWilayahModal(false)} className="p-1 hover:bg-gray-100 rounded-lg">
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            {/* All Wilayah Option */}
+            <div className="px-5 py-3 border-b border-gray-100">
+              <button
+                onClick={() => { setFilterWilayah(null); setShowWilayahModal(false) }}
+                className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium ${!filterWilayah ? "bg-blue-50 text-blue-700 border border-blue-200" : "bg-gray-50 hover:bg-gray-100 border border-gray-200"}`}
+              >
+                Semua Wilayah
+              </button>
+            </div>
+            {/* 2 Column Layout: Province | Kabupaten */}
+            <div className="flex-1 overflow-hidden">
+              <div className="flex h-full max-h-[400px]">
+                {/* Left: Province List */}
+                <div className="w-1/2 border-r border-gray-100 overflow-y-auto">
+                  <div className="p-2">
+                    {PROVINSI_LIST.map((province) => {
+                      const kabupatens = Array.from(new Set(list.filter((i) => i.provinsi === province).map((i) => i.kabupatenKota))).filter(Boolean).sort()
+                      const isSelected = filterWilayah?.province === province
+                      return (
+                        <button
+                          key={province}
+                          onClick={() => setFilterWilayah({ province, kabupaten: "" })}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between ${
+                            isSelected ? "bg-blue-50 text-blue-700 font-medium" : "hover:bg-gray-50"
+                          }`}
+                        >
+                          <span className="truncate">{province}</span>
+                          {kabupatens.length > 0 && <span className="text-xs text-gray-400">{kabupatens.length}</span>}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+                {/* Right: Kabupaten List */}
+                <div className="w-1/2 overflow-y-auto bg-gray-50">
+                  <div className="p-2">
+                    {filterWilayah ? (
+                      (() => {
+                        const kabupatens = Array.from(new Set(list.filter((i) => i.provinsi === filterWilayah.province).map((i) => i.kabupatenKota))).filter(Boolean).sort()
+                        if (kabupatens.length === 0) {
+                          return <p className="text-sm text-gray-400 p-3">Tidak ada kabupaten/kota</p>
+                        }
+                        return (
+                          <>
+                            <button
+                              onClick={() => { setFilterWilayah({ province: filterWilayah.province, kabupaten: "" }); setShowWilayahModal(false) }}
+                              className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
+                                !filterWilayah.kabupaten ? "bg-blue-50 text-blue-700 font-medium" : "hover:bg-gray-100"
+                              }`}
+                            >
+                              Semua Kabupaten/Kota
+                            </button>
+                            {kabupatens.map((kab) => (
+                              <button
+                                key={kab}
+                                onClick={() => { setFilterWilayah({ province: filterWilayah.province, kabupaten: kab }); setShowWilayahModal(false) }}
+                                className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
+                                  filterWilayah?.kabupaten === kab ? "bg-blue-50 text-blue-700 font-medium" : "hover:bg-gray-100"
+                                }`}
+                              >
+                                {kab}
+                              </button>
+                            ))}
+                          </>
+                        )
+                      })()
+                    ) : (
+                      <p className="text-sm text-gray-400 p-3">Pilih province di kiri</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="px-5 py-4 border-t border-gray-200 flex gap-2">
+              <button
+                onClick={() => setShowWilayahModal(false)}
+                className="flex-1 py-2.5 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition"
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => setShowWilayahModal(false)}
+                className="flex-1 py-2.5 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition"
+              >
+                Terapkan
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
