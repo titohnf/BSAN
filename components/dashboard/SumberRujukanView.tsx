@@ -11,6 +11,13 @@ import {
   XCircle, ExternalLink, RotateCcw, Clock, ArrowUpDown, Download,
   Upload, FileSpreadsheet, AlertCircle,
 } from "lucide-react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { DEFAULT_DINAS_NAMA, getDinasNamaForLogs, readAuthSession } from "@/lib/auth-session"
 import { RUJUKAN_LOG, dinasLog, formatLogTerakhirDisplay, getStatusAfterRestore } from "@/lib/rujukan-logs"
 
@@ -770,36 +777,8 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-bold text-gray-900">Sumber Dukungan</h2>
-            <button
-              onClick={() => setShowStats(!showStats)}
-              className="p-1 rounded-lg hover:bg-gray-100 text-gray-500 transition"
-              title={showStats ? "Sembunyikan Stats" : "Tampilkan Stats"}
-            >
-              {showStats ? <ChevronsDown className="w-4 h-4" /> : <ChevronsRight className="w-4 h-4" />}
-            </button>
           </div>
-          {/* Selected Wilayah Display */}
-          <div className="flex items-center gap-2 text-sm">
-            {filterWilayah ? (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg font-medium">
-                <MapPin className="w-3.5 h-3.5" />
-                {filterWilayah.kabupaten 
-                  ? `${filterWilayah.province} - ${filterWilayah.kabupaten}` 
-                  : filterWilayah.province}
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 text-gray-600 rounded-lg">
-                <MapPin className="w-3.5 h-3.5" />
-                Semua Wilayah
-              </span>
-            )}
-            <button
-              onClick={() => setShowWilayahModal(true)}
-              className="text-blue-600 hover:underline font-medium"
-            >
-              Ganti
-            </button>
-          </div>
+          <p className="text-xs text-gray-500 mt-0.5">Daftar kontak layanan untuk upaya preventif permasalahan di sekolah</p>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {/* Template & Import - only for Admin Pusat */}
@@ -837,6 +816,42 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
         </div>
       </div>
 
+      {/* Divider */}
+      <div className="border-t border-gray-200" />
+
+      {/* Wilayah Display with Stats Toggle */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-gray-500 text-lg">Wilayah:</span>
+          {filterWilayah ? (
+            <span className="font-bold text-gray-900 text-lg">
+              {filterWilayah.kabupaten 
+                ? `${filterWilayah.province} - ${filterWilayah.kabupaten}` 
+                : filterWilayah.province}
+            </span>
+          ) : (
+            <span className="font-bold text-gray-500 text-lg">
+              Semua Wilayah
+            </span>
+          )}
+          <button
+            onClick={() => setShowWilayahModal(true)}
+            className="text-blue-600 hover:text-blue-800 font-medium text-sm underline underline-offset-2"
+          >
+            Ganti
+          </button>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-500">Statistik:</span>
+          <button
+            onClick={() => setShowStats(!showStats)}
+            className={`relative w-10 h-5 rounded-full transition-colors ${showStats ? "bg-blue-600" : "bg-gray-300"}`}
+          >
+            <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${showStats ? "translate-x-5" : "translate-x-0"}`} />
+          </button>
+        </div>
+      </div>
+
       {/* Stat cards - only show if showStats is true */}
       {showStats && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -867,40 +882,43 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Cari nama instansi atau kota..."
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
           />
         </div>
-        <select
-          value={filterKategori}
-          onChange={(e) => setFilterKategori(e.target.value as KategoriDukungan | "semua")}
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-        >
-          <option value="semua">Semua Kategori</option>
-          {(Object.keys(KATEGORI_CONFIG) as KategoriDukungan[]).map((k) => (
-            <option key={k} value={k}>{k}</option>
-          ))}
-        </select>
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value as StatusRujukan | "semua")}
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-        >
-          <option value="semua">Semua Status</option>
-          <option value="terverifikasi">Terverifikasi</option>
-          <option value="menunggu">Menunggu Verifikasi</option>
-          <option value="menunggu_review">Menunggu Review</option>
-          <option value="dihapus">Dihapus</option>
-        </select>
-        <select
-          value={filterPenyedia}
-          onChange={(e) => setFilterPenyedia(e.target.value as KategoriPenyedia | "semua")}
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-        >
-          <option value="semua">Semua Penyedia</option>
-          {(["Pemerintah Pusat", "Pemerintah Daerah", "Swasta", "OMS", "Lainnya"] as KategoriPenyedia[]).map((p) => (
-            <option key={p} value={p}>{p}</option>
-          ))}
-        </select>
+        <Select value={filterKategori} onValueChange={(v) => setFilterKategori(v as KategoriDukungan | "semua")}>
+          <SelectTrigger className="w-[180px] rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+            <SelectValue placeholder="Semua Kategori" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="semua">Semua Kategori</SelectItem>
+            {(Object.keys(KATEGORI_CONFIG) as KategoriDukungan[]).map((k) => (
+              <SelectItem key={k} value={k}>{k}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as StatusRujukan | "semua")}>
+          <SelectTrigger className="w-[180px] rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+            <SelectValue placeholder="Semua Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="semua">Semua Status</SelectItem>
+            <SelectItem value="terverifikasi">Terverifikasi</SelectItem>
+            <SelectItem value="menunggu">Menunggu Verifikasi</SelectItem>
+            <SelectItem value="menunggu_review">Menunggu Review</SelectItem>
+            <SelectItem value="dihapus">Dihapus</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={filterPenyedia} onValueChange={(v) => setFilterPenyedia(v as KategoriPenyedia | "semua")}>
+          <SelectTrigger className="w-[180px] rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+            <SelectValue placeholder="Semua Penyedia" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="semua">Semua Penyedia</SelectItem>
+            {(["Pemerintah Pusat", "Pemerintah Daerah", "Swasta", "OMS", "Lainnya"] as KategoriPenyedia[]).map((p) => (
+              <SelectItem key={p} value={p}>{p}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         {/* Sort */}
         <div className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 bg-white">
           <ArrowUpDown className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
