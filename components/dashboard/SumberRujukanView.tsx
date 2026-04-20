@@ -781,19 +781,23 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
           {/* Selected Wilayah Display */}
           <div className="flex items-center gap-2 text-sm">
             {filterWilayah ? (
-              <span className="text-gray-700">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg font-medium">
+                <MapPin className="w-3.5 h-3.5" />
                 {filterWilayah.kabupaten 
                   ? `${filterWilayah.province} - ${filterWilayah.kabupaten}` 
                   : filterWilayah.province}
               </span>
             ) : (
-              <span className="text-gray-500">Semua Wilayah</span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 text-gray-600 rounded-lg">
+                <MapPin className="w-3.5 h-3.5" />
+                Semua Wilayah
+              </span>
             )}
             <button
               onClick={() => setShowWilayahModal(true)}
               className="text-blue-600 hover:underline font-medium"
             >
-              Ganti Wilayah
+              Ganti
             </button>
           </div>
         </div>
