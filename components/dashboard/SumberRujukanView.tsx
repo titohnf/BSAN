@@ -836,7 +836,7 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
           )}
           <button
             onClick={() => setShowWilayahModal(true)}
-            className="text-blue-600 hover:bg-gray-100 font-medium text-sm px-2 py-1 rounded-md transition"
+            className="bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium text-sm px-2 py-1 rounded-md transition"
           >
             Ganti
           </button>
@@ -1162,21 +1162,19 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            {/* All Wilayah Option */}
-            <div className="px-5 py-3 border-b border-gray-100">
-              <button
-                onClick={() => { setFilterWilayah(null); setShowWilayahModal(false) }}
-                className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium ${!filterWilayah ? "bg-blue-50 text-blue-700 border border-blue-200" : "bg-gray-50 hover:bg-gray-100 border border-gray-200"}`}
-              >
-                Semua Wilayah
-              </button>
-            </div>
             {/* 2 Column Layout: Province | Kabupaten */}
             <div className="flex-1 overflow-hidden">
               <div className="flex h-full max-h-[400px]">
                 {/* Left: Province List */}
                 <div className="w-1/2 border-r border-gray-100 overflow-y-auto">
                   <div className="p-2">
+                    {/* All Provinces Option */}
+                    <button
+                      onClick={() => { setFilterWilayah(null); setShowWilayahModal(false) }}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium ${!filterWilayah ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50"}`}
+                    >
+                      Semua Provinsi
+                    </button>
                     {PROVINSI_LIST.map((province) => {
                       const kabupatens = Array.from(new Set(list.filter((i) => i.provinsi === province).map((i) => i.kabupatenKota))).filter(Boolean).sort()
                       const isSelected = filterWilayah?.province === province
@@ -1196,7 +1194,7 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
                   </div>
                 </div>
                 {/* Right: Kabupaten List */}
-                <div className="w-1/2 overflow-y-auto bg-gray-50">
+                <div className="w-1/2 overflow-y-auto bg-white">
                   <div className="p-2">
                     {filterWilayah ? (
                       (() => {
@@ -1235,16 +1233,16 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
                 </div>
               </div>
             </div>
-            <div className="px-5 py-4 border-t border-gray-200 flex gap-2">
+            <div className="px-5 py-4 border-t border-gray-200 flex justify-end gap-2">
               <button
                 onClick={() => setShowWilayahModal(false)}
-                className="flex-1 py-2.5 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition"
+                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition"
               >
                 Batal
               </button>
               <button
                 onClick={() => setShowWilayahModal(false)}
-                className="flex-1 py-2.5 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition"
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition"
               >
                 Terapkan
               </button>
