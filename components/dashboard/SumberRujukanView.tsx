@@ -836,7 +836,7 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
           )}
           <button
             onClick={() => setShowWilayahModal(true)}
-            className="text-blue-600 hover:bg-blue-50 font-medium text-sm px-2 py-1 rounded-md transition"
+            className="text-blue-600 hover:bg-gray-100 font-medium text-sm px-2 py-1 rounded-md transition"
           >
             Ganti
           </button>
@@ -1001,9 +1001,9 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
                       <td className="px-4 py-3.5 text-right">
                         <a
                           href={`/sumber-rujukan/form?view=${item.id}`}
-                          className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 transition whitespace-nowrap"
+                          className="text-blue-600 hover:underline"
                         >
-                          Lihat Detail <ChevronRight className="w-3.5 h-3.5" />
+                          Lihat Detail
                         </a>
                       </td>
                     </tr>
