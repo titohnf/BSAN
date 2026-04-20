@@ -778,7 +778,19 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
               {showStats ? <ChevronsDown className="w-4 h-4" /> : <ChevronsRight className="w-4 h-4" />}
             </button>
           </div>
-          <p className="text-xs text-gray-500 mt-0.5">Daftar kontak layanan untuk upaya preventif permasalahan di sekolah</p>
+          {/* Filter Wilayah - moved below title */}
+          <button
+            onClick={() => setShowWilayahModal(true)}
+            className="flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white hover:bg-gray-50 min-w-[180px] justify-between"
+          >
+            <span className="truncate">
+              {filterWilayah 
+                ? filterWilayah.kabupaten 
+                  ? `${filterWilayah.province} - ${filterWilayah.kabupaten}` 
+                  : `${filterWilayah.province}` : "Semua Wilayah"}
+            </span>
+            <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
+          </button>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {/* Template & Import - only for Admin Pusat */}
@@ -849,19 +861,6 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
             className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        {/* Filter Wilayah - Single Button with Modal */}
-        <button
-          onClick={() => setShowWilayahModal(true)}
-          className="flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white hover:bg-gray-50 min-w-[180px] justify-between"
-        >
-          <span className="truncate">
-            {filterWilayah 
-              ? filterWilayah.kabupaten 
-                ? `${filterWilayah.province} - ${filterWilayah.kabupaten}` 
-                : `${filterWilayah.provinsi}` : "Semua Wilayah"}
-          </span>
-          <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
-        </button>
         <select
           value={filterKategori}
           onChange={(e) => setFilterKategori(e.target.value as KategoriDukungan | "semua")}
