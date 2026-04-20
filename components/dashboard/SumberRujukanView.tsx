@@ -778,19 +778,24 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
               {showStats ? <ChevronsDown className="w-4 h-4" /> : <ChevronsRight className="w-4 h-4" />}
             </button>
           </div>
-          {/* Filter Wilayah - moved below title */}
-          <button
-            onClick={() => setShowWilayahModal(true)}
-            className="flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm bg-white hover:bg-gray-50 min-w-[180px] justify-between"
-          >
-            <span className="truncate">
-              {filterWilayah 
-                ? filterWilayah.kabupaten 
+          {/* Selected Wilayah Display */}
+          <div className="flex items-center gap-2 text-sm">
+            {filterWilayah ? (
+              <span className="text-gray-700">
+                {filterWilayah.kabupaten 
                   ? `${filterWilayah.province} - ${filterWilayah.kabupaten}` 
-                  : `${filterWilayah.province}` : "Semua Wilayah"}
-            </span>
-            <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
-          </button>
+                  : filterWilayah.province}
+              </span>
+            ) : (
+              <span className="text-gray-500">Semua Wilayah</span>
+            )}
+            <button
+              onClick={() => setShowWilayahModal(true)}
+              className="text-blue-600 hover:underline font-medium"
+            >
+              Ganti Wilayah
+            </button>
+          </div>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {/* Template & Import - only for Admin Pusat */}
