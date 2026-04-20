@@ -6,7 +6,7 @@ import {
   Heart, Scale, Shield, Phone, MapPin, Plus,
   Search, MessageCircle, Globe, Lock, Users,
   Building2, GraduationCap, HandHeart, Radio,
-  ChevronRight, ChevronLeft, ChevronsLeft, ChevronsRight,
+  ChevronRight, ChevronLeft, ChevronsLeft, ChevronsRight, ChevronsDown,
   X, Pencil, Trash2, CheckCircle,
   XCircle, ExternalLink, RotateCcw, Clock, ArrowUpDown, Download,
   Upload, FileSpreadsheet, AlertCircle,
@@ -389,6 +389,7 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
   const [currentPage, setCurrentPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [showWilayahModal, setShowWilayahModal] = useState(false)
+  const [showStats, setShowStats] = useState(true)
 
   useEffect(() => {
     const loadData = () => {
@@ -767,7 +768,16 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
       {/* Heading */}
       <div className="flex items-center justify-between gap-4">
         <div className="min-w-0">
-          <h2 className="text-xl font-bold text-gray-900">Sumber Dukungan</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-bold text-gray-900">Sumber Dukungan</h2>
+            <button
+              onClick={() => setShowStats(!showStats)}
+              className="p-1 rounded-lg hover:bg-gray-100 text-gray-500 transition"
+              title={showStats ? "Sembunyikan Stats" : "Tampilkan Stats"}
+            >
+              {showStats ? <ChevronsDown className="w-4 h-4" /> : <ChevronsRight className="w-4 h-4" />}
+            </button>
+          </div>
           <p className="text-xs text-gray-500 mt-0.5">Daftar kontak layanan untuk upaya preventif permasalahan di sekolah</p>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
@@ -806,8 +816,9 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
         </div>
       </div>
 
-      {/* Stat cards - 8 cards: 4 per row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {/* Stat cards - only show if showStats is true */}
+      {showStats && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {statKeys.map((key) => {
           const cfg = KATEGORI_CONFIG[key]
           const count = filtered.filter((i) => i.kategoriBentukDukungan === key && i.status !== "dihapus").length
@@ -824,6 +835,7 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
           )
         })}
       </div>
+      )}
 
       {/* Filter bar */}
       <div className="flex flex-col sm:flex-row gap-2 items-end flex-wrap">
