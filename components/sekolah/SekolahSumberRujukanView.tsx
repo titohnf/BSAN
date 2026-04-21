@@ -459,6 +459,12 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
               Semua Wilayah
             </span>
           )}
+          <button
+            onClick={() => setShowWilayahModal(true)}
+            className="bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium text-sm px-2 py-1 rounded-md transition"
+          >
+            Ganti
+          </button>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-500">Statistik:</span>
