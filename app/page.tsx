@@ -216,14 +216,14 @@ function AdminPageInner() {
   const [mounted, setMounted] = useState(false)
   const [authChecked, setAuthChecked] = useState(false)
 
-  useLayoutEffect(() => {
+  useEffect(() => {
+    const auth = sessionStorage.getItem("auth")
+    if (!auth) {
+      setViewMode("landing")
+      setAuthChecked(true)
+      return
+    }
     try {
-      const auth = sessionStorage.getItem("auth")
-      if (!auth) {
-        setViewMode("landing")
-        setAuthChecked(true)
-        return
-      }
       const parsed = JSON.parse(auth) as { role: AdminRole }
       if (parsed.role === "pusat") setRole("pusat")
       else if (parsed.role === "sekolah") setRole("sekolah")
@@ -233,7 +233,7 @@ function AdminPageInner() {
       setViewMode("landing")
       setAuthChecked(true)
     }
-  }, [router])
+  }, [])
 
   if (!authChecked) {
     return (
