@@ -20,8 +20,9 @@ import {
   XCircle,
   Clock,
   ArrowUpDown,
+  Building2,
 } from "lucide-react"
-import Link from "next/link"
+import { RUJUKAN_LOG } from "@/lib/rujukan-logs"
 import {
   KATEGORI_CONFIG,
   PENYEDIA_CONFIG,
@@ -205,10 +206,31 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
   const [filterPenyedia, setFilterPenyedia] = useState<KategoriPenyedia | "semua">("semua")
   const [sortMode, setSortMode] = useState<SortMode>("relevansi")
   const [selected, setSelected] = useState<SumberRujukan | null>(null)
+  const [showForm, setShowForm] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [showWilayahModal, setShowWilayahModal] = useState(false)
   const [showStats, setShowStats] = useState(true)
+
+  // Form state
+  const [formNama, setFormNama] = useState("")
+  const [formKategori, setFormKategori] = useState<KategoriDukungan>("Konseling")
+  const [formPenyedia, setFormPenyedia] = useState<KategoriPenyedia>("Pemerintah Daerah")
+  const [formProvinsi, setFormProvinsi] = useState("")
+  const [formKabupaten, setFormKabupaten] = useState("")
+  const [formKecamatan, setFormKecamatan] = useState("")
+  const [formKelurahan, setFormKelurahan] = useState("")
+  const [formNamaJalan, setFormNamaJalan] = useState("")
+  const [formNomorJalan, setFormNomorJalan] = useState("")
+  const [formKodePos, setFormKodePos] = useState("")
+  const [formCallCenter, setFormCallCenter] = useState("")
+  const [formWhatsapp, setFormWhatsapp] = useState("")
+  const [formEmail, setFormEmail] = useState("")
+  const [formWebsite, setFormWebsite] = useState("")
+  const [formGoogleMaps, setFormGoogleMaps] = useState("")
+  const [formSosialMedia, setFormSosialMedia] = useState("")
+  const [sending, setSending] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
 
   // Parse wilayah prop
   const myWilayah = wilayah.trim().toLowerCase()
@@ -305,6 +327,64 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
     URL.revokeObjectURL(url)
   }
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!formNama.trim() || !formProvinsi || !formKabupaten || !formCallCenter.trim()) return
+    setSending(true)
+    const newRujukan: SumberRujukan = {
+      id: `usul-${Date.now()}`,
+      namaInstansi: formNama.trim(),
+      kategoriBentukDukungan: formKategori,
+      kategoriPenyedia: formPenyedia,
+      provinsi: formProvinsi,
+      kabupatenKota: formKabupaten,
+      kecamatan: formKecamatan.trim() || undefined,
+      kelurahan: formKelurahan.trim() || undefined,
+      namaJalan: formNamaJalan.trim() || undefined,
+      nomorJalan: formNomorJalan.trim() || undefined,
+      kodePos: formKodePos.trim() || undefined,
+      nomorCallCenter: formCallCenter.trim(),
+      nomorWhatsapp: formWhatsapp.trim() || undefined,
+      email: formEmail.trim() || undefined,
+      website: formWebsite.trim() || undefined,
+      tautanGoogleMaps: formGoogleMaps.trim() || undefined,
+      sosialMedia: formSosialMedia.trim() || undefined,
+      status: "menunggu",
+      logTerakhir: RUJUKAN_LOG.menunggu,
+      createdAt: new Date().toISOString(),
+    }
+    try {
+      const raw = sessionStorage.getItem("rujukanList")
+      const stored: Array<Partial<SumberRujukan> & { id: string }> = raw ? JSON.parse(raw) : []
+      stored.unshift(newRujukan)
+      sessionStorage.setItem("rujukanList", JSON.stringify(stored))
+      window.dispatchEvent(new CustomEvent("rujukanUpdated"))
+    } catch { /* ignore */ }
+    setSending(false)
+    setSubmitted(true)
+  }
+
+  const handleCloseForm = () => {
+    setShowForm(false)
+    setSubmitted(false)
+    setFormNama("")
+    setFormKategori("Konseling")
+    setFormPenyedia("Pemerintah Daerah")
+    setFormProvinsi("")
+    setFormKabupaten("")
+    setFormKecamatan("")
+    setFormKelurahan("")
+    setFormNamaJalan("")
+    setFormNomorJalan("")
+    setFormKodePos("")
+    setFormCallCenter("")
+    setFormWhatsapp("")
+    setFormEmail("")
+    setFormWebsite("")
+    setFormGoogleMaps("")
+    setFormSosialMedia("")
+  }
+
   return (
     <div className="space-y-5">
       {/* Heading */}
@@ -324,12 +404,12 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
           >
             <Download className="w-4 h-4" /> Export CSV
           </button>
-          <Link
-            href="/usul-instansi"
+          <button
+            onClick={() => setShowForm(true)}
             className="flex items-center gap-1.5 h-9 px-4 rounded-lg text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition"
           >
-            <Plus className="w-4 h-4" /> Usul Instansi
-          </Link>
+            <Plus className="w-4 h-4" /> Usul Sumber Dukungan
+          </button>
         </div>
       </div>
 
@@ -661,6 +741,242 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
       )}
 
       {selected && <ReadOnlyDetailPanel item={selected} onClose={() => setSelected(null)} />}
+
+      {/* Usul Sumber Dukungan Form Modal */}
+      {showForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/40" onClick={handleCloseForm} />
+          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            {submitted ? (
+              <div className="p-8 text-center">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="w-8 h-8 text-green-600" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Usulan Berhasil Dikirim</h3>
+                <p className="text-sm text-gray-600 mb-6">Usulan sumber dukungan Anda akan diverifikasi oleh admin.</p>
+                <button
+                  onClick={handleCloseForm}
+                  className="px-6 py-2 rounded-lg text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition"
+                >
+                  Tutup
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 sticky top-0 bg-white">
+                  <h3 className="text-base font-bold text-gray-900">Usul Sumber Dukungan</h3>
+                  <button onClick={handleCloseForm} className="p-1.5 hover:bg-gray-100 rounded-lg">
+                    <X className="w-5 h-5 text-gray-500" />
+                  </button>
+                </div>
+                <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                  <div>
+                    <label className="text-xs font-semibold text-gray-600">Nama Instansi <span className="text-red-500">*</span></label>
+                    <input
+                      type="text"
+                      value={formNama}
+                      onChange={(e) => setFormNama(e.target.value)}
+                      placeholder="Nama instansi atau layanan"
+                      required
+                      className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-semibold text-gray-600">Kategori Dukungan <span className="text-red-500">*</span></label>
+                      <select
+                        value={formKategori}
+                        onChange={(e) => setFormKategori(e.target.value as KategoriDukungan)}
+                        className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+                      >
+                        {(Object.keys(KATEGORI_CONFIG) as KategoriDukungan[]).map((k) => (
+                          <option key={k} value={k}>{k}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-gray-600">Penyedia Layanan <span className="text-red-500">*</span></label>
+                      <select
+                        value={formPenyedia}
+                        onChange={(e) => setFormPenyedia(e.target.value as KategoriPenyedia)}
+                        className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+                      >
+                        {(["Pemerintah Pusat", "Pemerintah Daerah", "Swasta", "OMS", "Lainnya"] as KategoriPenyedia[]).map((p) => (
+                          <option key={p} value={p}>{p}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-semibold text-gray-600">Provinsi <span className="text-red-500">*</span></label>
+                      <select
+                        value={formProvinsi}
+                        onChange={(e) => { setFormProvinsi(e.target.value); setFormKabupaten("") }}
+                        required
+                        className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+                      >
+                        <option value="">Pilih Provinsi</option>
+                        {PROVINSI_LIST.map((p) => (
+                          <option key={p} value={p}>{p}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-gray-600">Kabupaten/Kota <span className="text-red-500">*</span></label>
+                      <input
+                        type="text"
+                        value={formKabupaten}
+                        onChange={(e) => setFormKabupaten(e.target.value)}
+                        placeholder="Nama kabupaten/kota"
+                        required
+                        className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-semibold text-gray-600">Kecamatan</label>
+                      <input
+                        type="text"
+                        value={formKecamatan}
+                        onChange={(e) => setFormKecamatan(e.target.value)}
+                        placeholder="Nama kecamatan"
+                        className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-gray-600">Kelurahan/Desa</label>
+                      <input
+                        type="text"
+                        value={formKelurahan}
+                        onChange={(e) => setFormKelurahan(e.target.value)}
+                        placeholder="Nama kelurahan/desa"
+                        className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-semibold text-gray-600">Nama Jalan</label>
+                      <input
+                        type="text"
+                        value={formNamaJalan}
+                        onChange={(e) => setFormNamaJalan(e.target.value)}
+                        placeholder="Nama jalan"
+                        className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-gray-600">Nomor Jalan</label>
+                      <input
+                        type="text"
+                        value={formNomorJalan}
+                        onChange={(e) => setFormNomorJalan(e.target.value)}
+                        placeholder="Nomor"
+                        className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-semibold text-gray-600">Kode Pos</label>
+                      <input
+                        type="text"
+                        value={formKodePos}
+                        onChange={(e) => setFormKodePos(e.target.value)}
+                        placeholder="Kode pos"
+                        className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-gray-600">Call Center <span className="text-red-500">*</span></label>
+                      <input
+                        type="tel"
+                        value={formCallCenter}
+                        onChange={(e) => setFormCallCenter(e.target.value)}
+                        placeholder="08xxxxxxxxxx"
+                        required
+                        className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-semibold text-gray-600">WhatsApp</label>
+                      <input
+                        type="tel"
+                        value={formWhatsapp}
+                        onChange={(e) => setFormWhatsapp(e.target.value)}
+                        placeholder="08xxxxxxxxxx"
+                        className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-gray-600">Email</label>
+                      <input
+                        type="email"
+                        value={formEmail}
+                        onChange={(e) => setFormEmail(e.target.value)}
+                        placeholder="email@instansi.go.id"
+                        className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-semibold text-gray-600">Website</label>
+                      <input
+                        type="url"
+                        value={formWebsite}
+                        onChange={(e) => setFormWebsite(e.target.value)}
+                        placeholder="https://..."
+                        className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-gray-600">Link Google Maps</label>
+                      <input
+                        type="url"
+                        value={formGoogleMaps}
+                        onChange={(e) => setFormGoogleMaps(e.target.value)}
+                        placeholder="https://maps.google.com/..."
+                        className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-gray-600">Sosial Media</label>
+                    <input
+                      type="text"
+                      value={formSosialMedia}
+                      onChange={(e) => setFormSosialMedia(e.target.value)}
+                      placeholder="@username atau link"
+                      className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                  </div>
+                  <div className="flex justify-end gap-2 pt-4 border-t border-gray-200">
+                    <button
+                      type="button"
+                      onClick={handleCloseForm}
+                      className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={sending}
+                      className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition"
+                    >
+                      {sending ? "Mengirim..." : "Kirim Usulan"}
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
