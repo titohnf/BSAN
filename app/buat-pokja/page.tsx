@@ -341,11 +341,7 @@ export default function BuatPokjaPage() {
   const fillDummyData = () => {
     setKanalPengaduan("081234567890")
     setMembers(DUMMY_MEMBERS)
-    setAnggotaList([
-      { nama: "Drs. Mukhlis, M.Pd", email: "mukhlis@dinas-aceh.go.id", jenisKelamin: "Laki-Laki", bidang: "Pendidikan", noWhatsapp: "081312345678" },
-      { nama: "Nur Aini, S.KM", email: "nuraini@dinkes-aceh.go.id", jenisKelamin: "Perempuan", bidang: "Kesehatan", noWhatsapp: "081298765432" },
-      { nama: "Hasan Basri, S.Sos", email: "hasan.basri@dinsos-aceh.go.id", jenisKelamin: "Laki-Laki", bidang: "Sosial", noWhatsapp: "082345678901" },
-    ])
+    setAnggotaList([])
     setSkDetail(DUMMY_SK)
     // Create a mock File for the SK upload
     const blob = new Blob(["(dummy PDF content)"], { type: "application/pdf" })
@@ -636,7 +632,7 @@ export default function BuatPokjaPage() {
                           <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
                             <User className="w-3.5 h-3.5 text-blue-700" />
                           </div>
-                          <span className="text-sm font-semibold text-gray-800">Anggota Tambahan {index + 1}</span>
+                          <span className="text-sm font-semibold text-gray-800">Anggota Lainnya {index + 1}</span>
                         </div>
                         <button
                           onClick={() => removeAnggota(index)}
