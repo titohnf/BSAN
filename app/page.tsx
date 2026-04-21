@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useLayoutEffect, useRef, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { GraduationCap, Construction, Shield, CheckCircle2, Users, X } from "lucide-react"
 
 import { Sidebar } from "@/components/dashboard/Sidebar"
 import { Header } from "@/components/dashboard/Header"
@@ -156,6 +157,112 @@ function AdminPageInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const hasProcessedSubmit = useRef(false)
+
+  const [viewMode, setViewMode] = useState<"landing" | "admin">("landing")
+  const [showLoginModal, setShowLoginModal] = useState(false)
+  const [loginForm, setLoginForm] = useState({ username: "", password: "", role: "dinas" as AdminRole })
+  const [loginError, setLoginError] = useState("")
+  const [loggingIn, setLoggingIn] = useState(false)
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoginError("")
+    setLoggingIn(true)
+    await new Promise(r => setTimeout(r, 800))
+    if (!loginForm.username || !loginForm.password) {
+      setLoginError("Isi username dan password")
+      setLoggingIn(false)
+      return
+    }
+    const authData = { role: loginForm.role, username: loginForm.username, wilayah: loginForm.role === "dinas" ? "Prov. Aceh" : undefined }
+    sessionStorage.setItem("auth", JSON.stringify(authData))
+    setShowLoginModal(false)
+    setViewMode("admin")
+    setLoggingIn(false)
+  }
+
+  if (viewMode === "landing") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800">
+        {/* Navbar */}
+        <nav className="sticky top-0 z-50 bg-white/10 backdrop-blur-md border-b border-white/10">
+          <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center">
+                <GraduationCap className="w-6 h-6 text-emerald-700" />
+              </div>
+              <span className="text-white font-bold text-lg">BSAN</span>
+            </div>
+            <div className="flex items-center gap-6">
+              <button onClick={() => {}} className="text-white/80 hover:text-white font-medium">Beranda</button>
+              <button onClick={() => {}} className="text-white/80 hover:text-white font-medium">Data Publik</button>
+              <button onClick={() => setShowLoginModal(true)} className="px-4 py-2 bg-white text-emerald-700 font-semibold rounded-lg hover:bg-emerald-50 transition">Login</button>
+            </div>
+          </div>
+        </nav>
+
+        {/* Hero Content */}
+        <div className="max-w-4xl mx-auto px-4 py-24 text-center">
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-white/20 mb-6">
+            <Construction className="w-12 h-12 text-white" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Under Construction</h1>
+          <p className="text-lg text-emerald-100 mb-8">Sistem Informasi POKJA sekolah Aceh sedang dalam pengembangan</p>
+          <div className="flex flex-wrap justify-center gap-4 text-sm text-emerald-200">
+            <span className="flex items-center gap-2"><Shield className="w-4 h-4" /> Perlindungan Anak Terintegrasi</span>
+            <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4" /> Verifikasi Resmi</span>
+            <span className="flex items-center gap-2"><Users className="w-4 h-4" /> Kolaborasi Dinas</span>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <footer className="absolute bottom-0 w-full py-6 text-center text-white/60 text-sm">
+          © 2025 BSAN - Badan Perlindungan Anak Aceh
+        </footer>
+
+        {/* Login Modal */}
+        {showLoginModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="fixed inset-0 bg-black/50" onClick={() => setShowLoginModal(false)} />
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+              <button onClick={() => setShowLoginModal(false)} className="absolute top-4 right-4 p-1 text-gray-400 hover:text-gray-600">
+                <X className="w-5 h-5" />
+              </button>
+              <div className="text-center mb-6">
+                <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Shield className="w-6 h-6 text-emerald-600" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">Login BSAN</h2>
+                <p className="text-sm text-gray-500">Masuk untuk mengelola POKJA</p>
+              </div>
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div>
+                  <label className="text-xs font-semibold text-gray-600">Role</label>
+                  <select value={loginForm.role} onChange={(e) => setLoginForm({ ...loginForm, role: e.target.value as AdminRole })} className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <option value="dinas">Admin Dinas</option>
+                    <option value="pusat">Admin Pusat</option>
+                    <option value="sekolah">Admin Sekolah</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-600">Username</label>
+                  <input type="text" value={loginForm.username} onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })} className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="NIP/Username" />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-600">Password</label>
+                  <input type="password" value={loginForm.password} onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })} className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Password" />
+                </div>
+                {loginError && <p className="text-sm text-red-600">{loginError}</p>}
+                <button type="submit" disabled={loggingIn} className="w-full py-2.5 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 disabled:opacity-50 transition">
+                  {loggingIn ? "Memproses..." : "Masuk"}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
 
   const [role, setRole] = useState<AdminRole>("dinas")
   const [dinasMenu, setDinasMenu] = useState<DinaMenu>("dashboard")
