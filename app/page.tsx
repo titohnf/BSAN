@@ -220,15 +220,16 @@ function AdminPageInner() {
     try {
       const auth = sessionStorage.getItem("auth")
       if (!auth) {
-        router.replace("/login")
+        setViewMode("landing")
         return
       }
       const parsed = JSON.parse(auth) as { role: AdminRole }
       if (parsed.role === "pusat") setRole("pusat")
       else if (parsed.role === "sekolah") setRole("sekolah")
+      setViewMode("admin")
       setAuthChecked(true)
     } catch {
-      router.replace("/login")
+      setViewMode("landing")
     }
   }, [router])
 
