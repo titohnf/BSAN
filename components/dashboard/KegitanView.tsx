@@ -1,1 +1,0 @@
-export { KegiatanView as KegitanView } from "./KegiatanView"

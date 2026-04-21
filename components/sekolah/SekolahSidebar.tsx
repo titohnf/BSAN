@@ -4,7 +4,7 @@ import { BookOpenCheck, CalendarCheck, GraduationCap, LogOut, Menu, X } from "lu
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 
-export type SekolahMenu = "sumber-rujukan" | "kegitan"
+export type SekolahMenu = "sumber-rujukan" | "kegiatan"
 
 interface SekolahSidebarProps {
   activeMenu: SekolahMenu
@@ -14,7 +14,7 @@ interface SekolahSidebarProps {
 
 const navItems: { id: SekolahMenu; label: string; icon: typeof BookOpenCheck }[] = [
   { id: "sumber-rujukan", label: "SumberDukungan", icon: BookOpenCheck },
-  { id: "kegitan", label: "Kegitan", icon: CalendarCheck },
+  { id: "kegiatan", label: "Kegiatan", icon: CalendarCheck },
 ]
 
 export function SekolahSidebar({ activeMenu, onMenuChange, onLogout }: SekolahSidebarProps) {
