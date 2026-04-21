@@ -223,14 +223,20 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
   const [formNamaJalan, setFormNamaJalan] = useState("")
   const [formNomorJalan, setFormNomorJalan] = useState("")
   const [formKodePos, setFormKodePos] = useState("")
-  const [formCallCenter, setFormCallCenter] = useState("")
-  const [formWhatsapp, setFormWhatsapp] = useState("")
-  const [formEmail, setFormEmail] = useState("")
-  const [formWebsite, setFormWebsite] = useState("")
   const [formGoogleMaps, setFormGoogleMaps] = useState("")
-  const [formSosialMedia, setFormSosialMedia] = useState("")
+  const [formKontak, setFormKontak] = useState<{ nomor: string; tipe: "call_center" | "nomor_pribadi" }[]>([
+    { nomor: "", tipe: "call_center" }
+  ])
+  const [formwebsite, setFormwebsite] = useState("")
+  const [formAksesInfo, setFormAksesInfo] = useState<"publik" | "terbatas">("publik")
   const [sending, setSending] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+
+  const addKontak = () => setFormKontak((prev) => [...prev, { nomor: "", tipe: "call_center" }])
+  const removeKontak = (idx: number) => setFormKontak((prev) => prev.filter((_, i) => i !== idx))
+  const updateKontak = (idx: number, field: "nomor" | "tipe", val: string) => {
+    setFormKontak((prev) => prev.map((k, i) => i === idx ? { ...k, [field]: field === "nomor" ? val.replace(/\D/g, "") : val } : k))
+  }
 
   // Parse wilayah prop
   const myWilayah = wilayah.trim().toLowerCase()
@@ -329,8 +335,10 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formNama.trim() || !formProvinsi || !formKabupaten || !formCallCenter.trim()) return
+    const validKontak = formKontak.filter((k) => k.nomor.trim())
+    if (!formNama.trim() || !formProvinsi || !formKabupaten || validKontak.length === 0) return
     setSending(true)
+    const callCenterNomor = validKontak.find((k) => k.tipe === "call_center")?.nomor ?? validKontak[0]?.nomor ?? ""
     const newRujukan: SumberRujukan = {
       id: `usul-${Date.now()}`,
       namaInstansi: formNama.trim(),
@@ -343,14 +351,15 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
       namaJalan: formNamaJalan.trim() || undefined,
       nomorJalan: formNomorJalan.trim() || undefined,
       kodePos: formKodePos.trim() || undefined,
-      nomorCallCenter: formCallCenter.trim(),
-      nomorWhatsapp: formWhatsapp.trim() || undefined,
-      email: formEmail.trim() || undefined,
-      website: formWebsite.trim() || undefined,
       tautanGoogleMaps: formGoogleMaps.trim() || undefined,
-      sosialMedia: formSosialMedia.trim() || undefined,
+      kontak: validKontak,
+      nomorCallCenter: callCenterNomor,
+      website: formwebsite.trim() || undefined,
+      aksesInfo: formAksesInfo,
       status: "menunggu",
+      dibuatOleh: "Admin Sekolah",
       logTerakhir: RUJUKAN_LOG.menunggu,
+      usulanDari: "sekolah",
       createdAt: new Date().toISOString(),
     }
     try {
@@ -377,12 +386,10 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
     setFormNamaJalan("")
     setFormNomorJalan("")
     setFormKodePos("")
-    setFormCallCenter("")
-    setFormWhatsapp("")
-    setFormEmail("")
-    setFormWebsite("")
     setFormGoogleMaps("")
-    setFormSosialMedia("")
+    setFormKontak([{ nomor: "", tipe: "call_center" }])
+    setFormwebsite("")
+    setFormAksesInfo("publik")
   }
 
   return (
@@ -762,8 +769,8 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
                 </button>
               </div>
             ) : (
-              <>
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 sticky top-0 bg-white">
+              <div className="flex flex-col">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 sticky top-0 bg-white z-10">
                   <h3 className="text-base font-bold text-gray-900">Usul Sumber Dukungan</h3>
                   <button onClick={handleCloseForm} className="p-1.5 hover:bg-gray-100 rounded-lg">
                     <X className="w-5 h-5 text-gray-500" />
@@ -889,72 +896,49 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
                         className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                       />
                     </div>
-                    <div>
-                      <label className="text-xs font-semibold text-gray-600">Call Center <span className="text-red-500">*</span></label>
-                      <input
-                        type="tel"
-                        value={formCallCenter}
-                        onChange={(e) => setFormCallCenter(e.target.value)}
-                        placeholder="08xxxxxxxxxx"
-                        required
-                        className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                      />
+                    <div className="rounded-lg bg-blue-50 border border-blue-100 px-3 py-2.5 space-y-1">
+                      <p className="text-xs text-blue-700">
+                        <span className="font-semibold">Nomor call center</span> dapat ditambahkan lebih dari satu.
+                      </p>
+                      <p className="text-xs text-blue-600">
+                        Bila call center tidak tersedia, nomor pribadi Anda akan menjadi kontak rujukan dan dapat diakses publik.
+                      </p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs font-semibold text-gray-600">WhatsApp</label>
-                      <input
-                        type="tel"
-                        value={formWhatsapp}
-                        onChange={(e) => setFormWhatsapp(e.target.value)}
-                        placeholder="08xxxxxxxxxx"
-                        className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs font-semibold text-gray-600">Email</label>
-                      <input
-                        type="email"
-                        value={formEmail}
-                        onChange={(e) => setFormEmail(e.target.value)}
-                        placeholder="email@instansi.go.id"
-                        className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                      />
-                    </div>
+                  <div className="flex gap-2 items-center">
+                    <span className="flex-1 text-xs font-semibold text-gray-700">Nomor <span className="text-red-500">*</span></span>
+                    <span className="w-36 text-xs font-semibold text-gray-700">Tipe Kontak</span>
+                    {formKontak.length > 1 && <span className="w-9" />}
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs font-semibold text-gray-600">Website</label>
-                      <input
-                        type="url"
-                        value={formWebsite}
-                        onChange={(e) => setFormWebsite(e.target.value)}
-                        placeholder="https://..."
-                        className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs font-semibold text-gray-600">Link Google Maps</label>
-                      <input
-                        type="url"
-                        value={formGoogleMaps}
-                        onChange={(e) => setFormGoogleMaps(e.target.value)}
-                        placeholder="https://maps.google.com/..."
-                        className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                      />
-                    </div>
+                  <div className="space-y-2">
+                    {formKontak.map((k, i) => (
+                      <div key={i} className="flex gap-2 items-center">
+                        <input
+                          type="tel"
+                          value={k.nomor}
+                          onChange={(e) => updateKontak(i, "nomor", e.target.value)}
+                          placeholder="08xxxxxxxxxx"
+                          className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        />
+                        <select
+                          value={k.tipe}
+                          onChange={(e) => updateKontak(i, "tipe", e.target.value)}
+                          className="w-36 px-2 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+                        >
+                          <option value="call_center">Call Center</option>
+                          <option value="nomor_pribadi">Nomor Pribadi</option>
+                        </select>
+                        {formKontak.length > 1 && (
+                          <button type="button" onClick={() => removeKontak(i)} className="p-2 text-gray-400 hover:text-red-500">
+                            <X className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                  <div>
-                    <label className="text-xs font-semibold text-gray-600">Sosial Media</label>
-                    <input
-                      type="text"
-                      value={formSosialMedia}
-                      onChange={(e) => setFormSosialMedia(e.target.value)}
-                      placeholder="@username atau link"
-                      className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    />
-                  </div>
+                  <button type="button" onClick={addKontak} className="text-xs font-medium text-emerald-600 hover:text-emerald-700">
+                    + Tambah nomor lain
+                  </button>
                   <div className="flex justify-end gap-2 pt-4 border-t border-gray-200">
                     <button
                       type="button"
@@ -972,7 +956,7 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
                     </button>
                   </div>
                 </form>
-              </>
+              </div>
             )}
           </div>
         </div>
