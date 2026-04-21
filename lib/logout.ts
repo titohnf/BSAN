@@ -1,6 +1,6 @@
 export function clearAuthAndRedirectToLogin(router: { replace: (href: string) => void }) {
   try {
-    sessionStorage.removeItem("auth")
+    localStorage.removeItem("auth")
   } catch {
     /* ignore */
   }
