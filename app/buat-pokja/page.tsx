@@ -797,10 +797,13 @@ export default function BuatPokjaPage() {
                     {PIMPINAN_ROLES.map((r) => (
                       <ReviewMemberCard key={r.key} label={r.label} member={members[r.key]} />
                     ))}
+                    {BIDANG_ROLES.map((r) => (
+                      <ReviewMemberCard key={r.key} label={r.label} member={members[r.key]} />
+                    ))}
                     {anggotaList.filter(a => a.nama).map((a, i) => (
                       <ReviewMemberCard
                         key={`anggota-${i}`}
-                        label={`Anggota ${i + 1}${a.bidang ? ` – ${a.bidang}` : ""}`}
+                        label={`Anggota Lainnya ${i + 1}${a.bidang ? ` – ${a.bidang}` : ""}`}
                         member={{ nama: a.nama, email: a.email, jenisKelamin: a.jenisKelamin as "Laki-Laki" | "Perempuan" | "", noWhatsapp: a.noWhatsapp, instansi: "" }}
                       />
                     ))}
