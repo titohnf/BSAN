@@ -235,14 +235,21 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
   // Auto-fill wilayah from prop
   useEffect(() => {
     const w = wilayah.trim()
+    let prov = ""
+    let kab = ""
     if (w.includes(" - ")) {
-      const [prov, kab] = w.split(" - ")
-      setFormProvinsi(prov)
-      setFormKabupaten(kab)
+      const parts = w.split(" - ")
+      prov = parts[0].trim()
+      kab = parts[1].trim()
     } else {
-      setFormProvinsi(w)
-      setFormKabupaten("")
+      prov = w
     }
+    setFormProvinsi(prov)
+    setFormKabupaten(kab)
+    // Set default filter to show only school's wilayah (auto-enabled)
+    setFilterWilayah({ province: prov, kabupaten: kab })
+    setShowWilayahModal(false)
+    setShowStats(true)
   }, [])
 
   const addKontak = () => setFormKontak((prev) => [...prev, { nomor: "", tipe: "call_center" }])
@@ -452,12 +459,6 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
               Semua Wilayah
             </span>
           )}
-          <button
-            onClick={() => setShowWilayahModal(true)}
-            className="bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium text-sm px-2 py-1 rounded-md transition"
-          >
-            Ganti
-          </button>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-500">Statistik:</span>
@@ -470,25 +471,21 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
         </div>
       </div>
 
-      {/* Stats cards */}
+      {/* Stats cards by kategori */}
       {showStats && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="bg-white rounded-xl border border-gray-200 p-4">
-            <p className="text-xs text-gray-500">Total</p>
-            <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-          </div>
-          <div className="bg-white rounded-xl border border-gray-200 p-4">
-            <p className="text-xs text-gray-500">Terverifikasi</p>
-            <p className="text-2xl font-bold text-green-700">{stats.terverifikasi}</p>
-          </div>
-          <div className="bg-white rounded-xl border border-gray-200 p-4">
-            <p className="text-xs text-gray-500">Menunggu</p>
-            <p className="text-2xl font-bold text-amber-700">{stats.menunggu}</p>
-          </div>
-          <div className="bg-white rounded-xl border border-gray-200 p-4">
-            <p className="text-xs text-gray-500">Kategori</p>
-            <p className="text-2xl font-bold text-gray-900">{stats.byKategori.length}</p>
-          </div>
+          {stats.byKategori.filter(k => k.count > 0).map((k) => {
+            const cfg = KATEGORI_CONFIG[k.label]
+            return (
+              <div key={k.label} className="bg-white rounded-xl border border-gray-200 p-4">
+                <div className={`w-8 h-8 rounded-full ${cfg.bg} ${cfg.color} flex items-center justify-center mb-2`}>
+                  {cfg.icon}
+                </div>
+                <p className="text-xs text-gray-500">{k.label}</p>
+                <p className="text-2xl font-bold text-gray-900">{k.count}</p>
+              </div>
+            )
+          })}
         </div>
       )}
 
