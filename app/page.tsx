@@ -221,6 +221,7 @@ function AdminPageInner() {
       const auth = sessionStorage.getItem("auth")
       if (!auth) {
         setViewMode("landing")
+        setAuthChecked(true)
         return
       }
       const parsed = JSON.parse(auth) as { role: AdminRole }
@@ -230,8 +231,17 @@ function AdminPageInner() {
       setAuthChecked(true)
     } catch {
       setViewMode("landing")
+      setAuthChecked(true)
     }
   }, [router])
+
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+      </div>
+    )
+  }
 
   useEffect(() => {
     try {
