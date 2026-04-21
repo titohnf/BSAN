@@ -138,7 +138,7 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue }: {
         </div>
         <span className="text-sm font-semibold text-gray-800">{label}</span>
       </div>
-      {/* Order: Nama, Jenis Kelamin, Bidang, Instansi, Jabatan, Email, No. WhatsApp */}
+      {/* Order: Nama, Jenis Kelamin, Instansi, Jabatan, Email, No. WhatsApp */}
       <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
         <InputField label="Nama" required placeholder="Nama lengkap" value={value.nama} onChange={(v) => onChange("nama", v)} />
         <div className="flex flex-col gap-1.5">
@@ -155,15 +155,6 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue }: {
             </select>
             <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
           </div>
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-gray-600">Bidang <span className="text-red-500">*</span></label>
-          <input
-            type="text"
-            value={bidangValue}
-            disabled
-            className="w-full h-9 px-3 text-sm border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
-          />
         </div>
         <InputField label="Instansi" required placeholder="Nama instansi" value={value.instansi} onChange={(v) => onChange("instansi", v)} />
         <InputField label="Jabatan" placeholder="Contoh: Kepala Bidang, Staff, dll" value={value.jabatan ?? ""} onChange={(v) => onChange("jabatan", v)} />
