@@ -47,7 +47,7 @@ export default function LoginPage() {
               : base
         sessionStorage.setItem("auth", JSON.stringify(payload))
       } catch {}
-      router.replace("/")
+      window.location.href = "/"
     } else {
       setError("Username atau password salah.")
       setLoading(false)
