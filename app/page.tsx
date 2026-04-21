@@ -217,7 +217,7 @@ function AdminPageInner() {
   const [authChecked, setAuthChecked] = useState(false)
 
   useEffect(() => {
-    const auth = sessionStorage.getItem("auth")
+    const auth = localStorage.getItem("auth")
     if (!auth) {
       setViewMode("landing")
       setAuthChecked(true)

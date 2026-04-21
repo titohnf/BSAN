@@ -45,7 +45,7 @@ export default function LoginPage() {
                   namaDinas: "Dinas Pendidikan Provinsi Aceh",
                 }
               : base
-        sessionStorage.setItem("auth", JSON.stringify(payload))
+        localStorage.setItem("auth", JSON.stringify(payload))
       } catch {}
       window.location.href = "/"
     } else {
