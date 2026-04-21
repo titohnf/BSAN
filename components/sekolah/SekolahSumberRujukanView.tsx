@@ -232,6 +232,19 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
   const [sending, setSending] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
+  // Auto-fill wilayah from prop
+  useEffect(() => {
+    const w = wilayah.trim()
+    if (w.includes(" - ")) {
+      const [prov, kab] = w.split(" - ")
+      setFormProvinsi(prov)
+      setFormKabupaten(kab)
+    } else {
+      setFormProvinsi(w)
+      setFormKabupaten("")
+    }
+  }, [])
+
   const addKontak = () => setFormKontak((prev) => [...prev, { nomor: "", tipe: "call_center" }])
   const removeKontak = (idx: number) => setFormKontak((prev) => prev.filter((_, i) => i !== idx))
   const updateKontak = (idx: number, field: "nomor" | "tipe", val: string) => {
@@ -376,6 +389,7 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
   const handleCloseForm = () => {
     setShowForm(false)
     setSubmitted(false)
+    // Note: Province/Kabupaten are auto-filled from wilayah prop, don't reset them
     setFormNama("")
     setFormKategori("Konseling")
     setFormPenyedia("Pemerintah Daerah")
@@ -814,32 +828,21 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
                       </select>
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs font-semibold text-gray-600">Provinsi <span className="text-red-500">*</span></label>
-                      <select
-                        value={formProvinsi}
-                        onChange={(e) => { setFormProvinsi(e.target.value); setFormKabupaten("") }}
-                        required
-                        className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
-                      >
-                        <option value="">Pilih Provinsi</option>
-                        {PROVINSI_LIST.map((p) => (
-                          <option key={p} value={p}>{p}</option>
-                        ))}
-                      </select>
+                  <div>
+                    <label className="text-xs font-semibold text-gray-600">Wilayah Anda</label>
+                    <div className="mt-1 px-3 py-2 text-sm bg-gray-100 rounded-lg text-gray-600">
+                      {formProvinsi}{formKabupaten ? ` - ${formKabupaten}` : ""}
                     </div>
-                    <div>
-                      <label className="text-xs font-semibold text-gray-600">Kabupaten/Kota <span className="text-red-500">*</span></label>
-                      <input
-                        type="text"
-                        value={formKabupaten}
-                        onChange={(e) => setFormKabupaten(e.target.value)}
-                        placeholder="Nama kabupaten/kota"
-                        required
-                        className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                      />
-                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-gray-600">Alamat Lengkap</label>
+                    <input
+                      type="text"
+                      value={formNamaJalan}
+                      onChange={(e) => setFormNamaJalan(e.target.value)}
+                      placeholder="Nama jalan, nomor,(rt/rw), dll"
+                      className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
