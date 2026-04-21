@@ -331,7 +331,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                   <p className="text-sm text-gray-500">Wilayah: {pokja.data.region}</p>
                 )}
               </div>
-              {!isAdminPusat && (pokja.status === "aktif" || pokja.status === "masih-diverifikasi") && (
+              {!isAdminPusat && (pokja.status === "aktif" || pokja.status === "butuh-perbaikan") && (
                 <button
                   type="button"
                   onClick={() => onPerbaikiPokja?.(pokja)}
