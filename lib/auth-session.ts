@@ -15,7 +15,7 @@ export type AuthSession = {
 export function readAuthSession(): AuthSession | null {
   if (typeof window === "undefined") return null
   try {
-    const raw = sessionStorage.getItem("auth")
+    const raw = localStorage.getItem("auth")
     if (!raw) return null
     const p = JSON.parse(raw) as Record<string, unknown>
     const role = p.role as AuthRole | undefined

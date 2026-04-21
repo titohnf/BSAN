@@ -4,5 +4,5 @@ export function clearAuthAndRedirectToLogin(router: { replace: (href: string) =>
   } catch {
     /* ignore */
   }
-  router.replace("/login")
+  router.replace("/")
 }
