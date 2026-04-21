@@ -218,18 +218,28 @@ function AdminPageInner() {
 
   useEffect(() => {
     const auth = localStorage.getItem("auth")
+    console.log("[auth check] localStorage auth:", auth)
     if (!auth) {
+      console.log("[auth check] no auth found, showing landing")
       setViewMode("landing")
       setAuthChecked(true)
       return
     }
     try {
       const parsed = JSON.parse(auth) as { role: AdminRole }
+      console.log("[auth check] parsed role:", parsed.role)
       if (parsed.role === "pusat") setRole("pusat")
+      else if (parsed.role === "dinas") setRole("dinas")
       else if (parsed.role === "sekolah") setRole("sekolah")
+      else {
+        setViewMode("landing")
+        setAuthChecked(true)
+        return
+      }
       setViewMode("admin")
       setAuthChecked(true)
-    } catch {
+    } catch (e) {
+      console.log("[auth check] parse error:", e)
       setViewMode("landing")
       setAuthChecked(true)
     }

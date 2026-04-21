@@ -47,6 +47,7 @@ export default function LoginPage() {
               : base
         localStorage.setItem("auth", JSON.stringify(payload))
       } catch {}
+      console.log("[login] stored auth:", localStorage.getItem("auth"))
       window.location.href = "/"
     } else {
       setError("Username atau password salah.")
