@@ -403,11 +403,11 @@ export default function BuatPokjaPage() {
         } catch { return null }
       })()
       if (isPerbaikanMode) {
-        window.location.href = "/?pokjaPerbaikan=1"
+        window.location.href = "/dashboard?pokjaPerbaikan=1"
       } else if (role === "pusat") {
-        window.location.href = "/?pokjaCreated=1"
+        window.location.href = "/dashboard?pokjaCreated=1"
       } else {
-        window.location.href = "/?pokjaSubmitted=1"
+        window.location.href = "/dashboard?pokjaSubmitted=1"
       }
     }, 1800)
     return () => clearTimeout(t)

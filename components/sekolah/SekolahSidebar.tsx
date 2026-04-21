@@ -1,10 +1,10 @@
 "use client"
 
-import { BookOpenCheck, GraduationCap, LogOut, Menu, X } from "lucide-react"
+import { BookOpenCheck, CalendarCheck, GraduationCap, LogOut, Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 
-export type SekolahMenu = "sumber-rujukan"
+export type SekolahMenu = "sumber-rujukan" | "kegitan"
 
 interface SekolahSidebarProps {
   activeMenu: SekolahMenu
@@ -14,6 +14,7 @@ interface SekolahSidebarProps {
 
 const navItems: { id: SekolahMenu; label: string; icon: typeof BookOpenCheck }[] = [
   { id: "sumber-rujukan", label: "SumberDukungan", icon: BookOpenCheck },
+  { id: "kegitan", label: "Kegitan", icon: CalendarCheck },
 ]
 
 export function SekolahSidebar({ activeMenu, onMenuChange, onLogout }: SekolahSidebarProps) {

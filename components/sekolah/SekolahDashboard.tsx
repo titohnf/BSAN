@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { SekolahSidebar, type SekolahMenu } from "@/components/sekolah/SekolahSidebar"
 import { SekolahHeader } from "@/components/sekolah/SekolahHeader"
 import { SekolahSumberRujukanView } from "@/components/sekolah/SekolahSumberRujukanView"
+import { KegitanView } from "@/components/dashboard/KegitanView"
 import { clearAuthAndRedirectToLogin } from "@/lib/logout"
 
 type AuthPayload = {
@@ -43,6 +44,7 @@ export function SekolahDashboard() {
         <SekolahHeader userName={displayName} onLogout={logout} />
         <main className="flex-1 px-4 md:px-6 py-6">
           {menu === "sumber-rujukan" && <SekolahSumberRujukanView wilayah={wilayah} />}
+          {menu === "kegitan" && <KegitanView />}
         </main>
       </div>
     </div>
