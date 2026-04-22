@@ -25,7 +25,7 @@ export interface Kegiatan {
 const SEED_DATA: Kegiatan[] = [
   { id: "kg-1", namaKegiatan: "Workshop PKSA", penyelenggara: "SMA Negeri 1 Banda Aceh", waktuKegiatan: "2025-04-15T10:00", deskripsiKegiatan: "Workshop pengenalan isu kekerasan pada anak", status: "selesai" },
   { id: "kg-2", namaKegiatan: "Sosialisasi Hak Anak", penyelenggara: "SMP Negeri 2 Banda Aceh", waktuKegiatan: "2025-06-20T14:00", deskripsiKegiatan: "Sosialisasi hak anak kepada seluruh siswa dan wali kelas", status: "berlangsung" },
-  { id: "kg-3", namaKegiatan: "Rapat Koordinasi Pokja", penyelenggara: "Dinas Pendidikan Prov Aceh", waktuKegiatan: "2025-07-10T09:00", deskripsiKegiatan: "Rapat koordinasi bulanan antar anggota pokja", status: "menunggu" },
+  { id: "kg-3", namaKegiatan: "Rapat Koordinasi Kelompok Kerja", penyelenggara: "Dinas Pendidikan Prov Aceh", waktuKegiatan: "2025-07-10T09:00", deskripsiKegiatan: "Rapat koordinasi bulanan antar anggota kelompok kerja", status: "menunggu" },
 ]
 
 // ---------------------------------------------------------------------------
@@ -90,7 +90,7 @@ export function KegiatanView() {
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h2 className="text-xl font-bold text-gray-900">Kegiatan</h2>
-          <p className="text-xs text-gray-500 mt-0.5">Daftar kegiatan yang diselenggarakan oleh pokja</p>
+          <p className="text-xs text-gray-500 mt-0.5">Daftar kegiatan yang diselenggarakan oleh kelompok kerja</p>
         </div>
         <a
           href="/tambah-kegiatan"

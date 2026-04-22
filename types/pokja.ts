@@ -12,8 +12,8 @@ export interface MemberField {
 }
 
 export const PIMPINAN_ROLES = [
-  { key: "ketua", label: "Ketua Pokja" },
-  { key: "wakil", label: "Wakil Ketua Pokja" },
+  { key: "ketua", label: "Ketua Kelompok Kerja" },
+  { key: "wakil", label: "Wakil Ketua Kelompok Kerja" },
   { key: "koordinator", label: "Koordinator" },
 ] as const
 

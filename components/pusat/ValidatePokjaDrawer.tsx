@@ -101,7 +101,7 @@ export function ValidatePokjaDrawer({ pokja, onClose, onSave }: ValidatePokjaDra
           {(pokja.status === "butuh-perbaikan" || pokja.status === "aktif") && pokja.alasanPenolakan && (
             <div>
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Alasan Butuh Perbaikan</p>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Alasan Perlu Perbaikan</p>
               </div>
               <div className="rounded-xl border border-red-200 bg-red-50 p-4">
                 <p className="text-sm font-medium text-red-800">{pokja.alasanPenolakan}</p>

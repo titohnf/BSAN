@@ -9,7 +9,7 @@ export type PusatMenu = "dashboard" | "pokja" | "sumber-rujukan" | "kegiatan"
 
 const navItems = [
   { id: "dashboard" as PusatMenu, label: "Dashboard", icon: LayoutDashboard },
-  { id: "pokja" as PusatMenu, label: "POKJA", icon: Users },
+  { id: "pokja" as PusatMenu, label: "Kelompok Kerja", icon: Users },
   { id: "sumber-rujukan" as PusatMenu, label: "Sumber Dukungan", icon: BookOpenCheck },
   { id: "k" as PusatMenu, label: " kegiatan", icon: CalendarDays },
 ]
@@ -28,7 +28,7 @@ export function SidebarPusat({ activeMenu, onMenuChange }: SidebarPusatProps) {
         </div>
         <div className="min-w-0">
           <p className="text-white font-semibold text-sm leading-tight truncate">Pemerintah Pusat</p>
-          <p className="text-slate-200 text-xs leading-tight truncate">Admin POKJA Nasional</p>
+          <p className="text-slate-200 text-xs leading-tight truncate">Admin Kelompok Kerja Nasional</p>
         </div>
       </div>
 

@@ -114,7 +114,7 @@ function NotifModal({
             </div>
           </div>
           <p className="text-xs text-gray-400 leading-relaxed">
-            Notifikasi telah dikirimkan secara otomatis ke Admin Dinas Pendidikan dan seluruh anggota POKJA terkait.
+            Notifikasi telah dikirimkan secara otomatis ke Admin Dinas Pendidikan dan seluruh anggota Kelompok Kerja terkait.
           </p>
         </div>
 
@@ -360,13 +360,13 @@ export function DetailPengajuan({ item, onClose, onSave }: DetailPengajuanProps)
         <aside
           role="dialog"
           aria-modal="true"
-          aria-label="Detail Pengajuan POKJA"
+          aria-label="Detail Pengajuan Kelompok Kerja"
           className="relative z-10 flex flex-col w-full max-w-2xl h-screen bg-gray-50 shadow-2xl"
         >
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200 flex-shrink-0">
             <div>
-              <h2 className="text-base font-bold text-gray-900">Detail Pengajuan POKJA</h2>
+              <h2 className="text-base font-bold text-gray-900">Detail Pengajuan Kelompok Kerja</h2>
               <p className="text-xs text-gray-500 mt-0.5">{item.wilayah}</p>
             </div>
             <button

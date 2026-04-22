@@ -155,7 +155,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
       {/* Title */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Dashboard Admin Pusat</h1>
-        <p className="text-sm text-gray-500 mt-1">Pantau status pembentukan POKJA di seluruh Indonesia</p>
+        <p className="text-sm text-gray-500 mt-1">Pantau status pembentukan Kelompok Kerja di seluruh Indonesia</p>
       </div>
 
       {/* Header Stats - 3 cards */}
@@ -192,7 +192,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
           <div className="px-5 py-4 border-b border-amber-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-amber-600" />
-              <h3 className="text-sm font-semibold text-gray-800">POKJA Menunggu Verifikasi</h3>
+              <h3 className="text-sm font-semibold text-gray-800">Kelompok Kerja Menunggu Verifikasi</h3>
               <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-amber-200 text-amber-800 text-xs font-bold">
                 {menunggu}
               </span>
@@ -229,7 +229,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
       {/* Tabel Provinsi dengan Header */}
       <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
         <div className="px-6 py-5 border-b border-gray-100 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-1">Jumlah Kelompok Kerja tiap Provinsi</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-1">Jumlah Kelompok Kerja Tiap Provinsi</h2>
           <p className="text-sm text-gray-500">
             per {new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" })}
           </p>
@@ -286,7 +286,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
                 </th>
                 <th className="px-4 py-3 text-left">
                   <button className="flex items-center gap-1 text-xs font-semibold text-gray-600 uppercase tracking-wide hover:text-gray-900">
-                    Status Pokja
+                    Status Kelompok Kerja
                   </button>
                 </th>
                 <th className="px-4 py-3 text-center">
@@ -296,7 +296,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
                 </th>
                 <th className="px-4 py-3 text-center">
                   <button className="flex items-center gap-1 text-xs font-semibold text-gray-600 uppercase tracking-wide hover:text-gray-900 mx-auto">
-                    Pokja Kota/Kab
+                    Kelompok Kerja Kota/Kab
                   </button>
                 </th>
                 <th className="px-4 py-3 text-center">

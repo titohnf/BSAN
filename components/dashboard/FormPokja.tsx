@@ -318,8 +318,8 @@ function ReviewMemberCard({ label, member }: { label: string; member: MemberFiel
 function downloadTemplate() {
   const csv = [
     ["Jabatan", "Nama", "Email", "Jenis Kelamin", "No. WhatsApp", "Instansi"],
-    ["Ketua Pokja", "", "", "Laki-Laki/Perempuan", "", ""],
-    ["Wakil Ketua Pokja", "", "", "Laki-Laki/Perempuan", "", ""],
+    ["Ketua Kelompok Kerja", "", "", "Laki-Laki/Perempuan", "", ""],
+    ["Wakil Ketua Kelompok Kerja", "", "", "Laki-Laki/Perempuan", "", ""],
     ["Koordinator", "", "", "Laki-Laki/Perempuan", "", ""],
     ["Bidang Pendidikan", "", "", "Laki-Laki/Perempuan", "", ""],
     ["Bidang PPPA", "", "", "Laki-Laki/Perempuan", "", ""],
@@ -334,7 +334,7 @@ function downloadTemplate() {
   const url = URL.createObjectURL(blob)
   const a = document.createElement("a")
   a.href = url
-  a.download = "template_pengurus_pokja.csv"
+  a.download = "template_pengurus_kelompok_kerja.csv"
   a.click()
   URL.revokeObjectURL(url)
 }
@@ -342,8 +342,8 @@ function downloadTemplate() {
 function parseExcelCSV(text: string, setMembers: React.Dispatch<React.SetStateAction<Members>>) {
   const rows = text.trim().split("\n").slice(1) // skip header
   const keyMap: Record<string, RoleKey> = {
-    "ketua pokja": "ketua",
-    "wakil ketua pokja": "wakil",
+    "ketua kelompok kerja": "ketua",
+    "wakil ketua kelompok kerja": "wakil",
     koordinator: "koordinator",
     "bidang pendidikan": "pendidikan",
     "bidang pppa": "pppa",
@@ -454,9 +454,9 @@ export function FormPokja({ region, onClose, onSubmit }: FormPokjaProps) {
           <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
             <CheckCircle2 className="w-7 h-7 text-green-600" />
           </div>
-          <h3 className="text-lg font-bold text-gray-900">Data Pokja Berhasil Dikirim!</h3>
+          <h3 className="text-lg font-bold text-gray-900">Data Kelompok Kerja Berhasil Dikirim!</h3>
           <p className="text-sm text-gray-500 leading-relaxed">
-            Data Pokja wilayah <strong>{region}</strong> sedang menunggu verifikasi dari tim kami.
+            Data Kelompok Kerja wilayah <strong>{region}</strong> sedang menunggu verifikasi dari tim kami.
           </p>
         </div>
       </div>
@@ -470,13 +470,13 @@ export function FormPokja({ region, onClose, onSubmit }: FormPokjaProps) {
       <aside
         role="dialog"
         aria-modal="true"
-        aria-label="Form Pembentukan POKJA"
+        aria-label="Form Pembentukan Kelompok Kerja"
         className="relative z-10 flex flex-col w-full max-w-2xl h-screen bg-gray-50 shadow-2xl"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200 flex-shrink-0">
           <div>
-            <h2 className="text-base font-bold text-gray-900">Pembentukan POKJA</h2>
+            <h2 className="text-base font-bold text-gray-900">Pembentukan Kelompok Kerja</h2>
             <p className="text-xs text-gray-500 mt-0.5">Wilayah {region}</p>
           </div>
           <button
@@ -525,11 +525,11 @@ export function FormPokja({ region, onClose, onSubmit }: FormPokjaProps) {
             <div className="space-y-5">
               <div>
                 <h3 className="text-sm font-bold text-gray-900">Informasi Dasar</h3>
-                <p className="text-xs text-gray-500 mt-0.5">Isi informasi umum Pokja yang akan dibentuk.</p>
+                <p className="text-xs text-gray-500 mt-0.5">Isi informasi umum Kelompok Kerja yang akan dibentuk.</p>
               </div>
               <div className="rounded-xl border border-gray-200 bg-white p-5 space-y-4">
                 <InputField
-                  label="Wilayah / Nama Pokja"
+label="Wilayah / Nama Kelompok Kerja"
                   value={region}
                   readOnly
                   icon={<Building2 className="w-3.5 h-3.5" />}

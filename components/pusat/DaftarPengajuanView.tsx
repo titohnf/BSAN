@@ -88,7 +88,7 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Data POKJA</h1>
+          <h1 className="text-xl font-bold text-gray-900">Data Kelompok Kerja</h1>
           <p className="text-sm text-gray-500 mt-0.5">Kelola data Kelompok Kerja di seluruh Indonesia</p>
         </div>
       </div>
@@ -123,13 +123,13 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-400">
             <Search className="w-8 h-8" />
-            <p className="text-sm">Tidak ada POKJA ditemukan</p>
+            <p className="text-sm">Tidak ada Kelompok Kerja ditemukan</p>
           </div>
         ) : (
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50">
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Wilayah Pokja</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Wilayah Kelompok Kerja</th>
                 <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Tanggal Diverifikasi</th>
                 <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Tgl Berakhir SK</th>
                 <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
@@ -194,7 +194,7 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
       {totalPages > 1 && (
         <div className="flex items-center justify-between pt-2">
           <p className="text-xs text-gray-500">
-            Menampilkan {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filtered.length)} dari {filtered.length} POKJA
+            Menampilkan {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filtered.length)} dari {filtered.length} Kelompok Kerja
           </p>
           <div className="flex items-center gap-1">
             <button
@@ -229,7 +229,7 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
       )}
 
       {totalPages <= 1 && (
-        <p className="text-xs text-gray-400 text-right">Menampilkan {filtered.length} dari {pokjaList.length} POKJA</p>
+        <p className="text-xs text-gray-400 text-right">Menampilkan {filtered.length} dari {pokjaList.length} Kelompok Kerja</p>
       )}
     </div>
   )

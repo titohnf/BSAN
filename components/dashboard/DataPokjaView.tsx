@@ -63,13 +63,13 @@ function EmptyStatePokja({ onBuatPokja }: { onBuatPokja: () => void }) {
       <div className="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center mb-5">
         <Users className="w-9 h-9 text-blue-400" />
       </div>
-      <h3 className="text-lg font-bold text-gray-800 mb-2">POKJA Belum Dibentuk</h3>
+      <h3 className="text-lg font-bold text-gray-800 mb-2">Kelompok Kerja Belum Dibentuk</h3>
       <p className="text-sm text-gray-500 max-w-sm leading-relaxed mb-6">
-        Data POKJA Budaya Sekolah Aman dan Nyaman untuk wilayah Anda belum tersedia.
-        Mulai pembentukan POKJA dengan mengisi data yang diperlukan.
+        Data Kelompok Kerja Budaya Sekolah Aman dan Nyaman untuk wilayah Anda belum tersedia.
+        Mulai pembentukan Kelompok Kerja dengan mengisi data yang diperlukan.
       </p>
       <Button color="blue" size="md" icon={PlusCircle} onClick={onBuatPokja}>
-        Buat POKJA Sekarang
+        Buat Kelompok Kerja Sekarang
       </Button>
     </div>
   )
@@ -303,11 +303,11 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
     <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <h2 className="text-xl font-bold text-gray-900">Data Pokja Wilayah</h2>
-        {/* Hanya tampilkan tombol buat POKJA untuk admin pusat */}
+        <h2 className="text-xl font-bold text-gray-900">Data Kelompok Kerja Wilayah</h2>
+        {/* Hanya tampilkan tombol buat Kelompok Kerja untuk admin pusat */}
         {isAdminPusat && (
           <Button color="blue" size="sm" icon={PlusCircle} onClick={onBuatPokja}>
-            Buat POKJA Baru
+            Buat Kelompok Kerja Baru
           </Button>
         )}
       </div>
@@ -338,7 +338,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex-shrink-0"
                 >
                   <Pencil className="w-4 h-4" />
-                  Edit Data POKJA
+                  Edit Data Kelompok Kerja
                 </button>
               )}
             </div>
@@ -369,7 +369,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors"
                     >
                       <FileText className="w-4 h-4" />
-                      Perbaiki Data POKJA
+                      Perbaiki Data Kelompok Kerja
                     </button>
                   </div>
                 </div>
@@ -386,7 +386,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                       <Users className="w-5 h-5 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-1">Ketua POKJA</p>
+                      <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-1">Ketua Kelompok Kerja</p>
                       <p className="text-base font-bold text-gray-900 truncate">{pokja.data.members.ketua.nama}</p>
                       {pokja.data.members.ketua.instansi && (
                         <p className="text-xs text-gray-600 mt-0.5 truncate">{pokja.data.members.ketua.instansi}</p>

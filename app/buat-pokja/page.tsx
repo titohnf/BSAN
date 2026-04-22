@@ -266,7 +266,7 @@ function downloadTemplate() {
   ].map((r) => r.join(",")).join("\n")
   const blob = new Blob([csv], { type: "text/csv" })
   const url = URL.createObjectURL(blob)
-  const a = document.createElement("a"); a.href = url; a.download = "template_pengurus_pokja.csv"; a.click()
+  const a = document.createElement("a"); a.href = url; a.download = "template_pengurus_kelompok_kerja.csv"; a.click()
   URL.revokeObjectURL(url)
 }
 
