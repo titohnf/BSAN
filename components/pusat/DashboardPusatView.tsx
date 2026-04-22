@@ -286,7 +286,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
                 </th>
                 <th className="px-4 py-3 text-left">
                   <button className="flex items-center gap-1 text-xs font-semibold text-gray-600 uppercase tracking-wide hover:text-gray-900">
-                    Status Kelompok Kerja
+                    Status
                   </button>
                 </th>
                 <th className="px-4 py-3 text-center">
