@@ -10,17 +10,17 @@ interface DaftarPengajuanViewProps {
 
 const STATUS_CONFIG: Record<PokjaStatus, { label: string; color: string; bg: string; icon: React.ElementType }> = {
   "belum-dibentuk": { label: "Belum Dibentuk", color: "text-gray-700", bg: "bg-gray-50 border-gray-200", icon: Building },
-  "masih-diverifikasi": { label: "Menunggu Verifikasi", color: "text-amber-700", bg: "bg-amber-50 border-amber-200", icon: Clock },
+  "masih-diverifikasi": { label: "Belum Diperiksa", color: "text-amber-700", bg: "bg-amber-50 border-amber-200", icon: Clock },
   aktif: { label: "Aktif", color: "text-emerald-700", bg: "bg-emerald-50 border-emerald-200", icon: CheckCircle2 },
-  "butuh-perbaikan": { label: "Butuh Perbaikan", color: "text-red-700", bg: "bg-red-50 border-red-200", icon: XCircle },
+  "butuh-perbaikan": { label: "Perlu Perbaikan", color: "text-red-700", bg: "bg-red-50 border-red-200", icon: XCircle },
 }
 
 const STATUS_FILTER_OPTIONS: { value: PokjaStatus | "semua"; label: string }[] = [
   { value: "semua", label: "Semua Status" },
   { value: "belum-dibentuk", label: "Belum Dibentuk" },
-  { value: "masih-diverifikasi", label: "Menunggu Verifikasi" },
+  { value: "masih-diverifikasi", label: "Belum Diperiksa" },
   { value: "aktif", label: "Aktif" },
-  { value: "butuh-perbaikan", label: "Butuh Perbaikan" },
+  { value: "butuh-perbaikan", label: "Perlu Perbaikan" },
 ]
 
 
@@ -131,7 +131,7 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
               <tr className="border-b border-gray-100 bg-gray-50">
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Wilayah Kelompok Kerja</th>
                 <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Tanggal Diverifikasi</th>
-                <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Tgl Berakhir SK</th>
+                <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Tanggal SK Selesai</th>
                 <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
                 <th className="px-3 py-3" />
               </tr>
@@ -179,7 +179,7 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
                         onClick={() => onSelect(p)}
                         className="text-xs px-3 py-1.5 rounded-lg font-medium transition-colors bg-slate-100 text-slate-700 hover:bg-slate-200"
                       >
-                        {p.effectiveStatus === "masih-diverifikasi" ? "Validasi" : "Lihat Detail"}
+                        {p.effectiveStatus === "masih-diverifikasi" ? "Periksa" : "Cek Detail"}
                       </button>
                     </td>
                   </tr>

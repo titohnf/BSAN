@@ -56,7 +56,7 @@ function StatusBadge({ status }: { status: StatusRujukan }) {
   if (status === "menunggu") {
     return (
       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
-        Menunggu Verifikasi
+        Belum Diperiksa
       </span>
     )
   }
@@ -523,7 +523,7 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
         >
           <option value="semua">Semua Status</option>
           <option value="terverifikasi">Terverifikasi</option>
-          <option value="menunggu">Menunggu Verifikasi</option>
+          <option value="menunggu">Belum Diperiksa</option>
           <option value="menunggu_review">Menunggu Review</option>
           <option value="dihapus">Dihapus</option>
         </select>
@@ -613,7 +613,7 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
                             href={`/sumber-rujukan/form?view=${item.id}`}
                             className="text-blue-600 hover:underline"
                           >
-                            Lihat Detail
+                            Cek Detail
                           </a>
                         </td>
                       </tr>

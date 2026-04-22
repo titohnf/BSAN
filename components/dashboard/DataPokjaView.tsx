@@ -26,9 +26,9 @@ import { ALL_ROLES } from "@/types/pokja"
 // ---------------------------------------------------------------------------
 const STATUS_CONFIG = {
   "belum-dibentuk": { label: "Belum Dibentuk", variant: "neutral" as const, icon: Clock },
-  "masih-diverifikasi": { label: "Menunggu Verifikasi", variant: "warning" as const, icon: Clock },
+  "masih-diverifikasi": { label: "Belum Diperiksa", variant: "warning" as const, icon: Clock },
   aktif: { label: "Aktif", variant: "success" as const, icon: CheckCircle2 },
-  "butuh-perbaikan": { label: "Butuh Perbaikan", variant: "error" as const, icon: XCircle },
+  "butuh-perbaikan": { label: "Perlu Perbaikan", variant: "error" as const, icon: XCircle },
 }
 
 const ROLE_BADGE_MAP: Record<string, "informational" | "success" | "warning" | "neutral"> = {
@@ -757,7 +757,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                               className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-600 hover:text-amber-800 transition-colors"
                             >
                               <Eye className="w-3.5 h-3.5" />
-                              Validasi
+                              Periksa
                             </button>
                           ) : (
                             <button
@@ -765,7 +765,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                               className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors"
                             >
                               <Eye className="w-3.5 h-3.5" />
-                              Lihat Detail
+                              Cek Detail
                             </button>
                           )}
                         </td>

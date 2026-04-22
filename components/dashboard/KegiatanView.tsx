@@ -138,7 +138,7 @@ export function KegiatanView() {
                         href={`/tambah-kegiatan?view=${item.id}`}
                         className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 transition border border-blue-200 whitespace-nowrap"
                       >
-                        <Eye className="w-3.5 h-3.5" /> Lihat Detail
+                        <Eye className="w-3.5 h-3.5" /> Cek Detail
                       </a>
                     </td>
                   </tr>

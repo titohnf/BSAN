@@ -158,7 +158,7 @@ function StatusBadge({ status }: { status: StatusRujukan }) {
   if (status === "menunggu_review") {
     return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800">Menunggu Review</span>
   }
-  return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Menunggu Verifikasi</span>
+  return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Belum Diperiksa</span>
 }
 
 const emptyForm = (): FormState => ({
