@@ -234,7 +234,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
             per {new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" })}
           </p>
           <p className="text-xs text-gray-400 mt-1">
-            [Update terakhir: {new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" })}]
+            [Terakhir diperbarui: {new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" })}]
           </p>
         </div>
 
@@ -296,7 +296,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
                 </th>
                 <th className="px-4 py-3 text-center">
                   <button className="flex items-center gap-1 text-xs font-semibold text-gray-600 uppercase tracking-wide hover:text-gray-900 mx-auto">
-                    Kelompok Kerja Kota/Kab
+                    Jumlah Kelompok Kerja per Kota/Kab
                   </button>
                 </th>
                 <th className="px-4 py-3 text-center">
@@ -315,7 +315,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
                   aktif:    { label: "Aktif",              cls: "bg-green-100 border border-green-300 text-green-700" },
                   menunggu: { label: "Belum Diperiksa", cls: "bg-amber-100 border border-amber-300 text-amber-700" },
                   perbaikan:{ label: "Perlu Perbaikan",     cls: "bg-red-100 border border-red-300 text-red-700" },
-                  belum:    { label: "Belum",               cls: "bg-gray-100 border border-gray-200 text-gray-500" },
+                  belum:    { label: "Belum Dibentuk",      cls: "bg-gray-100 border border-gray-200 text-gray-500" },
                 }
                 const sc = statusConfig[prov.statusProv]
 
@@ -417,10 +417,10 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
         </div>
       </div>
 
-      {/* Activities */}
+      {/* Kegiatan */}
       <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-gray-800">Activities</h3>
+          <h3 className="text-sm font-semibold text-gray-800">Kegiatan</h3>
           {onViewActivities && (
             <button onClick={onViewActivities} className="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1">
               Kelola <ChevronRight className="w-3.5 h-3.5" />
@@ -436,7 +436,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
             </div>
           </div>
           <div className="space-y-2">
-            <p className="text-xs font-semibold text-gray-600 uppercase">Activities Mendatang</p>
+            <p className="text-xs font-semibold text-gray-600 uppercase">Kegiatan Mendatang</p>
             {[{tanggal:"14 Jun",judul:"Pelatihan"},{tanggal:"17 Jun",judul:"Verifikasi"},{tanggal:"21 Jun",judul:"Rapat"}].map((k,i)=>(
               <div key={i} className="p-2.5 rounded-lg bg-gray-50 border border-gray-100">
                 <p className="text-xs font-medium text-gray-700">{k.judul}</p>
