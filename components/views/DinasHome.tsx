@@ -182,7 +182,7 @@ export function DashboardView({
       </div>
 
       <Panel>
-        <PanelHeader title="Kelompok Kerja">
+        <PanelHeader title="Data Kelompok Kerja">
           {/* Tampilkan tombol Buat Kelompok Kerja jika: Admin Pusat (bisa banyak) atau Dinas belum punya */}
           {total === 0 && <ViewBtn label="Buat Kelompok Kerja" onClick={onBuatPokja} />}
         </PanelHeader>
