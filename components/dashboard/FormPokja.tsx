@@ -42,7 +42,7 @@ const STEPS = [
   { number: 1, label: "Informasi Dasar" },
   { number: 2, label: "Susunan Pengurus" },
   { number: 3, label: "Dokumen SK" },
-  { number: 4, label: "Review Data" },
+  { number: 4, label: "Tinjau Data" },
 ]
 
 // ---------------------------------------------------------------------------
@@ -795,7 +795,7 @@ label="Wilayah / Nama Kelompok Kerja"
           {step === 4 && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-sm font-bold text-gray-900">Review Data</h3>
+                <h3 className="text-sm font-bold text-gray-900">Tinjau Data</h3>
                 <p className="text-xs text-gray-500 mt-0.5">Periksa kembali seluruh data sebelum mengirimkan.</p>
               </div>
 

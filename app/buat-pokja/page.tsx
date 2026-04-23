@@ -20,7 +20,7 @@ const STEPS = [
   { number: 1, label: "Informasi Dasar" },
   { number: 2, label: "Susunan Pengurus" },
   { number: 3, label: "Dokumen SK" },
-  { number: 4, label: "Review Data" },
+  { number: 4, label: "Tinjau Data" },
 ]
 
 // ---------------------------------------------------------------------------
