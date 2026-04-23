@@ -105,10 +105,10 @@ function MemberSection({ label, value, onChange }: {
           </div>
         </div>
         <InputField label="Instansi" required placeholder="Nama instansi" value={value.instansi} onChange={(v) => onChange("instansi", v)} />
-        <InputField label="Jabatan" placeholder="Contoh: Kepala Bidang, Staff, dll" value={value.jabatan ?? ""} onChange={(v) => onChange("jabatan", v)} />
+        <InputField label="Jabatan pada Instansi" placeholder="Contoh: Kepala Bidang, Staff, dll" value={value.jabatan ?? ""} onChange={(v) => onChange("jabatan", v)} />
         <InputField label="Email" required type="email" placeholder="nama@dinas.go.id" value={value.email} onChange={(v) => onChange("email", v)} />
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-gray-600">No. WhatsApp <span className="text-red-500">*</span></label>
+          <label className="text-xs font-semibold text-gray-600">Nomor HP <span className="text-red-500">*</span></label>
           <div className="relative">
             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
             <input
@@ -157,10 +157,10 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue }: {
           </div>
         </div>
         <InputField label="Instansi" required placeholder="Nama instansi" value={value.instansi} onChange={(v) => onChange("instansi", v)} />
-        <InputField label="Jabatan" placeholder="Contoh: Kepala Bidang, Staff, dll" value={value.jabatan ?? ""} onChange={(v) => onChange("jabatan", v)} />
+        <InputField label="Jabatan pada Instansi" placeholder="Contoh: Kepala Bidang, Staff, dll" value={value.jabatan ?? ""} onChange={(v) => onChange("jabatan", v)} />
         <InputField label="Email" required type="email" placeholder="nama@dinas.go.id" value={value.email} onChange={(v) => onChange("email", v)} />
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-gray-600">No. WhatsApp <span className="text-red-500">*</span></label>
+          <label className="text-xs font-semibold text-gray-600">Nomor HP <span className="text-red-500">*</span></label>
           <div className="relative">
             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
             <input
@@ -201,9 +201,9 @@ function ReviewMemberCard({ label, member }: { label: string; member: MemberFiel
           <ReviewRow label="Nama" value={member.nama} />
           <ReviewRow label="Jenis Kelamin" value={member.jenisKelamin} />
           <ReviewRow label="Instansi" value={member.instansi} />
-          {member.jabatan && <ReviewRow label="Jabatan" value={member.jabatan} />}
+          {member.jabatan && <ReviewRow label="Jabatan pada Instansi" value={member.jabatan} />}
           <ReviewRow label="Email" value={member.email} />
-          <ReviewRow label="No. WhatsApp" value={member.noWhatsapp} />
+          <ReviewRow label="Nomor HP" value={member.noWhatsapp} />
         </div>
       )}
     </div>
@@ -261,7 +261,7 @@ function FileUploadField({ value, onChange, error }: { value: File | null; onCha
 // ---------------------------------------------------------------------------
 function downloadTemplate() {
   const csv = [
-    ["Jabatan", "Nama", "Email", "Jenis Kelamin", "No. WhatsApp", "Instansi"],
+    ["Jabatan pada Instansi", "Nama", "Email", "Jenis Kelamin", "Nomor HP", "Instansi"],
     ...([...PIMPINAN_ROLES, ...BIDANG_ROLES].map((r) => [r.label, "", "", "Laki-Laki/Perempuan", "", ""])),
   ].map((r) => r.join(",")).join("\n")
   const blob = new Blob([csv], { type: "text/csv" })
@@ -658,7 +658,7 @@ export default function BuatPokjaPage() {
                           onChange={(v) => updateAnggota(index, "email", v)} 
                         />
                         <InputField 
-                          label="Jabatan" 
+                          label="Jabatan pada Instansi" 
                           required 
                           placeholder="Contoh: Kepala Bidang, Staff, dll" 
                           value={anggota.jabatan || ""} 
@@ -705,7 +705,7 @@ export default function BuatPokjaPage() {
                         </div>
                         <div className="flex flex-col gap-1.5">
                           <label className="text-xs font-semibold text-gray-600">
-                            No. WhatsApp <span className="text-red-500">*</span>
+                            Nomor HP <span className="text-red-500">*</span>
                           </label>
                           <div className="relative">
                             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
@@ -736,7 +736,7 @@ export default function BuatPokjaPage() {
                     type="button"
                     className="flex items-center justify-center gap-2 w-full py-2.5 mt-2 border-2 border-dashed border-gray-300 rounded-lg text-sm font-medium text-gray-500 hover:border-blue-400 hover:text-blue-600 transition"
                   >
-                    <Plus className="w-4 h-4" /> Tambah Anggota Lainnya
+                    <Plus className="w-4 h-4" /> Tambah Anggota
                   </button>
                 </div>
               </div>

@@ -123,7 +123,7 @@ function MemberSection({
           {/* No WA */}
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-gray-600">
-              No. WhatsApp <span className="text-red-500">*</span>
+              Nomor HP <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
@@ -304,7 +304,7 @@ function ReviewMemberCard({ label, member }: { label: string; member: MemberFiel
           <ReviewRow label="Nama" value={member.nama} />
           <ReviewRow label="Email" value={member.email} />
           <ReviewRow label="Jenis Kelamin" value={member.jenisKelamin} />
-          <ReviewRow label="No. WhatsApp" value={member.noWhatsapp} />
+          <ReviewRow label="Nomor HP" value={member.noWhatsapp} />
           <ReviewRow label="Instansi" value={member.instansi} />
         </div>
       )}
@@ -317,7 +317,7 @@ function ReviewMemberCard({ label, member }: { label: string; member: MemberFiel
 // ---------------------------------------------------------------------------
 function downloadTemplate() {
   const csv = [
-    ["Jabatan", "Nama", "Email", "Jenis Kelamin", "No. WhatsApp", "Instansi"],
+    ["Jabatan pada Instansi", "Nama", "Email", "Jenis Kelamin", "Nomor HP", "Instansi"],
     ["Ketua Kelompok Kerja", "", "", "Laki-Laki/Perempuan", "", ""],
     ["Wakil Ketua Kelompok Kerja", "", "", "Laki-Laki/Perempuan", "", ""],
     ["Koordinator", "", "", "Laki-Laki/Perempuan", "", ""],
@@ -708,7 +708,7 @@ label="Wilayah / Nama Kelompok Kerja"
                     className="flex items-center justify-center gap-2 w-full py-2.5 mt-2 rounded-lg border-2 border-dashed border-gray-300 text-sm font-medium text-gray-500 hover:border-blue-400 hover:text-blue-600 transition"
                   >
                     <Plus className="w-4 h-4" />
-                    Tambah Anggota Lainnya
+                    Tambah Anggota
                   </button>
                 )}
               </div>

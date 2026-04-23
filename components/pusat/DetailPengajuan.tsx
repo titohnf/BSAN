@@ -227,7 +227,7 @@ function MemberRow({
           <div className="flex items-start gap-2">
             <Phone className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wide">No. WhatsApp</p>
+              <p className="text-[10px] text-gray-400 uppercase tracking-wide">Nomor HP</p>
               <p className="text-xs text-gray-700">{member.noWhatsapp || "—"}</p>
             </div>
           </div>

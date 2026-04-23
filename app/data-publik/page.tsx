@@ -291,7 +291,7 @@ export default function DataPublikPage() {
                                 <thead>
                                   <tr className="border-b border-slate-200">
                                     <th className="text-left text-xs text-slate-500 pb-2 pr-4 font-medium">Nama</th>
-                                    <th className="text-left text-xs text-slate-500 pb-2 pr-4 font-medium">Jabatan</th>
+                                    <th className="text-left text-xs text-slate-500 pb-2 pr-4 font-medium">Jabatan pada Instansi</th>
                                     <th className="text-left text-xs text-slate-500 pb-2 pr-4 font-medium">Instansi</th>
                                     <th className="text-left text-xs text-slate-500 pb-2 font-medium">Status</th>
                                   </tr>

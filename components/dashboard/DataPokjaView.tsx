@@ -190,7 +190,7 @@ function PokjaDetailDrawer({ pokja, onClose }: { pokja: PokjaItem; onClose: () =
                   <table className="min-w-full text-sm text-left">
                     <thead className="bg-gray-50 border-b border-gray-100">
                       <tr>
-                        {["Posisi / Peran", "Nama", "Email", "Jenis Kelamin", "No. WhatsApp", "Instansi"].map((col) => (
+                        {["Posisi / Peran", "Nama", "Email", "Jenis Kelamin", "Nomor HP", "Instansi"].map((col) => (
                           <th key={col} className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             {col}
                           </th>
@@ -503,7 +503,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                       <table className="min-w-full text-sm text-left">
                         <thead className="bg-gray-50 border-b border-gray-100">
                           <tr>
-                            {["Posisi / Peran", "Nama", "Email", "Jenis Kelamin", "No. WhatsApp", "Instansi"].map((col) => (
+                            {["Posisi / Peran", "Nama", "Email", "Jenis Kelamin", "Nomor HP", "Instansi"].map((col) => (
                               <th key={col} className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
                                 {col}
                               </th>
