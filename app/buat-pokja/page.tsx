@@ -31,15 +31,15 @@ function makeDummyMember(nama: string, email: string, jenisKelamin: "Laki-Laki" 
 }
 
 const DUMMY_MEMBERS: Members = {
-  ketua:       makeDummyMember("Dr. Hendra Kusuma, M.Pd", "hendra.kusuma@dinas-aceh.go.id", "Laki-Laki", "Dinas Pendidikan Prov. Aceh"),
-  wakil:       makeDummyMember("Siti Rahmawati, S.Pd", "siti.rahmawati@dinas-aceh.go.id", "Perempuan", "Dinas Pendidikan Prov. Aceh"),
-  koordinator: makeDummyMember("Ahmad Fauzi, M.Si", "ahmad.fauzi@dinas-aceh.go.id", "Laki-Laki", "Dinas Pendidikan Prov. Aceh"),
-  pendidikan:  makeDummyMember("Nurhayati, S.Pd", "nurhayati@dinas-aceh.go.id", "Perempuan", "Dinas Pendidikan Prov. Aceh"),
-  pppa:        makeDummyMember("Rina Andriani, M.Kes", "rina.andriani@p3a-aceh.go.id", "Perempuan", "Dinas Pemberdayaan Perempuan Prov. Aceh"),
-  sosial:      makeDummyMember("Budi Santoso, S.Sos", "budi.santoso@dinsos-aceh.go.id", "Laki-Laki", "Dinas Sosial Prov. Aceh"),
-  kesehatan:   makeDummyMember("dr. Fitri Yanti", "fitri.yanti@dinkes-aceh.go.id", "Perempuan", "Dinas Kesehatan Prov. Aceh"),
-  kominfo:     makeDummyMember("Rizal Mahendra, S.Kom", "rizal.mahendra@kominfo-aceh.go.id", "Laki-Laki", "Dinas Kominfo Prov. Aceh"),
-  dukbangga:   makeDummyMember("Yuli Astuti, S.E", "yuli.astuti@dukcapil-aceh.go.id", "Perempuan", "Dinas Kependudukan Prov. Aceh"),
+  ketua:       makeDummyMember("Dr. Hendra Kusuma, M.Pd", "hendra.kusuma@dinas-aceh.go.id", "Laki-Laki", "Dinas Pendidikan Provinsi Aceh"),
+  wakil:       makeDummyMember("Siti Rahmawati, S.Pd", "siti.rahmawati@dinas-aceh.go.id", "Perempuan", "Dinas Pendidikan Provinsi Aceh"),
+  koordinator: makeDummyMember("Ahmad Fauzi, M.Si", "ahmad.fauzi@dinas-aceh.go.id", "Laki-Laki", "Dinas Pendidikan Provinsi Aceh"),
+  pendidikan:  makeDummyMember("Nurhayati, S.Pd", "nurhayati@dinas-aceh.go.id", "Perempuan", "Dinas Pendidikan Provinsi Aceh"),
+  pppa:        makeDummyMember("Rina Andriani, M.Kes", "rina.andriani@p3a-aceh.go.id", "Perempuan", "Dinas Pemberdayaan Perempuan Provinsi Aceh"),
+  sosial:      makeDummyMember("Budi Santoso, S.Sos", "budi.santoso@dinsos-aceh.go.id", "Laki-Laki", "Dinas Sosial Provinsi Aceh"),
+  kesehatan:   makeDummyMember("dr. Fitri Yanti", "fitri.yanti@dinkes-aceh.go.id", "Perempuan", "Dinas Kesehatan Provinsi Aceh"),
+  kominfo:     makeDummyMember("Rizal Mahendra, S.Kom", "rizal.mahendra@kominfo-aceh.go.id", "Laki-Laki", "Dinas Kominfo Provinsi Aceh"),
+  dukbangga:   makeDummyMember("Yuli Astuti, S.E", "yuli.astuti@dukcapil-aceh.go.id", "Perempuan", "Dinas Kependudukan Provinsi Aceh"),
 }
 
 const DUMMY_SK = {

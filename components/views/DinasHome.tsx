@@ -108,21 +108,21 @@ function ProvinceTable() {
   useEffect(() => { setTimeout(() => acehRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 300) }, [])
 
   const provinces = [
-    { prov: "Prov. Jateng", pct: 55 }, { prov: "Prov. Jatim", pct: 53 },
-    { prov: "Prov. Jabar", pct: 51 }, { prov: "DKI Jakarta", pct: 48 },
-    { prov: "Prov. Bali", pct: 45 }, { prov: "Prov. Sumut", pct: 47 },
-    { prov: "Prov. Sulsel", pct: 43 }, { prov: "Prov. Sumsel", pct: 43 },
-    { prov: "Prov. Riau", pct: 42 }, { prov: "Prov. DI Yogyakarta", pct: 40 },
-    { prov: "Prov. Kaltim", pct: 36 }, { prov: "Prov. Kalbar", pct: 33 },
-    { prov: "Prov. NTB", pct: 33 }, { prov: "Prov. Sulut", pct: 33 },
-    { prov: "Prov. Lampung", pct: 30 }, { prov: "Prov. Kalsel", pct: 30 },
-    { prov: "Prov. Kepri", pct: 29 }, { prov: "Prov. Jambi", pct: 25 },
-    { prov: "Prov. Kalteng", pct: 25 }, { prov: "Prov. Sulteng", pct: 25 },
-    { prov: "Prov. Bengkulu", pct: 25 }, { prov: "Prov. NTT", pct: 20 },
-    { prov: "Prov. Gorontalo", pct: 20 }, { prov: "Prov. Maluku", pct: 20 },
-    { prov: "Prov. Maluku Utara", pct: 20 }, { prov: "Prov. Babel", pct: 17 },
-    { prov: "Prov. Sultra", pct: 17 }, { prov: "Prov. Papua Barat", pct: 17 },
-    { prov: "Prov. Papua", pct: 13 }, { prov: "Prov. Aceh", pct: 0 },
+    { prov: "Provinsi Jateng", pct: 55 }, { prov: "Provinsi Jatim", pct: 53 },
+    { prov: "Provinsi Jabar", pct: 51 }, { prov: "DKI Jakarta", pct: 48 },
+    { prov: "Provinsi Bali", pct: 45 }, { prov: "Provinsi Sumut", pct: 47 },
+    { prov: "Provinsi Sulsel", pct: 43 }, { prov: "Provinsi Sumsel", pct: 43 },
+    { prov: "Provinsi Riau", pct: 42 }, { prov: "Provinsi DI Yogyakarta", pct: 40 },
+    { prov: "Provinsi Kaltim", pct: 36 }, { prov: "Provinsi Kalbar", pct: 33 },
+    { prov: "Provinsi NTB", pct: 33 }, { prov: "Provinsi Sulut", pct: 33 },
+    { prov: "Provinsi Lampung", pct: 30 }, { prov: "Provinsi Kalsel", pct: 30 },
+    { prov: "Provinsi Kepri", pct: 29 }, { prov: "Provinsi Jambi", pct: 25 },
+    { prov: "Provinsi Kalteng", pct: 25 }, { prov: "Provinsi Sulteng", pct: 25 },
+    { prov: "Provinsi Bengkulu", pct: 25 }, { prov: "Provinsi NTT", pct: 20 },
+    { prov: "Provinsi Gorontalo", pct: 20 }, { prov: "Provinsi Maluku", pct: 20 },
+    { prov: "Provinsi Maluku Utara", pct: 20 }, { prov: "Provinsi Babel", pct: 17 },
+    { prov: "Provinsi Sultra", pct: 17 }, { prov: "Provinsi Papua Barat", pct: 17 },
+    { prov: "Provinsi Papua", pct: 13 }, { prov: "Provinsi Aceh", pct: 0 },
   ]
 
   return (
@@ -130,12 +130,12 @@ function ProvinceTable() {
       {provinces.map((row, i) => (
         <div
           key={row.prov}
-          ref={row.prov === "Prov. Aceh" ? acehRef : null}
-          className={`flex items-center gap-2 px-3 py-2.5 ${row.prov === "Prov. Aceh" ? "bg-blue-50" : ""}`}
+          ref={row.prov === "Provinsi Aceh" ? acehRef : null}
+          className={`flex items-center gap-2 px-3 py-2.5 ${row.prov === "Provinsi Aceh" ? "bg-blue-50" : ""}`}
         >
           <span className="text-xs font-semibold text-gray-400 w-5 flex-shrink-0">{i + 1}</span>
-          <p className={`flex-1 text-xs font-medium truncate ${row.prov === "Prov. Aceh" ? "text-blue-700" : "text-gray-800"}`}>{row.prov}</p>
-          <p className={`text-xs font-bold ${row.prov === "Prov. Aceh" ? "text-blue-600" : "text-gray-600"}`}>{row.pct}%</p>
+          <p className={`flex-1 text-xs font-medium truncate ${row.prov === "Provinsi Aceh" ? "text-blue-700" : "text-gray-800"}`}>{row.prov}</p>
+          <p className={`text-xs font-bold ${row.prov === "Provinsi Aceh" ? "text-blue-600" : "text-gray-600"}`}>{row.pct}%</p>
         </div>
       ))}
     </div>
