@@ -545,7 +545,7 @@ export default function BuatPokjaPage() {
                     onChange={setKanalPengaduan}
                   />
                   <div className="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2.5 flex flex-col gap-1">
-                    <p className="text-xs font-semibold text-amber-900">Nomor ini akan menjadi call center utama POKJA</p>
+                    <p className="text-xs font-semibold text-amber-900">Nomor di atas akan menjadi kontak utama Kelompok Kerja</p>
                     <ul className="text-xs text-amber-800 space-y-0.5 list-disc list-inside">
                       <li>Pastikan nomor aktif dan dapat dihubungi masyarakat</li>
                       <li>Gunakan nomor resmi atas nama institusi, bukan nomor pribadi</li>
