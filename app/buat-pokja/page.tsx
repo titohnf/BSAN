@@ -220,7 +220,7 @@ function FileUploadField({ value, onChange, error }: { value: File | null; onCha
   return (
     <div className="flex flex-col gap-1.5">
       <label className="text-xs font-semibold text-gray-600">
-        Upload Dokumen SK <span className="text-red-500">*</span>
+        Unggah Dokumen SK <span className="text-red-500">*</span>
         <span className="ml-1 font-normal text-gray-400">(PDF, maks. 2MB)</span>
       </label>
       <div
@@ -759,12 +759,12 @@ export default function BuatPokjaPage() {
                       className="h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-gray-600">Periode Mulai <span className="text-red-500">*</span></label>
+                    <label className="text-xs font-semibold text-gray-600">Tanggal Mulai <span className="text-red-500">*</span></label>
                     <input type="date" value={skDetail.periodeMulai} onChange={(e) => setSkDetail((p) => ({ ...p, periodeMulai: e.target.value }))}
                       className="h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-gray-600">Periode Selesai <span className="text-red-500">*</span></label>
+                    <label className="text-xs font-semibold text-gray-600">Tanggal Selesai <span className="text-red-500">*</span></label>
                     <input type="date" value={skDetail.periodeSelesai} onChange={(e) => setSkDetail((p) => ({ ...p, periodeSelesai: e.target.value }))}
                       className="h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
                   </div>

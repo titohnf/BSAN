@@ -224,7 +224,7 @@ function FileUploadField({
   return (
     <div className="flex flex-col gap-1.5">
       <label className="text-xs font-semibold text-gray-600">
-        Upload Dokumen SK <span className="text-red-500">*</span>
+        Unggah Dokumen SK <span className="text-red-500">*</span>
         <span className="ml-1 font-normal text-gray-400">(PDF, maks. 2MB)</span>
       </label>
       <div
@@ -760,7 +760,7 @@ label="Wilayah / Nama Kelompok Kerja"
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-semibold text-gray-600">
-                      Periode Mulai <span className="text-red-500">*</span>
+                      Tanggal Mulai <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
@@ -774,7 +774,7 @@ label="Wilayah / Nama Kelompok Kerja"
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-semibold text-gray-600">
-                      Periode Selesai <span className="text-red-500">*</span>
+                      Tanggal Selesai <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
@@ -874,8 +874,8 @@ label="Wilayah / Nama Kelompok Kerja"
                   </div>
                   <ReviewRow label="Nomor SK" value={skDetail.nomorSK} />
                   <ReviewRow label="Tanggal SK" value={skDetail.tanggalSK} />
-                  <ReviewRow label="Periode Mulai" value={skDetail.periodeMulai} />
-                  <ReviewRow label="Periode Selesai" value={skDetail.periodeSelesai} />
+                  <ReviewRow label="Tanggal Mulai" value={skDetail.periodeMulai} />
+                  <ReviewRow label="Tanggal Selesai" value={skDetail.periodeSelesai} />
                 </div>
               </div>
 
