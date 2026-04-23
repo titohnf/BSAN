@@ -197,7 +197,7 @@ export function DashboardView({
             </div>
             <h3 className="text-base font-bold text-gray-900 mb-2">Belum Ada Kelompok Kerja</h3>
             <p className="text-sm text-gray-500 max-w-md leading-relaxed mb-4">
-              Anda dapat membentuk 1 Kelompok Kerja untuk wilayah {region}. Klik tombol di atas untuk memulai pembentukan Kelompok Kerja.
+              Silakan mulai membuat dan mengajukan pembentukan Kelompok Kerja di wilayah Anda.
             </p>
           </div>
         ) : (
@@ -433,7 +433,7 @@ export function DashboardView({
                           <AlertTriangle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0 mt-0.5" />
                           <div>
                             <p className="text-xs font-semibold text-amber-800">{pending} Belum Diperiksa</p>
-                            <p className="text-xs text-amber-700 mt-0.5">Cek untuk memverifikasi data.</p>
+                            <p className="text-xs text-amber-700 mt-0.5">Cek untuk verifikasi data.</p>
                           </div>
                         </div>
                       </td>
