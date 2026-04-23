@@ -23,47 +23,47 @@ const RUJUKAN_COLORS = ["#10b981", "#8b5cf6", "#f59e0b", "#ef4444", "#64748b"]
 
 // Data provinsi dengan jumlah kab/kota dan pokja yang terbentuk
 const PROVINCE_DATA = [
-  { nama: "Prov. Aceh", totalKabKota: 23, pokjaKabKota: 0 },
-  { nama: "Prov. Bali", totalKabKota: 9, pokjaKabKota: 0 },
-  { nama: "Prov. Banten", totalKabKota: 8, pokjaKabKota: 0 },
-  { nama: "Prov. Bengkulu", totalKabKota: 10, pokjaKabKota: 0 },
-  { nama: "Prov. D.I. Yogyakarta", totalKabKota: 5, pokjaKabKota: 0 },
-  { nama: "Prov. D.K.I. Jakarta", totalKabKota: 1, pokjaKabKota: 0 },
-  { nama: "Prov. Gorontalo", totalKabKota: 6, pokjaKabKota: 0 },
-  { nama: "Prov. Jambi", totalKabKota: 11, pokjaKabKota: 0 },
-  { nama: "Prov. Jawa Barat", totalKabKota: 27, pokjaKabKota: 0 },
-  { nama: "Prov. Jawa Tengah", totalKabKota: 35, pokjaKabKota: 0 },
-  { nama: "Prov. Jawa Timur", totalKabKota: 38, pokjaKabKota: 2 },
-  { nama: "Prov. Kalimantan Barat", totalKabKota: 14, pokjaKabKota: 0 },
-  { nama: "Prov. Kalimantan Selatan", totalKabKota: 13, pokjaKabKota: 0 },
-  { nama: "Prov. Kalimantan Tengah", totalKabKota: 14, pokjaKabKota: 0 },
-  { nama: "Prov. Kalimantan Timur", totalKabKota: 10, pokjaKabKota: 0 },
-  { nama: "Prov. Kalimantan Utara", totalKabKota: 5, pokjaKabKota: 0 },
-  { nama: "Prov. Kepulauan Bangka Belitung", totalKabKota: 7, pokjaKabKota: 0 },
-  { nama: "Prov. Kepulauan Riau", totalKabKota: 7, pokjaKabKota: 0 },
-  { nama: "Prov. Lampung", totalKabKota: 15, pokjaKabKota: 0 },
-  { nama: "Prov. Maluku", totalKabKota: 11, pokjaKabKota: 0 },
-  { nama: "Prov. Maluku Utara", totalKabKota: 10, pokjaKabKota: 0 },
-  { nama: "Prov. Nusa Tenggara Barat", totalKabKota: 10, pokjaKabKota: 0 },
-  { nama: "Prov. Nusa Tenggara Timur", totalKabKota: 22, pokjaKabKota: 0 },
-  { nama: "Prov. Papua", totalKabKota: 29, pokjaKabKota: 0 },
-  { nama: "Prov. Papua Barat", totalKabKota: 13, pokjaKabKota: 0 },
-  { nama: "Prov. Papua Barat Daya", totalKabKota: 5, pokjaKabKota: 0 },
-  { nama: "Prov. Papua Pegunungan", totalKabKota: 8, pokjaKabKota: 0 },
-  { nama: "Prov. Papua Selatan", totalKabKota: 4, pokjaKabKota: 0 },
-  { nama: "Prov. Papua Tengah", totalKabKota: 8, pokjaKabKota: 0 },
-  { nama: "Prov. Riau", totalKabKota: 12, pokjaKabKota: 0 },
-  { nama: "Prov. Sulawesi Barat", totalKabKota: 6, pokjaKabKota: 0 },
-  { nama: "Prov. Sulawesi Selatan", totalKabKota: 24, pokjaKabKota: 0 },
-  { nama: "Prov. Sulawesi Tengah", totalKabKota: 13, pokjaKabKota: 0 },
-  { nama: "Prov. Sulawesi Tenggara", totalKabKota: 17, pokjaKabKota: 0 },
-  { nama: "Prov. Sulawesi Utara", totalKabKota: 15, pokjaKabKota: 0 },
-  { nama: "Prov. Sumatra Barat", totalKabKota: 19, pokjaKabKota: 0 },
-  { nama: "Prov. Sumatra Selatan", totalKabKota: 17, pokjaKabKota: 0 },
-  { nama: "Prov. Sumatra Utara", totalKabKota: 33, pokjaKabKota: 0 },
+  { nama: "Provinsi Aceh", totalKabKota: 23, pokjaKabKota: 0 },
+  { nama: "Provinsi Bali", totalKabKota: 9, pokjaKabKota: 0 },
+  { nama: "Provinsi Banten", totalKabKota: 8, pokjaKabKota: 0 },
+  { nama: "Provinsi Bengkulu", totalKabKota: 10, pokjaKabKota: 0 },
+  { nama: "Provinsi D.I. Yogyakarta", totalKabKota: 5, pokjaKabKota: 0 },
+  { nama: "Provinsi D.K.I. Jakarta", totalKabKota: 1, pokjaKabKota: 0 },
+  { nama: "Provinsi Gorontalo", totalKabKota: 6, pokjaKabKota: 0 },
+  { nama: "Provinsi Jambi", totalKabKota: 11, pokjaKabKota: 0 },
+  { nama: "Provinsi Jawa Barat", totalKabKota: 27, pokjaKabKota: 0 },
+  { nama: "Provinsi Jawa Tengah", totalKabKota: 35, pokjaKabKota: 0 },
+  { nama: "Provinsi Jawa Timur", totalKabKota: 38, pokjaKabKota: 2 },
+  { nama: "Provinsi Kalimantan Barat", totalKabKota: 14, pokjaKabKota: 0 },
+  { nama: "Provinsi Kalimantan Selatan", totalKabKota: 13, pokjaKabKota: 0 },
+  { nama: "Provinsi Kalimantan Tengah", totalKabKota: 14, pokjaKabKota: 0 },
+  { nama: "Provinsi Kalimantan Timur", totalKabKota: 10, pokjaKabKota: 0 },
+  { nama: "Provinsi Kalimantan Utara", totalKabKota: 5, pokjaKabKota: 0 },
+  { nama: "Provinsi Kepulauan Bangka Belitung", totalKabKota: 7, pokjaKabKota: 0 },
+  { nama: "Provinsi Kepulauan Riau", totalKabKota: 7, pokjaKabKota: 0 },
+  { nama: "Provinsi Lampung", totalKabKota: 15, pokjaKabKota: 0 },
+  { nama: "Provinsi Maluku", totalKabKota: 11, pokjaKabKota: 0 },
+  { nama: "Provinsi Maluku Utara", totalKabKota: 10, pokjaKabKota: 0 },
+  { nama: "Provinsi Nusa Tenggara Barat", totalKabKota: 10, pokjaKabKota: 0 },
+  { nama: "Provinsi Nusa Tenggara Timur", totalKabKota: 22, pokjaKabKota: 0 },
+  { nama: "Provinsi Papua", totalKabKota: 29, pokjaKabKota: 0 },
+  { nama: "Provinsi Papua Barat", totalKabKota: 13, pokjaKabKota: 0 },
+  { nama: "Provinsi Papua Barat Daya", totalKabKota: 5, pokjaKabKota: 0 },
+  { nama: "Provinsi Papua Pegunungan", totalKabKota: 8, pokjaKabKota: 0 },
+  { nama: "Provinsi Papua Selatan", totalKabKota: 4, pokjaKabKota: 0 },
+  { nama: "Provinsi Papua Tengah", totalKabKota: 8, pokjaKabKota: 0 },
+  { nama: "Provinsi Riau", totalKabKota: 12, pokjaKabKota: 0 },
+  { nama: "Provinsi Sulawesi Barat", totalKabKota: 6, pokjaKabKota: 0 },
+  { nama: "Provinsi Sulawesi Selatan", totalKabKota: 24, pokjaKabKota: 0 },
+  { nama: "Provinsi Sulawesi Tengah", totalKabKota: 13, pokjaKabKota: 0 },
+  { nama: "Provinsi Sulawesi Tenggara", totalKabKota: 17, pokjaKabKota: 0 },
+  { nama: "Provinsi Sulawesi Utara", totalKabKota: 15, pokjaKabKota: 0 },
+  { nama: "Provinsi Sumatra Barat", totalKabKota: 19, pokjaKabKota: 0 },
+  { nama: "Provinsi Sumatra Selatan", totalKabKota: 17, pokjaKabKota: 0 },
+  { nama: "Provinsi Sumatra Utara", totalKabKota: 33, pokjaKabKota: 0 },
 ]
 
-// Matching menggunakan exact match pada p.nama (yang kini seragam "Prov. X")
+// Matching menggunakan exact match pada p.nama (yang kini seragam "Provinsi X")
 // sehingga tidak perlu map kompleks — cukup cocokkan p.nama === prov.nama
 
 
@@ -72,7 +72,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
   const [entriesPerPage, setEntriesPerPage] = useState(10)
 
   // Hitung pokja per provinsi dari pokjaList secara dinamis
-  // p.nama dan prov.nama sekarang keduanya menggunakan format "Prov. X" — exact match
+  // p.nama dan prov.nama sekarang keduanya menggunakan format "Provinsi X" — exact match
   const enrichedProvinces = PROVINCE_DATA.map((prov) => {
     const matching = pokjaList.filter((p) =>
       p.nama.trim().toLowerCase() === prov.nama.trim().toLowerCase()
@@ -192,7 +192,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
           <div className="px-5 py-4 border-b border-amber-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-amber-600" />
-              <h3 className="text-sm font-semibold text-gray-800">Kelompok Kerja Belum Diperiksa</h3>
+              <h3 className="text-sm font-semibold text-gray-800">Kelompok Kerja Perlu Diperiksa</h3>
               <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-amber-200 text-amber-800 text-xs font-bold">
                 {menunggu}
               </span>
@@ -213,11 +213,11 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-800 truncate">
-                      {(p.data?.region ?? p.nama).replace(/^Prov\.\s*/i, "")}
+                      {(p.data?.region ?? p.nama).replace(/^Provinsi\s*/i, "")}
                     </p>
                   </div>
                   <span className="text-xs text-amber-700 bg-amber-100 px-2 py-1 rounded-full whitespace-nowrap">
-                    Belum Diperiksa
+                    Perlu Diperiksa
                   </span>
                   <ChevronRight className="w-4 h-4 text-amber-400 flex-shrink-0" />
                 </li>
@@ -313,7 +313,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
 
                 const statusConfig = {
                   aktif:    { label: "Aktif",              cls: "bg-green-100 border border-green-300 text-green-700" },
-                  menunggu: { label: "Belum Diperiksa", cls: "bg-amber-100 border border-amber-300 text-amber-700" },
+                  menunggu: { label: "Perlu Diperiksa", cls: "bg-amber-100 border border-amber-300 text-amber-700" },
                   perbaikan:{ label: "Perlu Perbaikan",     cls: "bg-red-100 border border-red-300 text-red-700" },
                   belum:    { label: "Belum Dibentuk",      cls: "bg-gray-100 border border-gray-200 text-gray-500" },
                 }
@@ -323,7 +323,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
                   <tr key={prov.nama} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3.5 text-gray-500">{idx + 1}</td>
                     <td className="px-4 py-3.5 font-medium text-gray-900">
-                      {prov.nama.replace(/^Prov\.\s*/i, "")}
+                      {prov.nama.replace(/^Provinsi\s*/i, "")}
                     </td>
                     <td className="px-4 py-3.5">
                       <span className={`inline-block px-3 py-1 rounded-md text-xs font-medium ${sc.cls}`}>

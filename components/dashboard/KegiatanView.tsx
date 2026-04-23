@@ -90,7 +90,7 @@ export function KegiatanView() {
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h2 className="text-xl font-bold text-gray-900">Kegiatan</h2>
-          <p className="text-xs text-gray-500 mt-0.5">Daftar kegiatan yang diselenggarakan oleh kelompok kerja</p>
+          <p className="text-xs text-gray-500 mt-0.5">Daftar kegiatan yang diselenggarakan oleh Kelompok Kerja</p>
         </div>
         <a
           href="/tambah-kegiatan"
