@@ -202,7 +202,7 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
               disabled={currentPage === 1}
               className="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Prev
+              Sebelumnya
             </button>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button
@@ -222,7 +222,7 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
               disabled={currentPage === totalPages}
               className="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Next
+              Berikutnya
             </button>
           </div>
         </div>
