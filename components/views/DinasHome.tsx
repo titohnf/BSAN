@@ -178,7 +178,7 @@ export function DashboardView({
   return (
     <main className="space-y-4">
       <div className="px-1">
-        <h1 className="text-2xl font-bold text-gray-900">Selamat Datang Admin Dinas Prov {region}</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Selamat Datang Admin Dinas {region}</h1>
       </div>
 
       <Panel>
@@ -304,7 +304,7 @@ export function DashboardView({
                     <div className="flex items-start gap-2 p-3 bg-amber-100/50 rounded-lg border border-amber-300">
                       <AlertTriangle className="w-4 h-4 text-amber-700 flex-shrink-0 mt-0.5" />
                       <p className="text-xs text-amber-800">
-                        <strong>Belum Diperiksa:</strong> Kelompok Kerja Anda sedang dalam proses pemeriksaan oleh admin pusat. Mohon tunggu konfirmasi lebih lanjut.
+                        Pengajuan Kelompok Kerja sedang dalam proses pemeriksaan oleh Pusat.
                       </p>
                     </div>
                   )}
@@ -433,7 +433,7 @@ export function DashboardView({
                           <AlertTriangle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0 mt-0.5" />
                           <div>
                             <p className="text-xs font-semibold text-amber-800">{pending} Belum Diperiksa</p>
-                            <p className="text-xs text-amber-700 mt-0.5">Verifikasi untuk memastikan akurasi.</p>
+                            <p className="text-xs text-amber-700 mt-0.5">Cek untuk memverifikasi data.</p>
                           </div>
                         </div>
                       </td>
@@ -476,13 +476,13 @@ export function DashboardView({
       </Panel>
 
       <Panel>
-        <PanelHeader title="Log Aktivitas" />
+        <PanelHeader title="Riwayat Aktivitas" />
         <div className="px-5 py-4 overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50">
                 <th className="text-left px-3 py-2 font-semibold text-gray-600">Waktu</th>
-                <th className="text-left px-3 py-2 font-semibold text-gray-600">User</th>
+                <th className="text-left px-3 py-2 font-semibold text-gray-600">Pengguna</th>
                 <th className="text-left px-3 py-2 font-semibold text-gray-600">Aksi</th>
               </tr>
             </thead>
