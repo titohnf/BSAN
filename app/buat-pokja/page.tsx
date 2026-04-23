@@ -547,9 +547,8 @@ export default function BuatPokjaPage() {
                   <div className="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2.5 flex flex-col gap-1">
                     <p className="text-xs font-semibold text-amber-900">Nomor di atas akan menjadi kontak utama Kelompok Kerja</p>
                     <ul className="text-xs text-amber-800 space-y-0.5 list-disc list-inside">
-                      <li>Pastikan nomor aktif dan dapat dihubungi masyarakat</li>
+                      <li>Nomor akan dipublikasikan sebagai saluran pengaduan</li>
                       <li>Gunakan nomor resmi atas nama institusi, bukan nomor pribadi</li>
-                      <li>Nomor ini akan dipublikasikan sebagai saluran pengaduan</li>
                     </ul>
                   </div>
                 </div>
