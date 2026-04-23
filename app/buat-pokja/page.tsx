@@ -14,7 +14,7 @@ import {
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
-const REGION = "Prov. Aceh"
+const REGION = "Provinsi Aceh"
 
 const STEPS = [
   { number: 1, label: "Informasi Dasar" },
@@ -469,7 +469,7 @@ export default function BuatPokjaPage() {
             </button>
             <span className="text-gray-300">/</span>
             <h1 className="text-sm font-semibold text-gray-900">
-              {isPerbaikanMode ? "Perbaikan Data Kelompok Kerja" : "Pembentukan Kelompok Kerja"} — {REGION}
+              {isPerbaikanMode ? "Perbaikan Data Kelompok Kerja" : "Pembentukan Kelompok Kerja"} {REGION}
             </h1>
             {isPerbaikanMode && (
               <span className="text-xs font-medium text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">

@@ -51,7 +51,7 @@ function makeMember(jabatan: string, nama: string, email: string, jk: JenisKelam
 export const MOCK_PENGAJUAN: PengajuanPokja[] = [
   {
     id: "pkj-001",
-    wilayah: "Prov. Aceh",
+    wilayah: "Provinsi Aceh",
     provinsi: "Aceh",
     kanalPengaduan: "08111234567",
     nomorSK: "420/001/2024",
@@ -75,7 +75,7 @@ export const MOCK_PENGAJUAN: PengajuanPokja[] = [
   },
   {
     id: "pkj-002",
-    wilayah: "Prov. Sumatera Utara",
+    wilayah: "Provinsi Sumatera Utara",
     provinsi: "Sumatera Utara",
     kanalPengaduan: "08222345678",
     nomorSK: "420/015/2024",
@@ -99,7 +99,7 @@ export const MOCK_PENGAJUAN: PengajuanPokja[] = [
   },
   {
     id: "pkj-003",
-    wilayah: "Prov. DKI Jakarta",
+    wilayah: "Provinsi DKI Jakarta",
     provinsi: "DKI Jakarta",
     kanalPengaduan: "08311234567",
     nomorSK: "420/022/2024",
@@ -123,7 +123,7 @@ export const MOCK_PENGAJUAN: PengajuanPokja[] = [
   },
   {
     id: "pkj-004",
-    wilayah: "Prov. Jawa Barat",
+    wilayah: "Provinsi Jawa Barat",
     provinsi: "Jawa Barat",
     kanalPengaduan: "08411234567",
     nomorSK: "420/031/2024",
@@ -147,7 +147,7 @@ export const MOCK_PENGAJUAN: PengajuanPokja[] = [
   },
   {
     id: "pkj-005",
-    wilayah: "Prov. Jawa Tengah",
+    wilayah: "Provinsi Jawa Tengah",
     provinsi: "Jawa Tengah",
     kanalPengaduan: "08511234567",
     nomorSK: "420/042/2024",

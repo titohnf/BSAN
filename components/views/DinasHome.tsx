@@ -143,7 +143,7 @@ function ProvinceTable() {
 }
 
 export function DashboardView({
-  region = "Prov. Aceh",
+  region = "Provinsi Aceh",
   pokjaList = [],
   targetPokja = 10,
   onBuatPokja,
