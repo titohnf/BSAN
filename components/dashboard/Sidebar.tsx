@@ -20,7 +20,7 @@ const navItems = [
   },
   {
     id: "data-pokja" as ActiveMenu,
-    label: "Data Pokja",
+    label: "Data Kelompok Kerja",
     icon: Users,
   },
   {
@@ -49,7 +49,7 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
         </div>
         <div className="min-w-0">
           <p className="text-white font-semibold text-sm leading-tight truncate">Dinas Pendidikan</p>
-          <p className="text-blue-200 text-xs leading-tight truncate">POKJA Budaya Sekolah</p>
+          <p className="text-blue-200 text-xs leading-tight truncate">Kelompok Kerja Budaya Sekolah</p>
         </div>
       </div>
 

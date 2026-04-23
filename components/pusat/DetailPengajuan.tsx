@@ -114,7 +114,7 @@ function NotifModal({
             </div>
           </div>
           <p className="text-xs text-gray-400 leading-relaxed">
-            Notifikasi telah dikirimkan secara otomatis ke Admin Dinas Pendidikan dan seluruh anggota POKJA terkait.
+            Notifikasi telah dikirimkan secara otomatis ke Admin Dinas Pendidikan dan seluruh anggota Kelompok Kerja terkait.
           </p>
         </div>
 
@@ -227,7 +227,7 @@ function MemberRow({
           <div className="flex items-start gap-2">
             <Phone className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wide">No. WhatsApp</p>
+              <p className="text-[10px] text-gray-400 uppercase tracking-wide">Nomor HP</p>
               <p className="text-xs text-gray-700">{member.noWhatsapp || "—"}</p>
             </div>
           </div>
@@ -360,13 +360,13 @@ export function DetailPengajuan({ item, onClose, onSave }: DetailPengajuanProps)
         <aside
           role="dialog"
           aria-modal="true"
-          aria-label="Detail Pengajuan POKJA"
+          aria-label="Detail Pengajuan Kelompok Kerja"
           className="relative z-10 flex flex-col w-full max-w-2xl h-screen bg-gray-50 shadow-2xl"
         >
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200 flex-shrink-0">
             <div>
-              <h2 className="text-base font-bold text-gray-900">Detail Pengajuan POKJA</h2>
+              <h2 className="text-base font-bold text-gray-900">Detail Pengajuan Kelompok Kerja</h2>
               <p className="text-xs text-gray-500 mt-0.5">{item.wilayah}</p>
             </div>
             <button
@@ -479,7 +479,7 @@ export function DetailPengajuan({ item, onClose, onSave }: DetailPengajuanProps)
                   rows={3}
                   value={globalAlasan}
                   onChange={(e) => setGlobalAlasan(e.target.value)}
-                  placeholder="Tuliskan alasan penolakan keseluruhan pengajuan POKJA ini..."
+                  placeholder="Tuliskan alasan penolakan keseluruhan pengajuan Kelompok Kerja ini..."
                   className="w-full text-sm border border-red-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-red-400 resize-none bg-white"
                 />
               </section>

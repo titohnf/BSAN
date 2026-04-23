@@ -143,7 +143,7 @@ function ProvinceTable() {
 }
 
 export function DashboardView({
-  region = "Prov. Aceh",
+  region = "Provinsi Aceh",
   pokjaList = [],
   targetPokja = 10,
   onBuatPokja,
@@ -178,13 +178,13 @@ export function DashboardView({
   return (
     <main className="space-y-4">
       <div className="px-1">
-        <h1 className="text-2xl font-bold text-gray-900">Selamat Datang Admin Dinas Prov {region}</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Selamat Datang Admin Dinas {region}</h1>
       </div>
 
       <Panel>
-        <PanelHeader title="POKJA">
-          {/* Tampilkan tombol Buat POKJA jika: Admin Pusat (bisa banyak) atau Dinas belum punya */}
-          {total === 0 && <ViewBtn label="Buat POKJA" onClick={onBuatPokja} />}
+        <PanelHeader title="Data Kelompok Kerja">
+          {/* Tampilkan tombol Buat Kelompok Kerja jika: Admin Pusat (bisa banyak) atau Dinas belum punya */}
+          {total === 0 && <ViewBtn label="Buat Kelompok Kerja" onClick={onBuatPokja} />}
         </PanelHeader>
         
         {/* Jika belum ada pokja, tampilkan empty state */}
@@ -195,9 +195,9 @@ export function DashboardView({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
             </div>
-            <h3 className="text-base font-bold text-gray-900 mb-2">Belum Ada POKJA</h3>
+            <h3 className="text-base font-bold text-gray-900 mb-2">Belum Ada Kelompok Kerja</h3>
             <p className="text-sm text-gray-500 max-w-md leading-relaxed mb-4">
-              Anda dapat membentuk 1 POKJA untuk wilayah {region}. Klik tombol di atas untuk memulai pembentukan POKJA.
+              Silakan mulai membuat dan mengajukan pembentukan Kelompok Kerja di wilayah Anda.
             </p>
           </div>
         ) : (
@@ -249,17 +249,17 @@ export function DashboardView({
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${config.badge}`}>
                       {pokja.status === "aktif" ? "Aktif" : 
-                       pokja.status === "masih-diverifikasi" ? "Menunggu Verifikasi" :
-                       pokja.status === "butuh-perbaikan" ? "Butuh Perbaikan" : "Draf"}
+                       pokja.status === "masih-diverifikasi" ? "Belum Diperiksa" :
+                       pokja.status === "butuh-perbaikan" ? "Perlu Perbaikan" : "Draf"}
                     </span>
                   </div>
 
                   {/* Detail Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Ketua POKJA */}
+                    {/* Ketua Kelompok Kerja */}
                     {ketua?.nama && (
                       <div className="bg-white/60 rounded-lg p-3 border border-gray-200">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Ketua POKJA</p>
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Ketua Kelompok Kerja</p>
                         <p className="text-sm font-bold text-gray-900">{ketua.nama}</p>
                         {ketua.instansi && <p className="text-xs text-gray-600 mt-0.5">{ketua.instansi}</p>}
                       </div>
@@ -304,7 +304,7 @@ export function DashboardView({
                     <div className="flex items-start gap-2 p-3 bg-amber-100/50 rounded-lg border border-amber-300">
                       <AlertTriangle className="w-4 h-4 text-amber-700 flex-shrink-0 mt-0.5" />
                       <p className="text-xs text-amber-800">
-                        <strong>Menunggu Verifikasi:</strong> POKJA Anda sedang dalam proses verifikasi oleh admin pusat. Mohon tunggu konfirmasi lebih lanjut.
+                        Pengajuan Kelompok Kerja sedang dalam proses pemeriksaan oleh Pusat.
                       </p>
                     </div>
                   )}
@@ -329,7 +329,7 @@ export function DashboardView({
                           onClick={() => onPerbaikiPokja?.(pokja)}
                           className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors"
                         >
-                          Perbaiki Data POKJA
+                          Perbaiki Data Kelompok Kerja
                         </button>
                       </div>
                     )
@@ -340,7 +340,7 @@ export function DashboardView({
                       <div className="flex items-start gap-2 p-3 bg-green-100/50 rounded-lg border border-green-300">
                         <CheckCircle2 className="w-4 h-4 text-green-700 flex-shrink-0 mt-0.5" />
                         <p className="text-xs text-green-800">
-                          <strong>POKJA Aktif:</strong> POKJA Anda telah diverifikasi dan aktif. Anda dapat mengelola kegiatan dan sumber rujukan.
+                          <strong>Kelompok Kerja Aktif:</strong> Kelompok Kerja Anda telah diverifikasi dan aktif. Anda dapat mengelola kegiatan dan sumber rujukan.
                         </p>
                       </div>
                       <button
@@ -348,7 +348,7 @@ export function DashboardView({
                         onClick={() => onPerbaikiPokja?.(pokja)}
                         className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                       >
-                        Edit Data POKJA
+                        Edit Data Kelompok Kerja
                       </button>
                     </div>
                   )}
@@ -432,8 +432,8 @@ export function DashboardView({
                         <div className="rounded-lg bg-amber-50 border border-amber-200 p-2.5 flex items-start gap-2.5">
                           <AlertTriangle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0 mt-0.5" />
                           <div>
-                            <p className="text-xs font-semibold text-amber-800">{pending} Menunggu Verifikasi</p>
-                            <p className="text-xs text-amber-700 mt-0.5">Verifikasi untuk memastikan akurasi.</p>
+                            <p className="text-xs font-semibold text-amber-800">{pending} Belum Diperiksa</p>
+                            <p className="text-xs text-amber-700 mt-0.5">Cek untuk verifikasi data.</p>
                           </div>
                         </div>
                       </td>
@@ -462,7 +462,7 @@ export function DashboardView({
           <div className="space-y-2">
             <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Kegiatan Mendatang</p>
             {[
-              { tanggal: "14 Jun", judul: "Pelatihan Pokja Baru" },
+              { tanggal: "14 Jun", judul: "Pelatihan Kelompok Kerja Baru" },
               { tanggal: "17 Jun", judul: "Verifikasi Sumber Dukungan" },
               { tanggal: "21 Jun", judul: "Rapat Koordinasi Bulanan" },
             ].map((k, i) => (
@@ -476,21 +476,21 @@ export function DashboardView({
       </Panel>
 
       <Panel>
-        <PanelHeader title="Log Aktivitas" />
+        <PanelHeader title="Riwayat Aktivitas" />
         <div className="px-5 py-4 overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50">
                 <th className="text-left px-3 py-2 font-semibold text-gray-600">Waktu</th>
-                <th className="text-left px-3 py-2 font-semibold text-gray-600">User</th>
+                <th className="text-left px-3 py-2 font-semibold text-gray-600">Pengguna</th>
                 <th className="text-left px-3 py-2 font-semibold text-gray-600">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {[
                 { waktu: "12:45", user: "Admin Dinas", aksi: "Verifikasi Sumber Dukungan" },
-                { waktu: "11:30", user: "Admin Sekolah", aksi: "Upload Dokumen POKJA" },
-                { waktu: "10:15", user: "Admin Dinas", aksi: "Menolak Pengajuan POKJA" },
+                { waktu: "11:30", user: "Admin Sekolah", aksi: "Upload Dokumen Kelompok Kerja" },
+                { waktu: "10:15", user: "Admin Dinas", aksi: "Menolak Pengajuan Kelompok Kerja" },
               ].map((log, i) => (
                 <tr key={i} className="hover:bg-gray-50">
                   <td className="px-3 py-2.5 text-gray-700">{log.waktu}</td>

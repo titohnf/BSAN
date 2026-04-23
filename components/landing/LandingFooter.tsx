@@ -29,7 +29,7 @@ export function LandingFooter() {
             </div>
             <p className="text-slate-400 text-sm leading-relaxed mb-5">
               Sistem Informasi Budaya Sekolah Aman dan Nyaman — Platform pengelolaan
-              POKJA dan pemantauan program perlindungan peserta didik.
+              Kelompok Kerja dan pemantauan program perlindungan peserta didik.
             </p>
             <div className="flex gap-2 flex-wrap">
               {partners.map((p) => (
@@ -87,7 +87,7 @@ export function LandingFooter() {
             © 2025 BSAN — Kementerian Pendidikan, Kebudayaan, Riset dan Teknologi
           </p>
           <p className="text-slate-600 text-xs">
-            Sistem Informasi POKJA Sekolah Aceh
+            Sistem Informasi Kelompok Kerja Sekolah Aceh
           </p>
         </div>
       </div>

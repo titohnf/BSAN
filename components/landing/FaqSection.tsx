@@ -26,9 +26,9 @@ const faqs = [
   },
   {
     id: "pokja",
-    question: "Apa itu POKJA BSAN dan apa fungsinya?",
+    question: "Apa itu Kelompok Kerja BSAN dan apa fungsinya?",
     answer:
-      "POKJA (Kelompok Kerja) BSAN adalah tim yang dibentuk di tingkat dinas pendidikan untuk mengkoordinasikan, memantau, dan mengevaluasi implementasi program BSAN di wilayahnya. POKJA bertugas memastikan setiap sekolah menjalankan program sesuai regulasi.",
+      "Kelompok Kerja BSAN adalah tim yang dibentuk di tingkat dinas pendidikan untuk mengkoordinasikan, memantau, dan mengevaluasi implementasi program BSAN di wilayahnya. Kelompok Kerja bertugas memastikan setiap sekolah menjalankan program sesuai regulasi.",
   },
   {
     id: "pelaporan",
@@ -40,7 +40,7 @@ const faqs = [
     id: "sistem",
     question: "Apa fungsi sistem informasi BSAN ini?",
     answer:
-      "Sistem informasi BSAN memfasilitasi pengelolaan data POKJA, pemantauan implementasi program, pelaporan kasus, dan koordinasi antar pemangku kepentingan secara digital. Sistem ini diakses oleh Dinas Pendidikan, sekolah, dan Pusat Kemendikbud.",
+      "Sistem informasi BSAN memfasilitasi pengelolaan data Kelompok Kerja, pemantauan implementasi program, pelaporan kasus, dan koordinasi antar pemangku kepentingan secara digital. Sistem ini diakses oleh Dinas Pendidikan, sekolah, dan Pusat Kemendikbud.",
   },
 ]
 

@@ -27,7 +27,7 @@ interface KegiatanForm {
 const SEED_DATA = [
   { id: "kg-1", namaKegiatan: "Workshop PKSA", penyelenggara: "SMA Negeri 1 Banda Aceh", waktuKegiatan: "2025-04-15T10:00", deskripsiKegiatan: "Workshop pengenalan isu kekerasan pada anak", dokumentasi: "", status: "selesai" as StatusKegiatan },
   { id: "kg-2", namaKegiatan: "Sosialisasi Hak Anak", penyelenggara: "SMP Negeri 2 Banda Aceh", waktuKegiatan: "2025-06-20T14:00", deskripsiKegiatan: "Sosialisasi hak anak kepada seluruh siswa dan wali kelas", dokumentasi: "", status: "berlangsung" as StatusKegiatan },
-  { id: "kg-3", namaKegiatan: "Rapat Koordinasi Pokja", penyelenggara: "Dinas Pendidikan Prov Aceh", waktuKegiatan: "2025-07-10T09:00", deskripsiKegiatan: "Rapat koordinasi bulanan antar anggota pokja", dokumentasi: "", status: "menunggu" as StatusKegiatan },
+  { id: "kg-3", namaKegiatan: "Rapat Koordinasi Kelompok Kerja", penyelenggara: "Dinas Pendidikan Prov Aceh", waktuKegiatan: "2025-07-10T09:00", deskripsiKegiatan: "Rapat koordinasi bulanan antar anggota kelompok kerja", dokumentasi: "", status: "menunggu" as StatusKegiatan },
 ]
 
 const PENYELENGGARA_OPTIONS = [

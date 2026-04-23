@@ -24,9 +24,9 @@ interface ValidatePokjaDrawerProps {
 
 const STATUS_CONFIG = {
   "belum-dibentuk": { label: "Belum Dibentuk", variant: "neutral" as const },
-  "masih-diverifikasi": { label: "Menunggu Verifikasi", variant: "warning" as const },
+  "masih-diverifikasi": { label: "Belum Diperiksa", variant: "warning" as const },
   aktif: { label: "Aktif", variant: "success" as const },
-  "butuh-perbaikan": { label: "Butuh Perbaikan", variant: "error" as const },
+  "butuh-perbaikan": { label: "Perlu Perbaikan", variant: "error" as const },
 }
 
 function ReviewRow({ label, value }: { label: string; value: string }) {
@@ -54,7 +54,7 @@ function ReviewMemberCard({ label, member }: { label: string; member: MemberFiel
           <ReviewRow label="Nama" value={member.nama} />
           <ReviewRow label="Email" value={member.email} />
           <ReviewRow label="Jenis Kelamin" value={member.jenisKelamin} />
-          <ReviewRow label="No. WhatsApp" value={member.noWhatsapp} />
+          <ReviewRow label="Nomor HP" value={member.noWhatsapp} />
           <ReviewRow label="Instansi" value={member.instansi} />
         </div>
       )}
@@ -101,7 +101,7 @@ export function ValidatePokjaDrawer({ pokja, onClose, onSave }: ValidatePokjaDra
           {(pokja.status === "butuh-perbaikan" || pokja.status === "aktif") && pokja.alasanPenolakan && (
             <div>
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Alasan Butuh Perbaikan</p>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Alasan Perlu Perbaikan</p>
               </div>
               <div className="rounded-xl border border-red-200 bg-red-50 p-4">
                 <p className="text-sm font-medium text-red-800">{pokja.alasanPenolakan}</p>
@@ -145,10 +145,10 @@ export function ValidatePokjaDrawer({ pokja, onClose, onSave }: ValidatePokjaDra
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="text-left px-4 py-2 text-xs font-semibold text-gray-500">Jabatan</th>
+                    <th className="text-left px-4 py-2 text-xs font-semibold text-gray-500">Jabatan pada Instansi</th>
                     <th className="text-left px-4 py-2 text-xs font-semibold text-gray-500">Nama</th>
                     <th className="text-left px-4 py-2 text-xs font-semibold text-gray-500">Email</th>
-                    <th className="text-left px-4 py-2 text-xs font-semibold text-gray-500">No. WhatsApp</th>
+                    <th className="text-left px-4 py-2 text-xs font-semibold text-gray-500">Nomor HP</th>
                     <th className="text-left px-4 py-2 text-xs font-semibold text-gray-500">Instansi</th>
                   </tr>
                 </thead>

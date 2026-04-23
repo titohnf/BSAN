@@ -26,9 +26,9 @@ import { ALL_ROLES } from "@/types/pokja"
 // ---------------------------------------------------------------------------
 const STATUS_CONFIG = {
   "belum-dibentuk": { label: "Belum Dibentuk", variant: "neutral" as const, icon: Clock },
-  "masih-diverifikasi": { label: "Menunggu Verifikasi", variant: "warning" as const, icon: Clock },
+  "masih-diverifikasi": { label: "Belum Diperiksa", variant: "warning" as const, icon: Clock },
   aktif: { label: "Aktif", variant: "success" as const, icon: CheckCircle2 },
-  "butuh-perbaikan": { label: "Butuh Perbaikan", variant: "error" as const, icon: XCircle },
+  "butuh-perbaikan": { label: "Perlu Perbaikan", variant: "error" as const, icon: XCircle },
 }
 
 const ROLE_BADGE_MAP: Record<string, "informational" | "success" | "warning" | "neutral"> = {
@@ -63,20 +63,19 @@ function EmptyStatePokja({ onBuatPokja }: { onBuatPokja: () => void }) {
       <div className="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center mb-5">
         <Users className="w-9 h-9 text-blue-400" />
       </div>
-      <h3 className="text-lg font-bold text-gray-800 mb-2">POKJA Belum Dibentuk</h3>
+      <h3 className="text-lg font-bold text-gray-800 mb-2">Kelompok Kerja Belum Dibentuk</h3>
       <p className="text-sm text-gray-500 max-w-sm leading-relaxed mb-6">
-        Data POKJA Budaya Sekolah Aman dan Nyaman untuk wilayah Anda belum tersedia.
-        Mulai pembentukan POKJA dengan mengisi data yang diperlukan.
+        Silakan mulai membuat dan mengajukan pembentukan Kelompok Kerja di wilayah Anda.
       </p>
       <Button color="blue" size="md" icon={PlusCircle} onClick={onBuatPokja}>
-        Buat POKJA Sekarang
+        Buat Kelompok Kerja
       </Button>
     </div>
   )
 }
 
 // ---------------------------------------------------------------------------
-// Detail drawer for one POKJA
+// Detail drawer for one Kelompok Kerja
 // ---------------------------------------------------------------------------
 function PokjaDetailDrawer({ pokja, onClose }: { pokja: PokjaItem; onClose: () => void }) {
   const [search, setSearch] = useState("")
@@ -191,7 +190,7 @@ function PokjaDetailDrawer({ pokja, onClose }: { pokja: PokjaItem; onClose: () =
                   <table className="min-w-full text-sm text-left">
                     <thead className="bg-gray-50 border-b border-gray-100">
                       <tr>
-                        {["Posisi / Peran", "Nama", "Email", "Jenis Kelamin", "No. WhatsApp", "Instansi"].map((col) => (
+                        {["Posisi / Peran", "Nama", "Email", "Jenis Kelamin", "Nomor HP", "Instansi"].map((col) => (
                           <th key={col} className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
                             {col}
                           </th>
@@ -303,11 +302,11 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
     <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <h2 className="text-xl font-bold text-gray-900">Data Pokja Wilayah</h2>
-        {/* Hanya tampilkan tombol buat POKJA untuk admin pusat */}
+        <h2 className="text-xl font-bold text-gray-900">Data Kelompok Kerja</h2>
+        {/* Hanya tampilkan tombol buat Kelompok Kerja untuk admin pusat */}
         {isAdminPusat && (
           <Button color="blue" size="sm" icon={PlusCircle} onClick={onBuatPokja}>
-            Buat POKJA Baru
+            Buat Kelompok Kerja Baru
           </Button>
         )}
       </div>
@@ -338,7 +337,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex-shrink-0"
                 >
                   <Pencil className="w-4 h-4" />
-                  Edit Data POKJA
+                  Edit Data Kelompok Kerja
                 </button>
               )}
             </div>
@@ -358,7 +357,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                         </p>
                       )}
                       {!logTolak?.alasan && (
-                        <p className="text-sm text-red-600">Silakan perbaiki data POKJA Anda dan ajukan kembali.</p>
+                        <p className="text-sm text-red-600">Silakan perbaiki data Kelompok Kerja Anda dan ajukan kembali.</p>
                       )}
                     </div>
                   </div>
@@ -369,7 +368,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors"
                     >
                       <FileText className="w-4 h-4" />
-                      Perbaiki Data POKJA
+                      Perbaiki Data Kelompok Kerja
                     </button>
                   </div>
                 </div>
@@ -378,7 +377,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
 
             {/* Grid info utama */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Ketua POKJA */}
+              {/* Ketua Kelompok Kerja */}
               {pokja.data?.members?.ketua?.nama && (
                 <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl p-4 border border-blue-200">
                   <div className="flex items-start gap-3">
@@ -386,7 +385,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                       <Users className="w-5 h-5 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-1">Ketua POKJA</p>
+                      <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-1">Ketua Kelompok Kerja</p>
                       <p className="text-base font-bold text-gray-900 truncate">{pokja.data.members.ketua.nama}</p>
                       {pokja.data.members.ketua.instansi && (
                         <p className="text-xs text-gray-600 mt-0.5 truncate">{pokja.data.members.ketua.instansi}</p>
@@ -466,7 +465,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 border-b border-gray-100 bg-gray-50">
                 <h3 className="text-base font-bold text-gray-800">
-                  Daftar Anggota POKJA
+                  Daftar Anggota Kelompok Kerja
                   <span className="ml-2 text-sm font-normal text-gray-500">
                     ({pokja.data?.members ? toTableRows(pokja.data.members).length : 0} anggota)
                   </span>
@@ -504,7 +503,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                       <table className="min-w-full text-sm text-left">
                         <thead className="bg-gray-50 border-b border-gray-100">
                           <tr>
-                            {["Posisi / Peran", "Nama", "Email", "Jenis Kelamin", "No. WhatsApp", "Instansi"].map((col) => (
+                            {["Posisi / Peran", "Nama", "Email", "Jenis Kelamin", "Nomor HP", "Instansi"].map((col) => (
                               <th key={col} className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
                                 {col}
                               </th>
@@ -633,7 +632,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
             {/* Search bar */}
             <div className="px-5 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <p className="text-sm text-gray-500">
-                <span className="font-semibold text-gray-700">{pokjaList.length}</span> POKJA terdaftar
+                <span className="font-semibold text-gray-700">{pokjaList.length}</span> Kelompok Kerja terdaftar
               </p>
               <div className="relative w-full sm:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
@@ -641,7 +640,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Cari nama pokja, ketua, SK..."
+                  placeholder="Cari nama kelompok kerja, ketua, SK..."
                   className="w-full pl-8 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                 />
               </div>
@@ -652,7 +651,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
               <table className="min-w-full text-sm text-left">
                 <thead className="bg-gray-50 border-b border-gray-100">
                   <tr>
-                    {["No", "Nama POKJA", "Wilayah", "Jumlah Anggota", "Ketua POKJA", "Nomor SK", "Kontak Pokja", "Status", "Aksi"].map((col) => (
+                    {["No", "Nama Kelompok Kerja", "Wilayah", "Jumlah Anggota", "Ketua Kelompok Kerja", "Nomor SK", "Kontak Kelompok Kerja", "Status", "Aksi"].map((col) => (
                       <th key={col} className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
                         {col}
                       </th>
@@ -673,7 +672,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                         {/* No */}
                         <td className="px-4 py-3.5 text-gray-400 text-xs w-10">{idx + 1}</td>
 
-                        {/* Nama POKJA */}
+                        {/* Nama Kelompok Kerja */}
                         <td className="px-4 py-3.5">
                           <p className="font-semibold text-gray-900 whitespace-nowrap">{pokja.nama}</p>
                         </td>
@@ -696,7 +695,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                           )}
                         </td>
 
-                        {/* Ketua POKJA */}
+                        {/* Ketua Kelompok Kerja */}
                         <td className="px-4 py-3.5">
                           {ketua?.nama ? (
                             <div>
@@ -727,7 +726,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                           )}
                         </td>
 
-                        {/* Kontak Pokja */}
+                        {/* Kontak Kelompok Kerja */}
                         <td className="px-4 py-3.5">
                           {kanal ? (
                             <a
@@ -757,7 +756,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                               className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-600 hover:text-amber-800 transition-colors"
                             >
                               <Eye className="w-3.5 h-3.5" />
-                              Validasi
+                              Periksa
                             </button>
                           ) : (
                             <button
@@ -765,7 +764,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                               className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors"
                             >
                               <Eye className="w-3.5 h-3.5" />
-                              Lihat Detail
+                              Cek Detail
                             </button>
                           )}
                         </td>

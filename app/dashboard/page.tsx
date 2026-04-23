@@ -25,7 +25,7 @@ import type { PokjaItem, PokjaData } from "@/types/pokja"
 type AdminRole = "dinas" | "pusat" | "sekolah"
 type DinaMenu = "dashboard" | "data-pokja" | "sumber-rujukan" | "kActivities"
 
-const REGION = "Prov. Aceh"
+const REGION = "Provinsi Aceh"
 
 const emptyMember = () => ({ nama: "", email: "", jenisKelamin: "" as "", noWhatsapp: "", instansi: "", jabatan: "" })
 
@@ -38,10 +38,10 @@ const B = (id: string, nama: string): PokjaItem => ({
 
 const MOCK_POKJA_LIST: PokjaItem[] = [
   {
-    id: "p1", nama: "Prov. Jawa Timur", status: "aktif", tanggalDiverifikasi: "2024-03-15",
+    id: "p1", nama: "Provinsi Jawa Timur", status: "aktif", tanggalDiverifikasi: "2024-03-15",
     validasiLog: [{ tanggal: "2024-03-15", aksi: "terima", aktor: "admin_pusat" }],
     data: {
-      region: "Prov. Jawa Timur", nomorKanal: "0812xxx",
+      region: "Provinsi Jawa Timur", nomorKanal: "0812xxx",
       members: {
         ketua:       { nama: "Dr. Budi Santoso, M.Si",      email: "budi@jatim.go.id",   jenisKelamin: "Laki-Laki" as const,  noWhatsapp: "08121234567", instansi: "Dinas Pendidikan Prov. Jawa Timur",  jabatan: "Ketua" },
         wakil:       { nama: "Ibu Siti Rahayu, M.Pd",       email: "siti@jatim.go.id",   jenisKelamin: "Perempuan" as const,  noWhatsapp: "08121234568", instansi: "Dinas Pendidikan Prov. Jawa Timur",  jabatan: "Wakil Ketua" },
@@ -357,7 +357,7 @@ function DashboardPageInner() {
       const today = new Date().toISOString().slice(0, 10)
       const isEdit = parsed.prevStatus === "aktif"
       const defaultAlasan = isEdit
-        ? "Data POKJA diperbarui dan diajukan ulang untuk verifikasi"
+        ? "Data Kelompok Kerja diperbarui dan diajukan ulang untuk verifikasi"
         : "Data diperbaiki dan diajukan kembali"
       const logPerbaiki = {
         tanggal: today,

@@ -105,7 +105,7 @@ export default function DataPublikPage() {
   }
 
   const exportCSV = () => {
-    const header = ["No", "Provinsi", "Status POKJA", "Jml Kab/Kota", "POKJA Kab/Kota", "Persentase"]
+    const header = ["No", "Provinsi", "Status Kelompok Kerja", "Jml Kab/Kota", "Kelompok Kerja Kab/Kota", "Persentase"]
     const rows = PROVINSI_DATA.map((r) => [
       r.no,
       r.provinsi,
@@ -119,7 +119,7 @@ export default function DataPublikPage() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = "data-pokja-provinsi.csv"
+    a.download = "data-kelompok-kerja-provinsi.csv"
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -138,9 +138,9 @@ export default function DataPublikPage() {
               <ArrowLeft className="w-4 h-4" />
               Kembali ke Beranda
             </button>
-            <h1 className="text-3xl md:text-4xl font-bold text-white">Data Publik POKJA BSAN</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-white">Data Publik Kelompok Kerja BSAN</h1>
             <p className="mt-2 text-blue-200 text-base max-w-xl">
-              Data pembentukan Kelompok Kerja (POKJA) Budaya Sekolah Aman dan Nyaman
+              Data pembentukan Kelompok Kerja Budaya Sekolah Aman dan Nyaman
               seluruh provinsi di Indonesia.
             </p>
           </div>
@@ -189,7 +189,7 @@ export default function DataPublikPage() {
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
-                <h2 className="font-semibold text-slate-900">POKJA per Provinsi</h2>
+                <h2 className="font-semibold text-slate-900">Kelompok Kerja per Provinsi</h2>
                 <p className="text-slate-400 text-xs mt-0.5">
                   Menampilkan {paged.length} dari {filtered.length} provinsi
                 </p>
@@ -222,9 +222,9 @@ export default function DataPublikPage() {
                 <TableRow className="bg-slate-50/70 hover:bg-slate-50/70">
                   <TableHead className="w-10 text-slate-500 text-xs pl-5">No</TableHead>
                   <TableHead className="text-slate-500 text-xs">Provinsi</TableHead>
-                  <TableHead className="text-slate-500 text-xs">Status POKJA</TableHead>
+                  <TableHead className="text-slate-500 text-xs">Status Kelompok Kerja</TableHead>
                   <TableHead className="text-slate-500 text-xs text-right">Jml Kab/Kota</TableHead>
-                  <TableHead className="text-slate-500 text-xs text-right">POKJA Kab/Kota</TableHead>
+                  <TableHead className="text-slate-500 text-xs text-right">Kelompok Kerja Kab/Kota</TableHead>
                   <TableHead className="text-slate-500 text-xs text-right">Persentase</TableHead>
                   <TableHead className="w-10" />
                 </TableRow>
@@ -284,14 +284,14 @@ export default function DataPublikPage() {
                         <TableRow className="bg-blue-50/40 hover:bg-blue-50/40">
                           <TableCell colSpan={7} className="px-5 py-4">
                             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
-                              Anggota POKJA — {row.provinsi}
+                              Anggota Kelompok Kerja — {row.provinsi}
                             </p>
                             <div className="overflow-x-auto">
                               <table className="w-full text-sm">
                                 <thead>
                                   <tr className="border-b border-slate-200">
                                     <th className="text-left text-xs text-slate-500 pb-2 pr-4 font-medium">Nama</th>
-                                    <th className="text-left text-xs text-slate-500 pb-2 pr-4 font-medium">Jabatan</th>
+                                    <th className="text-left text-xs text-slate-500 pb-2 pr-4 font-medium">Jabatan pada Instansi</th>
                                     <th className="text-left text-xs text-slate-500 pb-2 pr-4 font-medium">Instansi</th>
                                     <th className="text-left text-xs text-slate-500 pb-2 font-medium">Status</th>
                                   </tr>

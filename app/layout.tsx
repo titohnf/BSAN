@@ -7,8 +7,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Admin Dashboard — POKJA Budaya Sekolah Aman dan Nyaman',
-  description: 'Dashboard Admin Dinas Pendidikan untuk manajemen POKJA Budaya Sekolah Aman dan Nyaman.',
+  title: 'Admin Dashboard — Kelompok Kerja Budaya Sekolah Aman dan Nyaman',
+  description: 'Dashboard Admin Dinas Pendidikan untuk manajemen Kelompok Kerja Budaya Sekolah Aman dan Nyaman.',
   generator: 'v0.app',
   icons: {
     icon: [

@@ -10,17 +10,17 @@ interface DaftarPengajuanViewProps {
 
 const STATUS_CONFIG: Record<PokjaStatus, { label: string; color: string; bg: string; icon: React.ElementType }> = {
   "belum-dibentuk": { label: "Belum Dibentuk", color: "text-gray-700", bg: "bg-gray-50 border-gray-200", icon: Building },
-  "masih-diverifikasi": { label: "Menunggu Verifikasi", color: "text-amber-700", bg: "bg-amber-50 border-amber-200", icon: Clock },
+  "masih-diverifikasi": { label: "Belum Diperiksa", color: "text-amber-700", bg: "bg-amber-50 border-amber-200", icon: Clock },
   aktif: { label: "Aktif", color: "text-emerald-700", bg: "bg-emerald-50 border-emerald-200", icon: CheckCircle2 },
-  "butuh-perbaikan": { label: "Butuh Perbaikan", color: "text-red-700", bg: "bg-red-50 border-red-200", icon: XCircle },
+  "butuh-perbaikan": { label: "Perlu Perbaikan", color: "text-red-700", bg: "bg-red-50 border-red-200", icon: XCircle },
 }
 
 const STATUS_FILTER_OPTIONS: { value: PokjaStatus | "semua"; label: string }[] = [
   { value: "semua", label: "Semua Status" },
   { value: "belum-dibentuk", label: "Belum Dibentuk" },
-  { value: "masih-diverifikasi", label: "Menunggu Verifikasi" },
+  { value: "masih-diverifikasi", label: "Belum Diperiksa" },
   { value: "aktif", label: "Aktif" },
-  { value: "butuh-perbaikan", label: "Butuh Perbaikan" },
+  { value: "butuh-perbaikan", label: "Perlu Perbaikan" },
 ]
 
 
@@ -88,7 +88,7 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Data POKJA</h1>
+          <h1 className="text-xl font-bold text-gray-900">Data Kelompok Kerja</h1>
           <p className="text-sm text-gray-500 mt-0.5">Kelola data Kelompok Kerja di seluruh Indonesia</p>
         </div>
       </div>
@@ -123,15 +123,15 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-400">
             <Search className="w-8 h-8" />
-            <p className="text-sm">Tidak ada POKJA ditemukan</p>
+            <p className="text-sm">Tidak ada Kelompok Kerja ditemukan</p>
           </div>
         ) : (
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50">
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Wilayah Pokja</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Wilayah</th>
                 <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Tanggal Diverifikasi</th>
-                <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Tgl Berakhir SK</th>
+                <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Tanggal SK Selesai</th>
                 <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
                 <th className="px-3 py-3" />
               </tr>
@@ -179,7 +179,7 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
                         onClick={() => onSelect(p)}
                         className="text-xs px-3 py-1.5 rounded-lg font-medium transition-colors bg-slate-100 text-slate-700 hover:bg-slate-200"
                       >
-                        {p.effectiveStatus === "masih-diverifikasi" ? "Validasi" : "Lihat Detail"}
+                        {p.effectiveStatus === "masih-diverifikasi" ? "Periksa" : "Cek Detail"}
                       </button>
                     </td>
                   </tr>
@@ -194,7 +194,7 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
       {totalPages > 1 && (
         <div className="flex items-center justify-between pt-2">
           <p className="text-xs text-gray-500">
-            Menampilkan {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filtered.length)} dari {filtered.length} POKJA
+            Menampilkan {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filtered.length)} dari {filtered.length} Kelompok Kerja
           </p>
           <div className="flex items-center gap-1">
             <button
@@ -229,7 +229,7 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
       )}
 
       {totalPages <= 1 && (
-        <p className="text-xs text-gray-400 text-right">Menampilkan {filtered.length} dari {pokjaList.length} POKJA</p>
+        <p className="text-xs text-gray-400 text-right">Menampilkan {filtered.length} dari {pokjaList.length} Kelompok Kerja</p>
       )}
     </div>
   )

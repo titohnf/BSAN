@@ -155,7 +155,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
       {/* Title */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Dashboard Admin Pusat</h1>
-        <p className="text-sm text-gray-500 mt-1">Pantau status pembentukan POKJA di seluruh Indonesia</p>
+        <p className="text-sm text-gray-500 mt-1">Pantau status pembentukan Kelompok Kerja di seluruh Indonesia</p>
       </div>
 
       {/* Header Stats - 3 cards */}
@@ -192,7 +192,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
           <div className="px-5 py-4 border-b border-amber-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-amber-600" />
-              <h3 className="text-sm font-semibold text-gray-800">POKJA Menunggu Verifikasi</h3>
+              <h3 className="text-sm font-semibold text-gray-800">Kelompok Kerja Belum Diperiksa</h3>
               <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-amber-200 text-amber-800 text-xs font-bold">
                 {menunggu}
               </span>
@@ -217,7 +217,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
                     </p>
                   </div>
                   <span className="text-xs text-amber-700 bg-amber-100 px-2 py-1 rounded-full whitespace-nowrap">
-                    Menunggu Verifikasi
+                    Belum Diperiksa
                   </span>
                   <ChevronRight className="w-4 h-4 text-amber-400 flex-shrink-0" />
                 </li>
@@ -229,12 +229,12 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
       {/* Tabel Provinsi dengan Header */}
       <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
         <div className="px-6 py-5 border-b border-gray-100 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-1">Jumlah Kelompok Kerja tiap Provinsi</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-1">Jumlah Kelompok Kerja Tiap Provinsi</h2>
           <p className="text-sm text-gray-500">
             per {new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" })}
           </p>
           <p className="text-xs text-gray-400 mt-1">
-            [Update terakhir: {new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" })}]
+            [Terakhir diperbarui: {new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" })}]
           </p>
         </div>
 
@@ -281,12 +281,12 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
                 </th>
                 <th className="px-4 py-3 text-left">
                   <button className="flex items-center gap-1 text-xs font-semibold text-gray-600 uppercase tracking-wide hover:text-gray-900">
-                    Nama Provinsi
+                    Wilayah
                   </button>
                 </th>
                 <th className="px-4 py-3 text-left">
                   <button className="flex items-center gap-1 text-xs font-semibold text-gray-600 uppercase tracking-wide hover:text-gray-900">
-                    Status Pokja
+                    Status
                   </button>
                 </th>
                 <th className="px-4 py-3 text-center">
@@ -296,7 +296,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
                 </th>
                 <th className="px-4 py-3 text-center">
                   <button className="flex items-center gap-1 text-xs font-semibold text-gray-600 uppercase tracking-wide hover:text-gray-900 mx-auto">
-                    Pokja Kota/Kab
+                    Jumlah Kelompok Kerja per Kota/Kab
                   </button>
                 </th>
                 <th className="px-4 py-3 text-center">
@@ -313,9 +313,9 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
 
                 const statusConfig = {
                   aktif:    { label: "Aktif",              cls: "bg-green-100 border border-green-300 text-green-700" },
-                  menunggu: { label: "Menunggu Verifikasi", cls: "bg-amber-100 border border-amber-300 text-amber-700" },
-                  perbaikan:{ label: "Butuh Perbaikan",     cls: "bg-red-100 border border-red-300 text-red-700" },
-                  belum:    { label: "Belum",               cls: "bg-gray-100 border border-gray-200 text-gray-500" },
+                  menunggu: { label: "Belum Diperiksa", cls: "bg-amber-100 border border-amber-300 text-amber-700" },
+                  perbaikan:{ label: "Perlu Perbaikan",     cls: "bg-red-100 border border-red-300 text-red-700" },
+                  belum:    { label: "Belum Dibentuk",      cls: "bg-gray-100 border border-gray-200 text-gray-500" },
                 }
                 const sc = statusConfig[prov.statusProv]
 
@@ -417,10 +417,10 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
         </div>
       </div>
 
-      {/* Activities */}
+      {/* Kegiatan */}
       <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-gray-800">Activities</h3>
+          <h3 className="text-sm font-semibold text-gray-800">Kegiatan</h3>
           {onViewActivities && (
             <button onClick={onViewActivities} className="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1">
               Kelola <ChevronRight className="w-3.5 h-3.5" />
@@ -436,7 +436,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
             </div>
           </div>
           <div className="space-y-2">
-            <p className="text-xs font-semibold text-gray-600 uppercase">Activities Mendatang</p>
+            <p className="text-xs font-semibold text-gray-600 uppercase">Kegiatan Mendatang</p>
             {[{tanggal:"14 Jun",judul:"Pelatihan"},{tanggal:"17 Jun",judul:"Verifikasi"},{tanggal:"21 Jun",judul:"Rapat"}].map((k,i)=>(
               <div key={i} className="p-2.5 rounded-lg bg-gray-50 border border-gray-100">
                 <p className="text-xs font-medium text-gray-700">{k.judul}</p>

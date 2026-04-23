@@ -148,7 +148,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-6">
-          Dinas Pendidikan &mdash; Sistem Informasi POKJA
+          Dinas Pendidikan &mdash; Sistem Informasi Kelompok Kerja
         </p>
       </div>
     </main>

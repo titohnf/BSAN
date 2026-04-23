@@ -14,13 +14,13 @@ import {
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
-const REGION = "Prov. Aceh"
+const REGION = "Provinsi Aceh"
 
 const STEPS = [
   { number: 1, label: "Informasi Dasar" },
   { number: 2, label: "Susunan Pengurus" },
   { number: 3, label: "Dokumen SK" },
-  { number: 4, label: "Review Data" },
+  { number: 4, label: "Tinjau Data" },
 ]
 
 // ---------------------------------------------------------------------------
@@ -105,10 +105,10 @@ function MemberSection({ label, value, onChange }: {
           </div>
         </div>
         <InputField label="Instansi" required placeholder="Nama instansi" value={value.instansi} onChange={(v) => onChange("instansi", v)} />
-        <InputField label="Jabatan" placeholder="Contoh: Kepala Bidang, Staff, dll" value={value.jabatan ?? ""} onChange={(v) => onChange("jabatan", v)} />
+        <InputField label="Jabatan pada Instansi" placeholder="Contoh: Kepala Bidang, Staff, dll" value={value.jabatan ?? ""} onChange={(v) => onChange("jabatan", v)} />
         <InputField label="Email" required type="email" placeholder="nama@dinas.go.id" value={value.email} onChange={(v) => onChange("email", v)} />
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-gray-600">No. WhatsApp <span className="text-red-500">*</span></label>
+          <label className="text-xs font-semibold text-gray-600">Nomor HP <span className="text-red-500">*</span></label>
           <div className="relative">
             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
             <input
@@ -157,10 +157,10 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue }: {
           </div>
         </div>
         <InputField label="Instansi" required placeholder="Nama instansi" value={value.instansi} onChange={(v) => onChange("instansi", v)} />
-        <InputField label="Jabatan" placeholder="Contoh: Kepala Bidang, Staff, dll" value={value.jabatan ?? ""} onChange={(v) => onChange("jabatan", v)} />
+        <InputField label="Jabatan pada Instansi" placeholder="Contoh: Kepala Bidang, Staff, dll" value={value.jabatan ?? ""} onChange={(v) => onChange("jabatan", v)} />
         <InputField label="Email" required type="email" placeholder="nama@dinas.go.id" value={value.email} onChange={(v) => onChange("email", v)} />
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-gray-600">No. WhatsApp <span className="text-red-500">*</span></label>
+          <label className="text-xs font-semibold text-gray-600">Nomor HP <span className="text-red-500">*</span></label>
           <div className="relative">
             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
             <input
@@ -201,9 +201,9 @@ function ReviewMemberCard({ label, member }: { label: string; member: MemberFiel
           <ReviewRow label="Nama" value={member.nama} />
           <ReviewRow label="Jenis Kelamin" value={member.jenisKelamin} />
           <ReviewRow label="Instansi" value={member.instansi} />
-          {member.jabatan && <ReviewRow label="Jabatan" value={member.jabatan} />}
+          {member.jabatan && <ReviewRow label="Jabatan pada Instansi" value={member.jabatan} />}
           <ReviewRow label="Email" value={member.email} />
-          <ReviewRow label="No. WhatsApp" value={member.noWhatsapp} />
+          <ReviewRow label="Nomor HP" value={member.noWhatsapp} />
         </div>
       )}
     </div>
@@ -220,7 +220,7 @@ function FileUploadField({ value, onChange, error }: { value: File | null; onCha
   return (
     <div className="flex flex-col gap-1.5">
       <label className="text-xs font-semibold text-gray-600">
-        Upload Dokumen SK <span className="text-red-500">*</span>
+        Unggah Dokumen SK <span className="text-red-500">*</span>
         <span className="ml-1 font-normal text-gray-400">(PDF, maks. 2MB)</span>
       </label>
       <div
@@ -261,12 +261,12 @@ function FileUploadField({ value, onChange, error }: { value: File | null; onCha
 // ---------------------------------------------------------------------------
 function downloadTemplate() {
   const csv = [
-    ["Jabatan", "Nama", "Email", "Jenis Kelamin", "No. WhatsApp", "Instansi"],
+    ["Jabatan pada Instansi", "Nama", "Email", "Jenis Kelamin", "Nomor HP", "Instansi"],
     ...([...PIMPINAN_ROLES, ...BIDANG_ROLES].map((r) => [r.label, "", "", "Laki-Laki/Perempuan", "", ""])),
   ].map((r) => r.join(",")).join("\n")
   const blob = new Blob([csv], { type: "text/csv" })
   const url = URL.createObjectURL(blob)
-  const a = document.createElement("a"); a.href = url; a.download = "template_pengurus_pokja.csv"; a.click()
+  const a = document.createElement("a"); a.href = url; a.download = "template_pengurus_kelompok_kerja.csv"; a.click()
   URL.revokeObjectURL(url)
 }
 
@@ -345,7 +345,7 @@ export default function BuatPokjaPage() {
     setSkDetail(DUMMY_SK)
     // Create a mock File for the SK upload
     const blob = new Blob(["(dummy PDF content)"], { type: "application/pdf" })
-    const dummyFile = new File([blob], "SK_POKJA_Aceh_2025.pdf", { type: "application/pdf" })
+    const dummyFile = new File([blob], "SK_Kelompok_Kerja_Aceh_2025.pdf", { type: "application/pdf" })
     setSkFile(dummyFile)
     setFileError("")
   }
@@ -434,15 +434,15 @@ export default function BuatPokjaPage() {
             {isPerbaikanMode
               ? "Perbaikan Berhasil Dikirim!"
               : isPusat
-                ? "POKJA Berhasil Dibuat!"
-                : "Data Pokja Berhasil Dikirim!"}
+                ? "Kelompok Kerja Berhasil Dibuat!"
+                : "Data Kelompok Kerja Berhasil Dikirim!"}
           </h3>
           <p className="text-sm text-gray-500 leading-relaxed">
             {isPerbaikanMode
-              ? `Perbaikan data POKJA wilayah ${REGION} telah dikirim dan kembali menunggu verifikasi Admin Pusat.`
+              ? `Perbaikan data Kelompok Kerja wilayah ${REGION} telah dikirim dan kembali menunggu verifikasi Admin Pusat.`
               : isPusat
-                ? `POKJA untuk wilayah ${REGION} telah dibuat dan aktif.`
-                : `Data Pokja wilayah ${REGION} sedang menunggu verifikasi dari Admin Pusat.`
+                ? `Kelompok Kerja untuk wilayah ${REGION} telah dibuat dan aktif.`
+                : `Data Kelompok Kerja wilayah ${REGION} sedang menunggu verifikasi dari Admin Pusat.`
             }
           </p>
           <p className="text-xs text-gray-400">Mengalihkan ke dashboard...</p>
@@ -469,7 +469,7 @@ export default function BuatPokjaPage() {
             </button>
             <span className="text-gray-300">/</span>
             <h1 className="text-sm font-semibold text-gray-900">
-              {isPerbaikanMode ? "Perbaikan Data POKJA" : "Pembentukan POKJA"} — {REGION}
+              {isPerbaikanMode ? "Perbaikan Data Kelompok Kerja" : "Pembentukan Kelompok Kerja"} {REGION}
             </h1>
             {isPerbaikanMode && (
               <span className="text-xs font-medium text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">
@@ -545,11 +545,11 @@ export default function BuatPokjaPage() {
                     onChange={setKanalPengaduan}
                   />
                   <div className="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2.5 flex flex-col gap-1">
-                    <p className="text-xs font-semibold text-amber-900">Nomor ini akan menjadi call center utama POKJA</p>
+                    <p className="text-xs font-semibold text-amber-900">Nomor di atas akan menjadi kontak utama Kelompok Kerja</p>
                     <ul className="text-xs text-amber-800 space-y-0.5 list-disc list-inside">
+                      <li>Nomor akan dipublikasikan sebagai saluran pengaduan</li>
+                      <li>Gunakan nomor resmi atas nama institusi dan bukan nomor pribadi</li>
                       <li>Pastikan nomor aktif dan dapat dihubungi masyarakat</li>
-                      <li>Gunakan nomor resmi atas nama institusi, bukan nomor pribadi</li>
-                      <li>Nomor ini akan dipublikasikan sebagai saluran pengaduan</li>
                     </ul>
                   </div>
                 </div>
@@ -658,7 +658,7 @@ export default function BuatPokjaPage() {
                           onChange={(v) => updateAnggota(index, "email", v)} 
                         />
                         <InputField 
-                          label="Jabatan" 
+                          label="Jabatan pada Instansi" 
                           required 
                           placeholder="Contoh: Kepala Bidang, Staff, dll" 
                           value={anggota.jabatan || ""} 
@@ -705,7 +705,7 @@ export default function BuatPokjaPage() {
                         </div>
                         <div className="flex flex-col gap-1.5">
                           <label className="text-xs font-semibold text-gray-600">
-                            No. WhatsApp <span className="text-red-500">*</span>
+                            Nomor HP <span className="text-red-500">*</span>
                           </label>
                           <div className="relative">
                             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
@@ -736,7 +736,7 @@ export default function BuatPokjaPage() {
                     type="button"
                     className="flex items-center justify-center gap-2 w-full py-2.5 mt-2 border-2 border-dashed border-gray-300 rounded-lg text-sm font-medium text-gray-500 hover:border-blue-400 hover:text-blue-600 transition"
                   >
-                    <Plus className="w-4 h-4" /> Tambah Anggota Lainnya
+                    <Plus className="w-4 h-4" /> Tambah Anggota
                   </button>
                 </div>
               </div>
@@ -759,12 +759,12 @@ export default function BuatPokjaPage() {
                       className="h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-gray-600">Periode Mulai <span className="text-red-500">*</span></label>
+                    <label className="text-xs font-semibold text-gray-600">Tanggal Mulai <span className="text-red-500">*</span></label>
                     <input type="date" value={skDetail.periodeMulai} onChange={(e) => setSkDetail((p) => ({ ...p, periodeMulai: e.target.value }))}
                       className="h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-gray-600">Periode Selesai <span className="text-red-500">*</span></label>
+                    <label className="text-xs font-semibold text-gray-600">Tanggal Selesai <span className="text-red-500">*</span></label>
                     <input type="date" value={skDetail.periodeSelesai} onChange={(e) => setSkDetail((p) => ({ ...p, periodeSelesai: e.target.value }))}
                       className="h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
                   </div>
@@ -872,7 +872,7 @@ export default function BuatPokjaPage() {
               className="flex items-center gap-2 px-6 py-2 text-sm font-semibold bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
             >
               <CheckCircle2 className="w-4 h-4" />
-              {isPerbaikanMode ? "Kirim Perbaikan" : "Submit Pengajuan"}
+              {isPerbaikanMode ? "Kirim Perbaikan" : "Ajukan"}
             </button>
           )}
         </div>
