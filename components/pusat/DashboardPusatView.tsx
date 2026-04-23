@@ -192,7 +192,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
           <div className="px-5 py-4 border-b border-amber-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-amber-600" />
-              <h3 className="text-sm font-semibold text-gray-800">Kelompok Kerja Belum Diperiksa</h3>
+              <h3 className="text-sm font-semibold text-gray-800">Kelompok Kerja Perlu Diperiksa</h3>
               <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-amber-200 text-amber-800 text-xs font-bold">
                 {menunggu}
               </span>
@@ -217,7 +217,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
                     </p>
                   </div>
                   <span className="text-xs text-amber-700 bg-amber-100 px-2 py-1 rounded-full whitespace-nowrap">
-                    Belum Diperiksa
+                    Perlu Diperiksa
                   </span>
                   <ChevronRight className="w-4 h-4 text-amber-400 flex-shrink-0" />
                 </li>
@@ -313,7 +313,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
 
                 const statusConfig = {
                   aktif:    { label: "Aktif",              cls: "bg-green-100 border border-green-300 text-green-700" },
-                  menunggu: { label: "Belum Diperiksa", cls: "bg-amber-100 border border-amber-300 text-amber-700" },
+                  menunggu: { label: "Perlu Diperiksa", cls: "bg-amber-100 border border-amber-300 text-amber-700" },
                   perbaikan:{ label: "Perlu Perbaikan",     cls: "bg-red-100 border border-red-300 text-red-700" },
                   belum:    { label: "Belum Dibentuk",      cls: "bg-gray-100 border border-gray-200 text-gray-500" },
                 }

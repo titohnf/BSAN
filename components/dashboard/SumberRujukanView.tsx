@@ -226,7 +226,7 @@ function StatusBadge({ status }: { status: StatusRujukan }) {
   if (status === "menunggu") {
     return (
       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
-        Belum Diperiksa
+        Perlu Diperiksa
       </span>
     )
   }
@@ -778,7 +778,7 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-bold text-gray-900">Sumber Dukungan</h2>
           </div>
-          <p className="text-xs text-gray-500 mt-0.5">Daftar kontak layanan untuk upaya preventif permasalahan di sekolah</p>
+          <p className="text-xs text-gray-500 mt-0.5">Daftar kontak layanan untuk membangun lingkungan sekolah yang aman, nyaman, dan inklusif</p>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {/* Template & Import - only for Admin Pusat */}
@@ -804,7 +804,7 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
             disabled={filtered.length === 0}
             className="flex items-center gap-1.5 h-9 px-4 rounded-lg text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <Download className="w-4 h-4" /> Export CSV
+            <Download className="w-4 h-4" /> Ekspor CSV
           </button>
           {/* Add New - Primary Action */}
           <button
@@ -881,7 +881,7 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari nama instansi atau kota..."
+            placeholder="Ketik nama instansi atau kota"
             className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
           />
         </div>
@@ -903,7 +903,7 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
           <SelectContent>
             <SelectItem value="semua">Semua Status</SelectItem>
             <SelectItem value="terverifikasi">Terverifikasi</SelectItem>
-            <SelectItem value="menunggu">Belum Diperiksa</SelectItem>
+            <SelectItem value="menunggu">Perlu Diperiksa</SelectItem>
             <SelectItem value="menunggu_review">Menunggu Review</SelectItem>
             <SelectItem value="dihapus">Dihapus</SelectItem>
           </SelectContent>

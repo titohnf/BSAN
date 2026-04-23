@@ -26,7 +26,7 @@ import { ALL_ROLES } from "@/types/pokja"
 // ---------------------------------------------------------------------------
 const STATUS_CONFIG = {
   "belum-dibentuk": { label: "Belum Dibentuk", variant: "neutral" as const, icon: Clock },
-  "masih-diverifikasi": { label: "Belum Diperiksa", variant: "warning" as const, icon: Clock },
+  "masih-diverifikasi": { label: "Perlu Diperiksa", variant: "warning" as const, icon: Clock },
   aktif: { label: "Aktif", variant: "success" as const, icon: CheckCircle2 },
   "butuh-perbaikan": { label: "Perlu Perbaikan", variant: "error" as const, icon: XCircle },
 }

@@ -10,7 +10,7 @@ interface DaftarPengajuanViewProps {
 
 const STATUS_CONFIG: Record<PokjaStatus, { label: string; color: string; bg: string; icon: React.ElementType }> = {
   "belum-dibentuk": { label: "Belum Dibentuk", color: "text-gray-700", bg: "bg-gray-50 border-gray-200", icon: Building },
-  "masih-diverifikasi": { label: "Belum Diperiksa", color: "text-amber-700", bg: "bg-amber-50 border-amber-200", icon: Clock },
+  "masih-diverifikasi": { label: "Perlu Diperiksa", color: "text-amber-700", bg: "bg-amber-50 border-amber-200", icon: Clock },
   aktif: { label: "Aktif", color: "text-emerald-700", bg: "bg-emerald-50 border-emerald-200", icon: CheckCircle2 },
   "butuh-perbaikan": { label: "Perlu Perbaikan", color: "text-red-700", bg: "bg-red-50 border-red-200", icon: XCircle },
 }
@@ -18,7 +18,7 @@ const STATUS_CONFIG: Record<PokjaStatus, { label: string; color: string; bg: str
 const STATUS_FILTER_OPTIONS: { value: PokjaStatus | "semua"; label: string }[] = [
   { value: "semua", label: "Semua Status" },
   { value: "belum-dibentuk", label: "Belum Dibentuk" },
-  { value: "masih-diverifikasi", label: "Belum Diperiksa" },
+  { value: "masih-diverifikasi", label: "Perlu Diperiksa" },
   { value: "aktif", label: "Aktif" },
   { value: "butuh-perbaikan", label: "Perlu Perbaikan" },
 ]

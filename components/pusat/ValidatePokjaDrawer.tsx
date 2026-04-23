@@ -24,7 +24,7 @@ interface ValidatePokjaDrawerProps {
 
 const STATUS_CONFIG = {
   "belum-dibentuk": { label: "Belum Dibentuk", variant: "neutral" as const },
-  "masih-diverifikasi": { label: "Belum Diperiksa", variant: "warning" as const },
+  "masih-diverifikasi": { label: "Perlu Diperiksa", variant: "warning" as const },
   aktif: { label: "Aktif", variant: "success" as const },
   "butuh-perbaikan": { label: "Perlu Perbaikan", variant: "error" as const },
 }

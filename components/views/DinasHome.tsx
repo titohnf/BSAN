@@ -249,7 +249,7 @@ export function DashboardView({
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${config.badge}`}>
                       {pokja.status === "aktif" ? "Aktif" : 
-                       pokja.status === "masih-diverifikasi" ? "Belum Diperiksa" :
+                       pokja.status === "masih-diverifikasi" ? "Perlu Diperiksa" :
                        pokja.status === "butuh-perbaikan" ? "Perlu Perbaikan" : "Draf"}
                     </span>
                   </div>
@@ -432,7 +432,7 @@ export function DashboardView({
                         <div className="rounded-lg bg-amber-50 border border-amber-200 p-2.5 flex items-start gap-2.5">
                           <AlertTriangle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0 mt-0.5" />
                           <div>
-                            <p className="text-xs font-semibold text-amber-800">{pending} Belum Diperiksa</p>
+                            <p className="text-xs font-semibold text-amber-800">{pending} Perlu Diperiksa</p>
                             <p className="text-xs text-amber-700 mt-0.5">Cek untuk verifikasi data.</p>
                           </div>
                         </div>
