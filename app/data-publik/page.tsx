@@ -119,7 +119,7 @@ export default function DataPublikPage() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = "data-pokja-provinsi.csv"
+    a.download = "data-kelompok-kerja-provinsi.csv"
     a.click()
     URL.revokeObjectURL(url)
   }

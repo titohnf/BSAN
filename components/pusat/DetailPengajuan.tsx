@@ -479,7 +479,7 @@ export function DetailPengajuan({ item, onClose, onSave }: DetailPengajuanProps)
                   rows={3}
                   value={globalAlasan}
                   onChange={(e) => setGlobalAlasan(e.target.value)}
-                  placeholder="Tuliskan alasan penolakan keseluruhan pengajuan POKJA ini..."
+                  placeholder="Tuliskan alasan penolakan keseluruhan pengajuan Kelompok Kerja ini..."
                   className="w-full text-sm border border-red-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-red-400 resize-none bg-white"
                 />
               </section>

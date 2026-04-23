@@ -40,7 +40,7 @@ const faqs = [
     id: "sistem",
     question: "Apa fungsi sistem informasi BSAN ini?",
     answer:
-      "Sistem informasi BSAN memfasilitasi pengelolaan data POKJA, pemantauan implementasi program, pelaporan kasus, dan koordinasi antar pemangku kepentingan secara digital. Sistem ini diakses oleh Dinas Pendidikan, sekolah, dan Pusat Kemendikbud.",
+      "Sistem informasi BSAN memfasilitasi pengelolaan data Kelompok Kerja, pemantauan implementasi program, pelaporan kasus, dan koordinasi antar pemangku kepentingan secara digital. Sistem ini diakses oleh Dinas Pendidikan, sekolah, dan Pusat Kemendikbud.",
   },
 ]
 

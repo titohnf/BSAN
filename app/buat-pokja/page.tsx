@@ -345,7 +345,7 @@ export default function BuatPokjaPage() {
     setSkDetail(DUMMY_SK)
     // Create a mock File for the SK upload
     const blob = new Blob(["(dummy PDF content)"], { type: "application/pdf" })
-    const dummyFile = new File([blob], "SK_POKJA_Aceh_2025.pdf", { type: "application/pdf" })
+    const dummyFile = new File([blob], "SK_Kelompok_Kerja_Aceh_2025.pdf", { type: "application/pdf" })
     setSkFile(dummyFile)
     setFileError("")
   }
@@ -434,15 +434,15 @@ export default function BuatPokjaPage() {
             {isPerbaikanMode
               ? "Perbaikan Berhasil Dikirim!"
               : isPusat
-                ? "POKJA Berhasil Dibuat!"
-                : "Data Pokja Berhasil Dikirim!"}
+                ? "Kelompok Kerja Berhasil Dibuat!"
+                : "Data Kelompok Kerja Berhasil Dikirim!"}
           </h3>
           <p className="text-sm text-gray-500 leading-relaxed">
             {isPerbaikanMode
-              ? `Perbaikan data POKJA wilayah ${REGION} telah dikirim dan kembali menunggu verifikasi Admin Pusat.`
+              ? `Perbaikan data Kelompok Kerja wilayah ${REGION} telah dikirim dan kembali menunggu verifikasi Admin Pusat.`
               : isPusat
-                ? `POKJA untuk wilayah ${REGION} telah dibuat dan aktif.`
-                : `Data Pokja wilayah ${REGION} sedang menunggu verifikasi dari Admin Pusat.`
+                ? `Kelompok Kerja untuk wilayah ${REGION} telah dibuat dan aktif.`
+                : `Data Kelompok Kerja wilayah ${REGION} sedang menunggu verifikasi dari Admin Pusat.`
             }
           </p>
           <p className="text-xs text-gray-400">Mengalihkan ke dashboard...</p>
@@ -469,7 +469,7 @@ export default function BuatPokjaPage() {
             </button>
             <span className="text-gray-300">/</span>
             <h1 className="text-sm font-semibold text-gray-900">
-              {isPerbaikanMode ? "Perbaikan Data POKJA" : "Pembentukan POKJA"} — {REGION}
+              {isPerbaikanMode ? "Perbaikan Data Kelompok Kerja" : "Pembentukan Kelompok Kerja"} — {REGION}
             </h1>
             {isPerbaikanMode && (
               <span className="text-xs font-medium text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">

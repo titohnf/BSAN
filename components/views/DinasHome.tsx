@@ -462,7 +462,7 @@ export function DashboardView({
           <div className="space-y-2">
             <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Kegiatan Mendatang</p>
             {[
-              { tanggal: "14 Jun", judul: "Pelatihan Pokja Baru" },
+              { tanggal: "14 Jun", judul: "Pelatihan Kelompok Kerja Baru" },
               { tanggal: "17 Jun", judul: "Verifikasi Sumber Dukungan" },
               { tanggal: "21 Jun", judul: "Rapat Koordinasi Bulanan" },
             ].map((k, i) => (
@@ -489,8 +489,8 @@ export function DashboardView({
             <tbody className="divide-y divide-gray-100">
               {[
                 { waktu: "12:45", user: "Admin Dinas", aksi: "Verifikasi Sumber Dukungan" },
-                { waktu: "11:30", user: "Admin Sekolah", aksi: "Upload Dokumen POKJA" },
-                { waktu: "10:15", user: "Admin Dinas", aksi: "Menolak Pengajuan POKJA" },
+                { waktu: "11:30", user: "Admin Sekolah", aksi: "Upload Dokumen Kelompok Kerja" },
+                { waktu: "10:15", user: "Admin Dinas", aksi: "Menolak Pengajuan Kelompok Kerja" },
               ].map((log, i) => (
                 <tr key={i} className="hover:bg-gray-50">
                   <td className="px-3 py-2.5 text-gray-700">{log.waktu}</td>
