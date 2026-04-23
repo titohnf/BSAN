@@ -65,8 +65,7 @@ function EmptyStatePokja({ onBuatPokja }: { onBuatPokja: () => void }) {
       </div>
       <h3 className="text-lg font-bold text-gray-800 mb-2">Kelompok Kerja Belum Dibentuk</h3>
       <p className="text-sm text-gray-500 max-w-sm leading-relaxed mb-6">
-        Data Kelompok Kerja Budaya Sekolah Aman dan Nyaman untuk wilayah Anda belum tersedia.
-        Mulai pembentukan Kelompok Kerja dengan mengisi data yang diperlukan.
+        Silakan mulai membuat dan mengajukan pembentukan Kelompok Kerja di wilayah Anda.
       </p>
       <Button color="blue" size="md" icon={PlusCircle} onClick={onBuatPokja}>
         Buat Kelompok Kerja Sekarang
