@@ -549,6 +549,7 @@ export default function BuatPokjaPage() {
                     <ul className="text-xs text-amber-800 space-y-0.5 list-disc list-inside">
                       <li>Nomor akan dipublikasikan sebagai saluran pengaduan</li>
                       <li>Gunakan nomor resmi atas nama institusi, bukan nomor pribadi</li>
+                      <li>Pastikan nomor aktif dan dapat dihubungi masyarakat</li>
                     </ul>
                   </div>
                 </div>
