@@ -302,7 +302,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
     <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <h2 className="text-xl font-bold text-gray-900">Data Kelompok Kerja</h2>
+        <h2 className="text-xl font-bold text-gray-900">Kelompok Kerja</h2>
         {/* Hanya tampilkan tombol buat Kelompok Kerja untuk admin pusat */}
         {isAdminPusat && (
           <Button color="blue" size="sm" icon={PlusCircle} onClick={onBuatPokja}>
