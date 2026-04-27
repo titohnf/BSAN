@@ -204,7 +204,7 @@ export function ValidatePokjaDrawer({ pokja, onClose, onSave }: ValidatePokjaDra
                       tolak:      { label: "Ditolak",            color: "text-red-700 bg-red-50 border-red-200",          dot: "bg-red-500"    },
                       perbaiki:   { label: "Perbaikan Diajukan", color: "text-amber-700 bg-amber-50 border-amber-200",    dot: "bg-amber-500"   },
                       edit:       { label: "Data Diperbarui",    color: "text-indigo-700 bg-indigo-50 border-indigo-200", dot: "bg-indigo-500"  },
-                      sk_expired: { label: "SK Kedaluwarsa",     color: "text-orange-700 bg-orange-50 border-orange-200", dot: "bg-orange-500"  },
+                      sk_expired: { label: "SK Kadaluwarsa",     color: "text-orange-700 bg-orange-50 border-orange-200", dot: "bg-orange-500"  },
                     }
                     const aktorLabel: Record<string, string> = {
                       user:        "Admin Dinas",
