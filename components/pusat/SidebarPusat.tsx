@@ -8,7 +8,7 @@ import { clearAuthAndRedirectToLogin } from "@/lib/logout"
 export type PusatMenu = "dashboard" | "pokja" | "sumber-rujukan" | "kegiatan"
 
 const navItems = [
-  { id: "dashboard" as PusatMenu, label: "Dashboard", icon: LayoutDashboard },
+  { id: "dashboard" as PusatMenu, label: "Dasbor", icon: LayoutDashboard },
   { id: "pokja" as PusatMenu, label: "Kelompok Kerja", icon: Users },
   { id: "sumber-rujukan" as PusatMenu, label: "Sumber Dukungan", icon: BookOpenCheck },
   { id: "k" as PusatMenu, label: " kegiatan", icon: CalendarDays },

@@ -15,12 +15,12 @@ interface SidebarProps {
 const navItems = [
   {
     id: "dashboard" as ActiveMenu,
-    label: "Dashboard",
+    label: "Dasbor",
     icon: LayoutDashboard,
   },
   {
     id: "data-pokja" as ActiveMenu,
-    label: "Data Kelompok Kerja",
+    label: "Kelompok Kerja",
     icon: Users,
   },
   {
