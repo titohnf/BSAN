@@ -11,7 +11,7 @@ const navItems = [
   { id: "dashboard" as PusatMenu, label: "Beranda", icon: LayoutDashboard },
   { id: "pokja" as PusatMenu, label: "Kelompok Kerja", icon: Users },
   { id: "sumber-rujukan" as PusatMenu, label: "Sumber Dukungan", icon: BookOpenCheck },
-  { id: "k" as PusatMenu, label: " kegiatan", icon: CalendarDays },
+  { id: "k" as PusatMenu, label: " Kegiatan", icon: CalendarDays },
 ]
 
 export function SidebarPusat({ activeMenu, onMenuChange }: SidebarPusatProps) {
