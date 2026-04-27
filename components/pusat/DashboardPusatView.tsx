@@ -154,7 +154,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
     <div className="space-y-6">
       {/* Title */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Beranda Admin Pusat</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Dasbor BSAN Admin Pusat</h1>
         <p className="text-sm text-gray-500 mt-1">Pantau status pembentukan Kelompok Kerja di seluruh Indonesia</p>
       </div>
 
