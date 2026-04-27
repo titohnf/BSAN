@@ -63,7 +63,7 @@ function EmptyStatePokja({ onBuatPokja }: { onBuatPokja: () => void }) {
       <div className="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center mb-5">
         <Users className="w-9 h-9 text-blue-400" />
       </div>
-      <h3 className="text-lg font-bold text-gray-800 mb-2">Kelompok Kerja Belum Dibentuk</h3>
+      <h3 className="text-lg font-bold text-gray-800 mb-2">Belum Ada Kelompok Kerja</h3>
       <p className="text-sm text-gray-500 max-w-sm leading-relaxed mb-6">
         Silakan mulai membuat dan mengajukan pembentukan Kelompok Kerja di wilayah Anda.
       </p>
