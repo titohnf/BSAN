@@ -904,10 +904,10 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
                     </div>
                     <div className="rounded-lg bg-blue-50 border border-blue-100 px-3 py-2.5 space-y-1">
                       <p className="text-xs text-blue-700">
-                        <span className="font-semibold">Nomor call center</span> dapat ditambahkan lebih dari satu.
+                        <span className="font-semibold">Nomor Call Center</span> bisa lebih dari satu.
                       </p>
                       <p className="text-xs text-blue-600">
-                        Bila call center tidak tersedia, nomor pribadi Anda akan menjadi kontak rujukan dan dapat diakses publik.
+                        Jika tidak tersedia, gunakan nomor HP pribadi yang dapat menjadi rujukan dan dapat diakses publik.
                       </p>
                     </div>
                   </div>
@@ -943,7 +943,7 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
                     ))}
                   </div>
                   <button type="button" onClick={addKontak} className="text-xs font-medium text-emerald-600 hover:text-emerald-700">
-                    + Tambah nomor lain
+                    + Tambah kontak
                   </button>
                   <div className="flex justify-end gap-2 pt-4 border-t border-gray-200">
                     <button
