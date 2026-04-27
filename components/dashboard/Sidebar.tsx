@@ -15,7 +15,7 @@ interface SidebarProps {
 const navItems = [
   {
     id: "dashboard" as ActiveMenu,
-    label: "Dasbor",
+    label: "Beranda",
     icon: LayoutDashboard,
   },
   {
