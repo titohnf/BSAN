@@ -520,7 +520,7 @@ function RujukanFormInner() {
             {/* Label row */}
             {!isReadOnly && (
               <div className="flex gap-2 items-center">
-                <span className="flex-1 text-xs font-semibold text-gray-700">Nomor <span className="text-red-500">*</span></span>
+                <span className="flex-1 text-xs font-semibold text-gray-700">Nomor Kontak <span className="text-red-500">*</span></span>
                 <span className="w-36 text-xs font-semibold text-gray-700">Tipe Kontak</span>
                 {form.kontak.length > 1 && <span className="w-9" />}
               </div>
