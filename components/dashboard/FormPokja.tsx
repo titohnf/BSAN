@@ -454,10 +454,11 @@ export function FormPokja({ region, onClose, onSubmit }: FormPokjaProps) {
           <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
             <CheckCircle2 className="w-7 h-7 text-green-600" />
           </div>
-          <h3 className="text-lg font-bold text-gray-900">Data Kelompok Kerja Berhasil Dikirim!</h3>
+          <h3 className="text-lg font-bold text-gray-900">Berhasil Mengirim Pengajuan Kelompok Kerja!</h3>
           <p className="text-sm text-gray-500 leading-relaxed">
-            Data Kelompok Kerja wilayah <strong>{region}</strong> sedang menunggu verifikasi dari tim kami.
+            Data pengajuan memerlukan pemeriksaan lebih dahulu oleh Admin Pusat.
           </p>
+          <p className="text-xs text-gray-400">Mengembalikan ke beranda...</p>
         </div>
       </div>
     )

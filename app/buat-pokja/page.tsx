@@ -435,17 +435,17 @@ export default function BuatPokjaPage() {
               ? "Perbaikan Berhasil Dikirim!"
               : isPusat
                 ? "Kelompok Kerja Berhasil Dibuat!"
-                : "Data Kelompok Kerja Berhasil Dikirim!"}
+                : "Berhasil Mengirim Pengajuan Kelompok Kerja!"}
           </h3>
           <p className="text-sm text-gray-500 leading-relaxed">
             {isPerbaikanMode
               ? `Perbaikan data Kelompok Kerja wilayah ${REGION} telah dikirim dan kembali menunggu verifikasi Admin Pusat.`
               : isPusat
                 ? `Kelompok Kerja untuk wilayah ${REGION} telah dibuat dan aktif.`
-                : `Data Kelompok Kerja wilayah ${REGION} sedang menunggu verifikasi dari Admin Pusat.`
+                : `Data pengajuan memerlukan pemeriksaan lebih dahulu oleh Admin Pusat.`
             }
           </p>
-          <p className="text-xs text-gray-400">Mengalihkan ke dashboard...</p>
+          <p className="text-xs text-gray-400">Mengembalikan ke beranda...</p>
         </div>
       </div>
     )
