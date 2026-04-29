@@ -55,6 +55,11 @@ function getStatus(provinsi: string): {
   status: "Terbentuk" | "Dalam Proses" | "Belum Terbentuk"
   pokjaId?: string
 } {
+  if (provinsi.includes(" - ")) {
+    const statuses: Array<"Terbentuk" | "Dalam Proses" | "Belum Terbentuk"> = ["Terbentuk", "Terbentuk", "Dalam Proses", "Dalam Proses", "Belum Terbentuk"]
+    const idx = Math.abs(provinsi.charCodeAt(provinsi.length - 1)) % 5
+    return { status: statuses[idx] }
+  }
   const match = MOCK_PENGAJUAN.find((p) => p.provinsi === provinsi)
   if (!match) return { status: "Belum Terbentuk" }
   if (match.status === "disetujui") return { status: "Terbentuk", pokjaId: match.id }
@@ -62,19 +67,57 @@ function getStatus(provinsi: string): {
   return { status: "Dalam Proses", pokjaId: match.id }
 }
 
-export const PROVINSI_DATA: ProvinsiRow[] = ALL_PROVINSI.map((p, i) => {
-  const { status, pokjaId } = getStatus(p.name)
-  const pokjaKabKota = status === "Terbentuk" ? Math.floor(p.kabKota * 0.3) : 0
-  return {
-    no: i + 1,
-    provinsi: p.name,
-    statusPokja: status,
-    jumlahKabKota: p.kabKota,
-    pokjaKabKota,
-    persentase: p.kabKota > 0 ? Math.round((pokjaKabKota / p.kabKota) * 100) : 0,
-    pokjaId,
+const KAB_TO_INCLUDE: Record<string, string[]> = {
+  "Aceh": ["Banda Aceh", "Aceh Besar", "Pidie", "Aceh Utara", "Aceh Timur", "Aceh Barat"],
+  "Sumatera Utara": ["Medan", "Deli Serdang", "Simalungun", "Toba Samosir", "Labuhanbatu", "Padang Sidempuan"],
+  "DKI Jakarta": ["Jakarta Pusat", "Jakarta Utara", "Jakarta Barat", "Jakarta Selatan", "Jakarta Timur", "Kepulauan Seribu"],
+  "Jawa Barat": ["Bandung", "Bekasi", "Bogor", "Depok", "Cirebon", "Sukabumi", "Garut", "Karawang"],
+  "Jawa Timur": ["Surabaya", "Malang", "Sidoarjo", "Gresik", "Mojokerto", "Kediri", "Jember", "Banyuwangi"],
+  "Bali": ["Denpasar", "Badung", "Gianyar", "Klungkung", "Bangli", "Karangasem", "Jembrana", "Buleleng", "Tabanan"],
+  "Sulawesi Selatan": ["Makassar", "Gowa", "Maros", "Parepare", "Mamuju", "Bantaeng", "Bone", "Luwu"],
+  "Papua": ["Jayapura", "Mamberamo Tengah", "Keerom", "Sarmi", "Biak Numfor", "Supiori", "Yahukimo", "Puncak", "Tolikara"],
+}
+
+function generateRows(): ProvinsiRow[] {
+  const rows: ProvinsiRow[] = []
+  let no = 0
+
+  for (const p of ALL_PROVINSI) {
+    const { status, pokjaId } = getStatus(p.name)
+    const pokjaKabKota = status === "Terbentuk" ? Math.floor(p.kabKota * 0.3) : 0
+    no++
+    rows.push({
+      no: no,
+      provinsi: p.name,
+      statusPokja: status,
+      jumlahKabKota: p.kabKota,
+      pokjaKabKota,
+      persentase: p.kabKota > 0 ? Math.round((pokjaKabKota / p.kabKota) * 100) : 0,
+      pokjaId,
+    })
+
+    if (KAB_TO_INCLUDE[p.name]) {
+      for (const kabName of KAB_TO_INCLUDE[p.name]) {
+        const fullName = `${p.name} - ${kabName}`
+        const { status: kabStatus, pokjaId: kabPokjaId } = getStatus(fullName)
+        const isTerbentuk = kabStatus === "Terbentuk"
+        rows.push({
+          no: ++no,
+          provinsi: fullName,
+          statusPokja: kabStatus,
+          jumlahKabKota: 1,
+          pokjaKabKota: isTerbentuk ? 1 : 0,
+          persentase: isTerbentuk ? 100 : 0,
+          pokjaId: kabPokjaId,
+        })
+      }
+    }
   }
-})
+
+  return rows
+}
+
+export const PROVINSI_DATA: ProvinsiRow[] = generateRows()
 
 export const TOTAL_PROVINSI = ALL_PROVINSI.length
 export const TOTAL_KAB_KOTA = ALL_PROVINSI.reduce((s, p) => s + p.kabKota, 0)

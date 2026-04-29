@@ -94,7 +94,9 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase()
-    return PROVINSI_DATA.filter((r) => r.provinsi.toLowerCase().includes(q))
+    return PROVINSI_DATA.filter((r) => 
+      r.provinsi.toLowerCase().includes(q) && r.statusPokja !== "Belum Terbentuk"
+    )
   }, [search])
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
@@ -231,13 +233,14 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
                 <TableRow className="bg-slate-50/70 hover:bg-slate-50/70">
                   <TableHead className="w-10 text-slate-500 text-xs pl-5">No</TableHead>
                   <TableHead className="text-slate-500 text-xs">Wilayah</TableHead>
+                  <TableHead className="text-slate-500 text-xs">Provinsi</TableHead>
                   <TableHead className="text-slate-500 text-xs">Status Kelompok Kerja</TableHead>
                   <TableHead className="text-slate-500 text-xs">Bidang Tersedia</TableHead>
                   <TableHead className="w-10" />
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paged.map((row) => {
+                {paged.map((row, idx) => {
                   const pokja = row.pokjaId
                     ? MOCK_PENGAJUAN.find((p) => p.id === row.pokjaId)
                     : null
@@ -245,17 +248,20 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
                   return (
                     <React.Fragment key={row.no}>
                       <TableRow className="group">
-                        <TableCell className="text-slate-400 text-xs pl-5">{row.no}</TableCell>
+                        <TableCell className="text-slate-400 text-xs pl-5">{(page - 1) * PAGE_SIZE + idx + 1}</TableCell>
                         <TableCell className="font-medium text-slate-900">
-                          {row.provinsi.includes(" - ") ? `Kabupaten/Kota` : `Provinsi`} {row.provinsi}
+                          {row.provinsi.includes(" - ") ? `Kota ${row.provinsi.split(" - ")[1]}` : `Provinsi ${row.provinsi}`}
+                        </TableCell>
+                        <TableCell className="text-slate-600">
+                          {row.provinsi.includes(" - ") ? row.provinsi.split(" - ")[0] : "-"}
                         </TableCell>
                         <TableCell>{statusBadge(row.statusPokja)}</TableCell>
                         <TableCell>
                           {row.statusPokja === "Terbentuk" ? (
                             <div className="flex flex-wrap gap-1">
-                              <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">Pendidikan</span>
-                              <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">Sosial</span>
-                              <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">Kesehatan</span>
+                              <span className="px-2 py-0.5 bg-slate-100 text-slate-700 text-xs rounded-full">Pendidikan</span>
+                              <span className="px-2 py-0.5 bg-slate-100 text-slate-700 text-xs rounded-full">Sosial</span>
+                              <span className="px-2 py-0.5 bg-slate-100 text-slate-700 text-xs rounded-full">Kesehatan</span>
                             </div>
                           ) : (
                             <span className="text-slate-400">-</span>
@@ -332,11 +338,25 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
               </TableBody>
             </Table>
 
-            {totalPages > 1 && (
-              <div className="px-5 py-4 border-t border-slate-100 flex items-center justify-between">
-                <p className="text-slate-400 text-xs">
-                  Halaman {page} dari {totalPages}
-                </p>
+            {totalPages >= 1 && (
+              <div className="px-5 py-4 border-t border-slate-100 flex items-center justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                  <p className="text-slate-400 text-xs">
+                    Menampilkan {(page - 1) * PAGE_SIZE + 1} - {Math.min(page * PAGE_SIZE, filtered.length)} dari {filtered.length}
+                  </p>
+                  <div className="flex items-center gap-1">
+                    <select
+                      value={PAGE_SIZE}
+                      onChange={(e) => { setPage(1) }}
+                      className="px-1 py-0.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent"
+                    >
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                      <option value={50}>50</option>
+                    </select>
+                    <span className="text-slate-400 text-xs">baris/halaman</span>
+                  </div>
+                </div>
                 <div className="flex items-center gap-1.5">
                   <Button
                     variant="outline"
