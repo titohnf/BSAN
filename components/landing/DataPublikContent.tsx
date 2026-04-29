@@ -66,17 +66,21 @@ function StatCard({
   icon: React.ElementType
   label: string
   value: string | number
-  sub: string
+  sub?: string
   color: string
 }) {
   return (
-    <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
-      <div className={`w-10 h-10 rounded-lg ${color} flex items-center justify-center mb-3`}>
-        <Icon className="w-5 h-5 text-white" />
+    <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5 flex flex-col h-full">
+      <div className="flex items-center gap-4">
+        <div className={`w-10 h-10 rounded-lg ${color} flex items-center justify-center shrink-0 self-start`}>
+          <Icon className="w-5 h-5 text-white" />
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-medium text-slate-900 leading-tight">{label}</p>
+          <p className="text-4xl font-extrabold text-slate-900">{value}</p>
+          {sub && <p className="text-sm text-slate-500">{sub}</p>}
+        </div>
       </div>
-      <p className="text-2xl font-bold text-slate-900">{value}</p>
-      <p className="text-slate-800 font-medium text-sm mt-0.5">{label}</p>
-      <p className="text-slate-400 text-xs mt-1">{sub}</p>
     </div>
   )
 }
@@ -157,20 +161,20 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
         </div>
 
         <div className="max-w-6xl mx-auto px-4 pb-0 mb-16">
-          <h2 className="text-xl font-bold text-slate-900 mb-6 mt-16">Data Pokja</h2>
+          <h2 className="text-xl font-bold text-slate-900 mb-6 mt-16">Data Kelompok Kerja</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <StatCard
               icon={MapPin}
               label="Provinsi Terbentuk"
-              value={`${PROVINSI_TERBENTUK}/${TOTAL_PROVINSI}`}
-              sub="dari 38 provinsi"
+              value={PROVINSI_TERBENTUK}
+              sub={`dari ${TOTAL_PROVINSI} provinsi`}
               color="bg-blue-600"
             />
             <StatCard
               icon={Building2}
               label="Kab/Kota Terbentuk"
-              value={`${KAB_KOTA_TERBENTUK}/${TOTAL_KAB_KOTA}`}
-              sub="dari total kab/kota"
+              value={KAB_KOTA_TERBENTUK}
+              sub={`dari ${TOTAL_KAB_KOTA} kab/kota`}
               color="bg-amber-500"
             />
             <StatCard
@@ -182,14 +186,20 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
             />
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-16">
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-8">
             <div className="px-5 py-4 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div>
-                <h2 className="font-semibold text-slate-900">Kelompok Kerja per Provinsi</h2>
-                <p className="text-slate-400 text-xs mt-0.5">
-                  Menampilkan {paged.length} dari {filtered.length} provinsi
-                </p>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                <h2 className="font-semibold text-slate-900">Kelompok Kerja: {search || "Seluruh Indonesia"}</h2>
+                <Button variant="outline" size="sm" onClick={() => { setSearch(""); setPage(1) }} className="w-fit h-7 text-xs gap-1">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Ganti
+                </Button>
               </div>
+              <p className="text-slate-400 text-xs">
+                {filtered.length} provinsi ditemukan
+              </p>
               <div className="flex items-center gap-2 w-full sm:w-auto">
                 <div className="relative flex-1 sm:flex-none sm:w-56">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
