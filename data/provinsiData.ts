@@ -8,6 +8,10 @@ export interface ProvinsiRow {
   pokjaKabKota: number
   persentase: number
   pokjaId?: string
+  skor?: number
+  skorDelta?: number
+  bidangTersedia?: number
+  kontak?: string
 }
 
 const ALL_PROVINSI: { name: string; kabKota: number }[] = [
@@ -78,6 +82,23 @@ const KAB_TO_INCLUDE: Record<string, string[]> = {
   "Papua": ["Jayapura", "Mamberamo Tengah", "Keerom", "Sarmi", "Biak Numfor", "Supiori", "Yahukimo", "Puncak", "Tolikara"],
 }
 
+function seedScore(seed: number, min: number, max: number): number {
+  const x = Math.sin(seed + 1) * 10000
+  return min + Math.floor((x - Math.floor(x)) * (max - min + 1))
+}
+
+function seedDelta(seed: number): number {
+  const x = Math.sin(seed + 13) * 10000
+  const raw = Math.floor((x - Math.floor(x)) * 21) - 10 // -10 to +10
+  return raw === 0 ? 1 : raw
+}
+
+function seedPhone(seed: number): string {
+  const x = Math.abs(Math.sin(seed + 7) * 1e10)
+  const digits = Math.floor(x) % 100000000
+  return `0812${String(digits).padStart(8, "0")}`
+}
+
 function generateRows(): ProvinsiRow[] {
   const rows: ProvinsiRow[] = []
   let no = 0
@@ -86,6 +107,17 @@ function generateRows(): ProvinsiRow[] {
     const { status, pokjaId } = getStatus(p.name)
     const pokjaKabKota = status === "Terbentuk" ? Math.floor(p.kabKota * 0.3) : 0
     no++
+    const skor = status === "Terbentuk"
+      ? seedScore(no, 60, 100)
+      : status === "Dalam Proses"
+      ? seedScore(no, 30, 59)
+      : undefined
+    const bidangTersedia = status === "Terbentuk" ? 3 + (no % 3) : undefined
+    const skorDelta = skor != null ? seedDelta(no) : undefined
+    const matchPokja = MOCK_PENGAJUAN.find((p2) => p2.id === pokjaId)
+    const kontak = status === "Terbentuk"
+      ? (matchPokja?.kanalPengaduan ?? seedPhone(no))
+      : undefined
     rows.push({
       no: no,
       provinsi: p.name,
@@ -94,6 +126,10 @@ function generateRows(): ProvinsiRow[] {
       pokjaKabKota,
       persentase: p.kabKota > 0 ? Math.round((pokjaKabKota / p.kabKota) * 100) : 0,
       pokjaId,
+      skor,
+      skorDelta,
+      bidangTersedia,
+      kontak,
     })
 
     if (KAB_TO_INCLUDE[p.name]) {
@@ -101,14 +137,27 @@ function generateRows(): ProvinsiRow[] {
         const fullName = `${p.name} - ${kabName}`
         const { status: kabStatus, pokjaId: kabPokjaId } = getStatus(fullName)
         const isTerbentuk = kabStatus === "Terbentuk"
+        const kabNo = ++no
+        const kabSkor = isTerbentuk
+          ? seedScore(kabNo, 60, 100)
+          : kabStatus === "Dalam Proses"
+          ? seedScore(kabNo, 30, 59)
+          : undefined
+        const kabBidang = isTerbentuk ? 3 + (kabNo % 3) : undefined
+        const kabSkorDelta = kabSkor != null ? seedDelta(kabNo) : undefined
+        const kabKontak = isTerbentuk ? seedPhone(kabNo) : undefined
         rows.push({
-          no: ++no,
+          no: kabNo,
           provinsi: fullName,
           statusPokja: kabStatus,
           jumlahKabKota: 1,
           pokjaKabKota: isTerbentuk ? 1 : 0,
           persentase: isTerbentuk ? 100 : 0,
           pokjaId: kabPokjaId,
+          skor: kabSkor,
+          skorDelta: kabSkorDelta,
+          bidangTersedia: kabBidang,
+          kontak: kabKontak,
         })
       }
     }

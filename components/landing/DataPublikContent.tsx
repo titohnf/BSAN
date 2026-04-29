@@ -9,8 +9,6 @@ import {
   Search,
   Download,
   X,
-  ChevronDown,
-  ChevronUp,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -31,7 +29,6 @@ import {
   PERSENTASE_NASIONAL,
   LAST_UPDATED,
 } from "@/data/provinsiData"
-import { MOCK_PENGAJUAN } from "@/data/mockPokja"
 import { cn } from "@/lib/utils"
 
 const PAGE_SIZE = 10
@@ -89,8 +86,8 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
   const router = useRouter()
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
-  const [expandedId, setExpandedId] = useState<string | null>(null)
   const [showWilayahModal, setShowWilayahModal] = useState(false)
+
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase()
@@ -234,17 +231,15 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
                   <TableHead className="w-10 text-slate-500 text-xs pl-5">No</TableHead>
                   <TableHead className="text-slate-500 text-xs">Wilayah</TableHead>
                   <TableHead className="text-slate-500 text-xs">Provinsi</TableHead>
-                  <TableHead className="text-slate-500 text-xs">Status Kelompok Kerja</TableHead>
-                  <TableHead className="text-slate-500 text-xs">Bidang Tersedia</TableHead>
-                  <TableHead className="w-10" />
+                  <TableHead className="w-36 text-slate-500 text-xs">Status Kelompok Kerja</TableHead>
+                  <TableHead className="w-36 text-slate-500 text-xs text-center">Jumlah Bidang</TableHead>
+                  <TableHead className="w-36 text-slate-500 text-xs">Kontak</TableHead>
+                  <TableHead className="w-36 text-slate-500 text-xs text-center">Skor Terakhir</TableHead>
+                  <TableHead className="w-28" />
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {paged.map((row, idx) => {
-                  const pokja = row.pokjaId
-                    ? MOCK_PENGAJUAN.find((p) => p.id === row.pokjaId)
-                    : null
-                  const isExpanded = expandedId === row.pokjaId
                   return (
                     <React.Fragment key={row.no}>
                       <TableRow className="group">
@@ -256,82 +251,39 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
                           {row.provinsi.includes(" - ") ? row.provinsi.split(" - ")[0] : "-"}
                         </TableCell>
                         <TableCell>{statusBadge(row.statusPokja)}</TableCell>
-                        <TableCell>
-                          {row.statusPokja === "Terbentuk" ? (
-                            <div className="flex flex-wrap gap-1">
-                              <span className="px-2 py-0.5 bg-slate-100 text-slate-700 text-xs rounded-full">Pendidikan</span>
-                              <span className="px-2 py-0.5 bg-slate-100 text-slate-700 text-xs rounded-full">Sosial</span>
-                              <span className="px-2 py-0.5 bg-slate-100 text-slate-700 text-xs rounded-full">Kesehatan</span>
-                            </div>
+                        <TableCell className="text-center">
+                          {row.bidangTersedia != null ? (
+                            <span className="text-slate-700">{row.bidangTersedia}</span>
+                          ) : (
+                            <span className="text-slate-400">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-slate-600 text-xs">
+                          {row.kontak ?? "-"}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {row.skor != null ? (
+                            <span className={cn(
+                              "font-semibold text-sm",
+                              row.skor >= 75 ? "text-emerald-600" : row.skor >= 50 ? "text-amber-600" : "text-slate-500"
+                            )}>
+                              {row.skor}
+                            </span>
                           ) : (
                             <span className="text-slate-400">-</span>
                           )}
                         </TableCell>
                         <TableCell>
-                          {pokja && (
-                            <button
-                              onClick={() =>
-                                setExpandedId(isExpanded ? null : row.pokjaId!)
-                              }
-                              className="p-1 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-                            >
-                              {isExpanded ? (
-                                <ChevronUp className="w-4 h-4" />
-                              ) : (
-                                <ChevronDown className="w-4 h-4" />
-                              )}
-                            </button>
-                          )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => router.push(`/detail/${row.no}`)}
+                            className="h-7 text-xs border-slate-200 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                          >
+                            Lihat Detail
+                          </Button>
                         </TableCell>
                       </TableRow>
-                      {isExpanded && pokja && (
-                        <TableRow className="bg-blue-50/40 hover:bg-blue-50/40">
-                          <TableCell colSpan={7} className="px-5 py-4">
-                            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
-                              Anggota Kelompok Kerja — {row.provinsi}
-                            </p>
-                            <div className="overflow-x-auto">
-                              <table className="w-full text-sm">
-                                <thead>
-                                  <tr className="border-b border-slate-200">
-                                    <th className="text-left text-xs text-slate-500 pb-2 pr-4 font-medium">Nama</th>
-                                    <th className="text-left text-xs text-slate-500 pb-2 pr-4 font-medium">Jabatan pada Instansi</th>
-                                    <th className="text-left text-xs text-slate-500 pb-2 pr-4 font-medium">Instansi</th>
-                                    <th className="text-left text-xs text-slate-500 pb-2 font-medium">Status</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {pokja.members.map((m, i) => (
-                                    <tr key={i} className="border-b border-slate-100 last:border-0">
-                                      <td className="py-2 pr-4 font-medium text-slate-900">{m.nama}</td>
-                                      <td className="py-2 pr-4 text-slate-600">{m.jabatan}</td>
-                                      <td className="py-2 pr-4 text-slate-500">{m.instansi}</td>
-                                      <td className="py-2">
-                                        <Badge
-                                          className={cn(
-                                            "text-xs",
-                                            m.status === "approved"
-                                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                                              : m.status === "declined"
-                                              ? "bg-red-50 text-red-700 border-red-200"
-                                              : "bg-slate-50 text-slate-500 border-slate-200"
-                                          )}
-                                        >
-                                          {m.status === "approved"
-                                            ? "Disetujui"
-                                            : m.status === "declined"
-                                            ? "Ditolak"
-                                            : "Menunggu"}
-                                        </Badge>
-                                      </td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      )}
                     </React.Fragment>
                   )
                 })}
