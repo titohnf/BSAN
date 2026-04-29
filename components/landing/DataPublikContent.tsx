@@ -123,7 +123,7 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="pt-16">
-        <div className="bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 py-14">
+        <div className="bg-[#C8F1F7]">
           <div className="max-w-6xl mx-auto px-4">
             {showBackButton && (
               <button
@@ -136,26 +136,29 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
                 Kembali ke Beranda
               </button>
             )}
-            <h1 className="text-3xl md:text-4xl font-bold text-white">Data Publik Kelompok Kerja BSAN</h1>
-            <p className="mt-2 text-blue-200 text-base max-w-xl">
-              Data pembentukan Kelompok Kerja Budaya Sekolah Aman dan Nyaman
-              seluruh provinsi di Indonesia.
-            </p>
+            <div className="grid md:grid-cols-2 gap-8 items-end">
+              <div className="pb-16 pt-16">
+                <h1 className="text-sm md:text-base font-bold text-slate-800">Selamat Datang di</h1>
+                <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mt-1">Portal Budaya Sekolah Aman dan Nyaman (BSAN)</h1>
+                <p className="mt-3 text-slate-700 text-base max-w-xl">
+                  Lihat informasi pembentukan kelompok kerja BSAN beserta beragam informasi
+                  dan Sumber Dukungan di Daerah Anda.
+                </p>
+              </div>
+              <div className="hidden md:block self-end">
+                <img
+                  src="/herobsan.png"
+                  alt="Ilustrasi BSAN"
+                  className="w-full h-auto rounded-2xl"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-8">
-            <svg className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <p className="text-amber-800 text-sm">
-              <span className="font-semibold">Catatan:</span> Data di bawah ini merupakan data dummy untuk keperluan
-              pengembangan dan demonstrasi sistem.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="max-w-6xl mx-auto px-4 pb-0 mb-16">
+          <h2 className="text-xl font-bold text-slate-900 mb-6 mt-16">Data Pokja</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <StatCard
               icon={MapPin}
               label="Provinsi Terbentuk"
@@ -177,16 +180,9 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
               sub="capaian di Indonesia"
               color="bg-emerald-600"
             />
-            <StatCard
-              icon={Clock}
-              label="Terakhir Diperbarui"
-              value="2 Feb 2026"
-              sub={LAST_UPDATED}
-              color="bg-slate-600"
-            />
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-16">
             <div className="px-5 py-4 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
                 <h2 className="font-semibold text-slate-900">Kelompok Kerja per Provinsi</h2>

@@ -38,18 +38,12 @@ export function HeroSection() {
           Kementerian Pendidikan, Kebudayaan, Riset & Teknologi
         </Badge>
 
-        <h1 className="text-4xl md:text-6xl font-bold text-white leading-tight mb-6">
-          Budaya{" "}
-          <span className="text-amber-400">Sekolah Aman</span>
-          <br />
-          dan{" "}
-          <span className="text-amber-400">Nyaman</span>
+        <h1 className="text-4xl md:text-6xl font-bold text-white leading-tight mb-4">
+          Selamat Datang di <span className="text-amber-400">Portal BSAN</span>
         </h1>
 
         <p className="text-lg md:text-xl text-blue-100 max-w-2xl mx-auto leading-relaxed mb-10">
-          Mewujudkan lingkungan sekolah yang memenuhi kebutuhan spiritual,
-          perlindungan fisik, kesejahteraan psikologis, dan keamanan sosiokultural
-          seluruh warga sekolah.
+          Portal Informasi Pembentukan Kelompok Kerja (Pokja) Budaya Sekolah Aman dan Nyaman di Seluruh Indonesia
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">

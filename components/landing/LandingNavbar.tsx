@@ -42,8 +42,7 @@ export function LandingNavbar() {
                   : "text-slate-600 font-medium hover:bg-slate-100 hover:text-slate-900"
               )}>{link.label}</button>
           ))}
-          <div className="w-px h-4 bg-slate-300 mx-2" />
-          <Button onClick={() => router.push("/login")} className="bg-blue-600 hover:bg-blue-800 text-white px-5" size="sm">Masuk</Button>
+          <Button onClick={() => router.push("/login")} className="ml-4 bg-blue-600 hover:bg-blue-800 text-white px-5" size="sm">Masuk</Button>
         </nav>
 
         <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 text-slate-700">
