@@ -256,6 +256,168 @@ function ReviewMemberCard({ label, member }: { label: string; member: MemberFiel
   )
 }
 
+function ReviewTable({ members, anggotaList, onEdit }: { members: Members; anggotaList: AnggotaItem[]; onEdit: () => void }) {
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const noColRef = useRef<HTMLTableCellElement>(null)
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [namaLeft, setNamaLeft] = useState(40)
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const handleScroll = () => setIsScrolled(el.scrollLeft > 0)
+    el.addEventListener("scroll", handleScroll, { passive: true })
+    return () => el.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  useEffect(() => {
+    if (noColRef.current) setNamaLeft(noColRef.current.offsetWidth)
+  }, [])
+
+  const allData: { no: number; kategori: string; nama: string; jenisKelamin: string; instansi: string; email: string; noHp: string; status: string; isCategory: boolean }[] = []
+  
+  let no = 1
+  
+  allData.push({ no: 0, kategori: "PIMPINAN", nama: "", jenisKelamin: "", instansi: "", email: "", noHp: "", status: "", isCategory: true })
+  PIMPINAN_ROLES.forEach((r) => {
+    const m = members[r.key]
+    allData.push({
+      no: no++,
+      kategori: r.label,
+      nama: m.nama || "-",
+      jenisKelamin: m.jenisKelamin || "-",
+      instansi: m.instansi || "-",
+      email: m.email || "-",
+      noHp: m.noWhatsapp || "-",
+      status: m.nama ? "Lengkap" : "Belum diisi",
+      isCategory: false
+    })
+  })
+
+  const bidangWithExtra: { key: string; label: string }[] = BIDANG_ROLES.map(r => ({ key: r.key, label: r.label }))
+  bidangWithExtra.forEach((b) => {
+    allData.push({ no: 0, kategori: b.label.toUpperCase(), nama: "", jenisKelamin: "", instansi: "", email: "", noHp: "", status: "", isCategory: true })
+    const m = members[b.key as keyof Members]
+    allData.push({
+      no: no++,
+      kategori: "Anggota",
+      nama: m.nama || "-",
+      jenisKelamin: m.jenisKelamin || "-",
+      instansi: m.instansi || "-",
+      email: m.email || "-",
+      noHp: m.noWhatsapp || "-",
+      status: m.nama ? "Lengkap" : "Belum diisi",
+      isCategory: false
+    })
+    
+    const extraMembers = anggotaList.filter(a => a.bidang === b.label)
+    extraMembers.forEach((a) => {
+      allData.push({
+        no: no++,
+        kategori: "Anggota",
+        nama: a.nama,
+        jenisKelamin: a.jenisKelamin || "-",
+        instansi: a.instansi || "-",
+        email: a.email || "-",
+        noHp: a.noWhatsapp || "-",
+        status: "Lengkap",
+        isCategory: false
+      })
+    })
+  })
+
+  const lainnya = anggotaList.filter(a => a.bidang === "Lainnya (Tokoh Masyarakat, Akademisi, Kepolisian, dan sebagainya..)" || a.bidang === "Lainnya" || !BIDANG_ROLES.some(b => b.label === a.bidang))
+  if ( lainnya.length > 0) {
+    allData.push({ no: 0, kategori: "LAINNYA", nama: "", jenisKelamin: "", instansi: "", email: "", noHp: "", status: "", isCategory: true })
+    lainnya.forEach((a) => {
+      allData.push({
+        no: no++,
+        kategori: "Anggota",
+        nama: a.nama,
+        jenisKelamin: a.jenisKelamin || "-",
+        instansi: a.instansi || "-",
+        email: a.email || "-",
+        noHp: a.noWhatsapp || "-",
+        status: "Lengkap",
+        isCategory: false
+      })
+    })
+  }
+
+  // Gradient overlay di dalam sticky cell — extend ke kanan melewati batas sel
+  // Harus berupa React element (bukan ::after CSS) agar z-index sticky cell berlaku
+  const Cue = () => (
+    <div
+      aria-hidden
+      className="absolute inset-y-0 left-full w-10 pointer-events-none bg-gradient-to-r from-gray-900/10 to-transparent transition-opacity duration-200"
+      style={{ opacity: isScrolled ? 1 : 0 }}
+    />
+  )
+
+  return (
+    <div ref={scrollRef} className="overflow-x-auto border border-gray-200 rounded-lg">
+      <table className="w-full text-sm border-separate border-spacing-0">
+        <thead className="bg-gray-50">
+          <tr>
+            <th ref={noColRef} className="w-10 px-2 py-3 text-center font-semibold text-gray-500 whitespace-nowrap bg-gray-50 sticky left-0 z-20 border-b border-gray-200">No</th>
+            <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap bg-gray-50 border-b border-gray-200 sticky z-10 relative" style={{ left: namaLeft }}>
+              Nama
+              <Cue />
+            </th>
+            <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap bg-gray-50 border-b border-gray-200">Jabatan Kelompok Kerja</th>
+            <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap border-b border-gray-200">Jenis Kelamin</th>
+            <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap border-b border-gray-200">Instansi</th>
+            <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap border-b border-gray-200">Email</th>
+            <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap border-b border-gray-200">No. HP</th>
+            <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap border-b border-gray-200">Status</th>
+            <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap border-b border-gray-200">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {allData.map((row, idx) => {
+            const isCategoryRow = row.isCategory
+            if (isCategoryRow) {
+              return (
+                <tr key={idx} className="bg-gray-50">
+                  <td colSpan={2} className="px-4 py-2 text-[11px] font-semibold text-gray-400 uppercase tracking-widest bg-gray-50 sticky left-0 z-20 border-b border-gray-100 min-w-[280px] relative">
+                    {row.kategori}
+                    <Cue />
+                  </td>
+                  <td colSpan={7} className="px-4 py-2 bg-gray-50 border-b border-gray-100"></td>
+                </tr>
+              )
+            }
+            return (
+              <tr key={idx} className="hover:bg-blue-50/30">
+                <td className="w-10 px-2 py-3 text-center whitespace-nowrap text-gray-400 text-xs bg-white sticky left-0 z-20 border-b border-gray-100">{row.no}</td>
+                <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap bg-white sticky z-10 border-b border-gray-100 relative" style={{ left: namaLeft }}>
+                  {row.nama}
+                  <Cue />
+                </td>
+                <td className="px-4 py-3 text-gray-500 whitespace-nowrap bg-white border-b border-gray-100">{row.kategori}</td>
+                <td className="px-4 py-3 text-gray-500 whitespace-nowrap bg-white border-b border-gray-100">{row.jenisKelamin}</td>
+                <td className="px-4 py-3 text-gray-500 whitespace-nowrap bg-white border-b border-gray-100">{row.instansi}</td>
+                <td className="px-4 py-3 text-gray-500 whitespace-nowrap bg-white border-b border-gray-100">{row.email}</td>
+                <td className="px-4 py-3 text-gray-500 whitespace-nowrap bg-white border-b border-gray-100">{row.noHp}</td>
+                <td className="px-4 py-3 whitespace-nowrap bg-white border-b border-gray-100">
+                  {row.status && (
+                    <span className={cn("px-2 py-1 rounded-full text-xs font-medium", row.status === "Lengkap" ? "bg-green-50 text-green-700" : "bg-amber-50 text-amber-600")}>
+                      {row.status}
+                    </span>
+                  )}
+                </td>
+                <td className="px-4 py-3 whitespace-nowrap bg-white border-b border-gray-100">
+                  {row.nama && <button onClick={onEdit} className="text-xs text-blue-600 hover:underline">Ubah</button>}
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 function FileUploadField({ value, onChange, error }: { value: File | null; onChange: (f: File | null) => void; error?: string }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const handleFile = (f: File) => {
@@ -729,21 +891,21 @@ export default function BuatPokjaPage() {
         {/* Step content */}
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
           {/* Step header */}
-          <div className={cn("px-6 py-5 border-b border-gray-100 bg-gray-50", step === 2 && "flex items-center justify-between")}>
+          <div 
+            className={cn("px-6 py-5 border-b border-gray-100 bg-gray-50", step === 2 && "flex items-center justify-between cursor-pointer hover:bg-gray-100 transition")}
+            onClick={step === 2 ? toggleCollapseAllStep2 : undefined}
+          >
             <div>
               <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Langkah {step} dari {STEPS.length}</p>
               <h2 className="text-lg font-bold text-gray-900 mt-0.5">{STEPS[step - 1].label}</h2>
             </div>
             {step === 2 && (
-              <button
-                onClick={toggleCollapseAllStep2}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-200 rounded-lg transition"
-              >
+              <div className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-gray-600">
                 <span className={cn("font-semibold", completeCount === totalCount ? "text-green-600" : "text-amber-600")}>
                   {completeCount}/{totalCount} pengurus lengkap
                 </span>
                 <ChevronDown className={cn("w-4 h-4 transition", collapseAllStep2 && "rotate-180")} />
-              </button>
+              </div>
             )}
           </div>
 
@@ -1063,21 +1225,7 @@ export default function BuatPokjaPage() {
                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Susunan Pengurus</p>
                     <button onClick={() => setStep(2)} className="text-xs text-blue-600 hover:underline flex items-center gap-1"><Eye className="w-3 h-3" /> Ubah</button>
                   </div>
-                  <div className="flex flex-col gap-3">
-                    {PIMPINAN_ROLES.map((r) => (
-                      <ReviewMemberCard key={r.key} label={r.label} member={members[r.key]} />
-                    ))}
-                    {BIDANG_ROLES.map((r) => (
-                      <ReviewMemberCard key={r.key} label={r.label} member={members[r.key]} />
-                    ))}
-                    {anggotaList.filter(a => a.nama).map((a, i) => (
-                      <ReviewMemberCard
-                        key={`anggota-${i}`}
-                        label={`Anggota Lainnya ${i + 1}${a.bidang ? ` – ${a.bidang}` : ""}`}
-                        member={{ nama: a.nama, email: a.email, jenisKelamin: a.jenisKelamin as "Laki-Laki" | "Perempuan" | "", noWhatsapp: a.noWhatsapp, instansi: "" }}
-                      />
-                    ))}
-                  </div>
+                  <ReviewTable members={members} anggotaList={anggotaList} onEdit={() => setStep(2)} />
                 </div>
 
                 {/* SK */}
