@@ -88,9 +88,13 @@ function MemberSection({ label, value, onChange, isCollapsed, onToggleCollapse }
   isCollapsed?: boolean
   onToggleCollapse?: () => void
 }) {
+  const isComplete = !!(value.nama && value.email && value.noWhatsapp && value.jenisKelamin && value.instansi)
   return (
     <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200">
+      <div 
+        className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition"
+        onClick={onToggleCollapse}
+      >
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
             <User className="w-3.5 h-3.5 text-blue-700" />
@@ -98,12 +102,14 @@ function MemberSection({ label, value, onChange, isCollapsed, onToggleCollapse }
           <span className="text-sm font-semibold text-gray-800">{label}</span>
         </div>
         {onToggleCollapse && (
-          <button
-            onClick={onToggleCollapse}
-            className="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition"
-          >
-            {isCollapsed ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
-          </button>
+          <div className="flex items-center gap-2">
+            <span className={cn("text-xs font-medium", isComplete ? "text-green-600" : "text-amber-600")}>
+              {isComplete ? "Field wajib diisi lengkap" : "Field wajib belum terisi"}
+            </span>
+            <div className="p-1 rounded-lg text-gray-400 hover:text-gray-600 transition">
+              {isCollapsed ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
+            </div>
+          </div>
         )}
       </div>
       {!isCollapsed && (
@@ -153,9 +159,13 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue, isCollaps
   isCollapsed?: boolean
   onToggleCollapse?: () => void
 }) {
+  const isComplete = !!(value.nama && value.email && value.noWhatsapp && value.jenisKelamin && value.instansi)
   return (
     <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200">
+      <div 
+        className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition"
+        onClick={onToggleCollapse}
+      >
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
             <User className="w-3.5 h-3.5 text-blue-700" />
@@ -163,12 +173,14 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue, isCollaps
           <span className="text-sm font-semibold text-gray-800">{label}</span>
         </div>
         {onToggleCollapse && (
-          <button
-            onClick={onToggleCollapse}
-            className="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition"
-          >
-            {isCollapsed ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
-          </button>
+          <div className="flex items-center gap-2">
+            <span className={cn("text-xs font-medium", isComplete ? "text-green-600" : "text-amber-600")}>
+              {isComplete ? "Field wajib diisi lengkap" : "Field wajib belum terisi"}
+            </span>
+            <div className="p-1 rounded-lg text-gray-400 hover:text-gray-600 transition">
+              {isCollapsed ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
+            </div>
+          </div>
         )}
       </div>
       {!isCollapsed && (
@@ -367,6 +379,31 @@ export default function BuatPokjaPage() {
       return s
     })
   }
+
+  // Collapse all in step 2
+  const [collapseAllStep2, setCollapseAllStep2] = useState(false)
+
+  const toggleCollapseAllStep2 = () => {
+    const newState = !collapseAllStep2
+    setCollapseAllStep2(newState)
+    if (newState) {
+      setCollapsedPimpinan(new Set(PIMPINAN_ROLES.map(r => r.key)))
+      setCollapsedBidang(new Set(["pendidikan", "pppa", "sosial", "kesehatan", "dukbangga", "kominfo"]))
+      setCollapsedAnggota(new Set(anggotaList.map((_, i) => i)))
+    } else {
+      setCollapsedPimpinan(new Set())
+      setCollapsedBidang(new Set())
+      setCollapsedAnggota(new Set())
+    }
+  }
+
+  // Count complete members
+  const isMemberComplete = (m: MemberField) => !!(m.nama && m.email && m.noWhatsapp && m.jenisKelamin && m.instansi)
+  const isBidangSelected = (a: AnggotaItem) => !!a.bidang
+  const completeCount = PIMPINAN_ROLES.filter(r => isMemberComplete(members[r.key])).length
+    + ["pendidikan", "pppa", "sosial", "kesehatan", "dukbangga", "kominfo"].filter(k => isMemberComplete(members[k as keyof Members])).length
+    + anggotaList.filter(a => isBidangSelected(a) && isMemberComplete({ nama: a.nama, email: a.email, noWhatsapp: a.noWhatsapp, jenisKelamin: a.jenisKelamin as "Laki-Laki" | "Perempuan", instansi: a.instansi || "" })).length
+  const totalCount = 9 + anggotaList.length
 
   // Step 3
   const [skFile, setSkFile] = useState<File | null>(null)
@@ -692,9 +729,22 @@ export default function BuatPokjaPage() {
         {/* Step content */}
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
           {/* Step header */}
-          <div className="px-6 py-5 border-b border-gray-100 bg-gray-50">
-            <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Langkah {step} dari {STEPS.length}</p>
-            <h2 className="text-lg font-bold text-gray-900 mt-0.5">{STEPS[step - 1].label}</h2>
+          <div className={cn("px-6 py-5 border-b border-gray-100 bg-gray-50", step === 2 && "flex items-center justify-between")}>
+            <div>
+              <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Langkah {step} dari {STEPS.length}</p>
+              <h2 className="text-lg font-bold text-gray-900 mt-0.5">{STEPS[step - 1].label}</h2>
+            </div>
+            {step === 2 && (
+              <button
+                onClick={toggleCollapseAllStep2}
+                className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-200 rounded-lg transition"
+              >
+                <span className={cn("font-semibold", completeCount === totalCount ? "text-green-600" : "text-amber-600")}>
+                  {completeCount}/{totalCount} pengurus lengkap
+                </span>
+                <ChevronDown className={cn("w-4 h-4 transition", collapseAllStep2 && "rotate-180")} />
+              </button>
+            )}
           </div>
 
           <div className="px-6 py-6">
@@ -820,24 +870,25 @@ export default function BuatPokjaPage() {
                   {anggotaList.map((anggota, index) => {
                     const isBidangSelected = !!anggota.bidang
                     const isCollapsed = collapsedAnggota.has(index)
+                    const isComplete = isBidangSelected && !!(anggota.nama && anggota.email && anggota.noWhatsapp && anggota.jenisKelamin && anggota.instansi)
                     return (
                     <div key={index} className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-                      <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200">
+                      <div 
+                        className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition"
+                        onClick={() => toggleCollapse(index)}
+                      >
                         <div className="flex items-center gap-3 flex-1">
                           <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
                             <User className="w-3.5 h-3.5 text-blue-700" />
                           </div>
                           <span className="text-sm font-semibold text-gray-800">Anggota Lainnya {index + 1}</span>
-                          <div className="flex flex-col gap-1 flex-1 max-w-xs">
+                          <div className="flex flex-col gap-1 flex-1 max-w-xs" onClick={(e) => e.stopPropagation()}>
                             <div className="relative">
                               <select
                                 value={anggota.bidang}
                                 onChange={(e) => updateAnggota(index, "bidang", e.target.value)}
                                 className={cn(
-                                  "w-full h-8 pl-3 pr-8 text-xs border rounded-lg appearance-none transition text-gray-700",
-                                  isBidangSelected 
-                                    ? "bg-green-50 border-green-300 text-green-700 font-medium" 
-                                    : "bg-white border-gray-300"
+                                  "w-full h-8 pl-3 pr-8 text-xs border rounded-lg appearance-none transition text-gray-700 bg-white border-gray-300"
                                 )}
                               >
                                 <option value="">Pilih bidang</option>
@@ -853,15 +904,19 @@ export default function BuatPokjaPage() {
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={() => toggleCollapse(index)}
-                            className="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition"
+                        <div className="flex items-center gap-2">
+                          {isBidangSelected && (
+                            <span className={cn("text-xs font-medium", isComplete ? "text-green-600" : "text-amber-600")}>
+                              {isComplete ? "Field wajib diisi lengkap" : "Field wajib belum terisi"}
+                            </span>
+                          )}
+                          <div
+                            className="p-1 rounded-lg text-gray-400 hover:text-gray-600 transition"
                           >
                             {isCollapsed ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
-                          </button>
+                          </div>
                           <button
-                            onClick={() => removeAnggota(index)}
+                            onClick={(e) => { e.stopPropagation(); removeAnggota(index) }}
                             className="p-1 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
                           >
                             <X className="w-4 h-4" />
@@ -888,15 +943,18 @@ export default function BuatPokjaPage() {
                               Jenis Kelamin <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
-                              <select
-                                value={anggota.jenisKelamin}
-                                onChange={(e) => updateAnggota(index, "jenisKelamin", e.target.value)}
-                                className="w-full h-9 pl-3 pr-8 text-sm border border-gray-300 rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-gray-700"
-                              >
-                                <option value="" disabled>Pilih jenis kelamin</option>
-                                <option value="Laki-Laki">Laki-Laki</option>
-                                <option value="Perempuan">Perempuan</option>
-                              </select>
+<select
+              value={anggota.jenisKelamin}
+              onChange={(e) => updateAnggota(index, "jenisKelamin", e.target.value)}
+              className={cn(
+                "w-full h-9 pl-3 pr-8 text-sm border border-gray-300 rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition",
+               anggota.jenisKelamin ? "text-gray-700" : "text-gray-400"
+              )}
+            >
+              <option value="" disabled>Pilih jenis kelamin</option>
+              <option value="Laki-Laki">Laki-Laki</option>
+              <option value="Perempuan">Perempuan</option>
+            </select>
                               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
                             </div>
                           </div>
