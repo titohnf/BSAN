@@ -4,13 +4,8 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { DevBanner } from "@/components/landing/DevBanner"
 import { LandingNavbar } from "@/components/landing/LandingNavbar"
-import { HeroSection } from "@/components/landing/HeroSection"
-import { UrgencySection } from "@/components/landing/UrgencySection"
-import { AboutSection } from "@/components/landing/AboutSection"
-import { RegulationSection } from "@/components/landing/RegulationSection"
-import { CampaignSection } from "@/components/landing/CampaignSection"
-import { FaqSection } from "@/components/landing/FaqSection"
 import { LandingFooter } from "@/components/landing/LandingFooter"
+import { DataPublikContent } from "@/components/landing/DataPublikContent"
 
 export default function LandingPage() {
   const router = useRouter()
@@ -32,12 +27,7 @@ export default function LandingPage() {
     <main>
       <DevBanner />
       <LandingNavbar />
-      <HeroSection />
-      <UrgencySection />
-      <AboutSection />
-      <RegulationSection />
-      <CampaignSection />
-      <FaqSection />
+      <DataPublikContent />
       <LandingFooter />
     </main>
   )

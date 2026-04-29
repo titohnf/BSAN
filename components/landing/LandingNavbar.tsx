@@ -7,12 +7,8 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
 const navLinks = [
-  { label: "Beranda", href: "#beranda", anchor: true },
-  { label: "Urgensi", href: "#urgensi", anchor: true },
-  { label: "Tentang", href: "#tentang", anchor: true },
-  { label: "Regulasi", href: "#regulasi", anchor: true },
-  { label: "Data Publik", href: "/data-publik", anchor: false },
-  { label: "FAQ", href: "#faq", anchor: true },
+  { label: "Beranda", href: "/", anchor: false },
+  { label: "Tentang", href: "https://cerdasberkarakter.kemendikdasmen.go.id/budayasekolahamannyaman/", external: true },
 ]
 
 export function LandingNavbar() {
@@ -28,8 +24,12 @@ export function LandingNavbar() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const handleNavClick = (link: { href: string; anchor: boolean }) => {
+  const handleNavClick = (link: { href: string; anchor: boolean; external?: boolean }) => {
     setMobileOpen(false)
+    if (link.external) {
+      window.open(link.href, "_blank")
+      return
+    }
     if (!link.anchor) {
       router.push(link.href)
       return
@@ -80,7 +80,11 @@ export function LandingNavbar() {
               onClick={() => handleNavClick(link)}
               className={cn(
                 "px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                !link.anchor && pathname === link.href
+                link.external
+                  ? scrolled
+                    ? "text-slate-600 hover:text-blue-700 hover:bg-blue-50"
+                    : "text-white/80 hover:text-white hover:bg-white/10"
+                  : !link.anchor && pathname === link.href
                   ? scrolled
                     ? "text-blue-700 bg-blue-50"
                     : "text-white bg-white/20"
@@ -90,6 +94,11 @@ export function LandingNavbar() {
               )}
             >
               {link.label}
+              {link.external && (
+                <svg className="w-3 h-3 ml-1 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              )}
             </button>
           ))}
           <div className="w-px h-4 bg-current opacity-20 mx-2" />
@@ -120,9 +129,14 @@ export function LandingNavbar() {
               <button
                 key={link.href}
                 onClick={() => handleNavClick(link)}
-                className="text-left px-3 py-2.5 rounded-md text-sm font-medium text-slate-700 hover:text-blue-700 hover:bg-blue-50 transition-colors"
+                className="text-left px-3 py-2.5 rounded-md text-sm font-medium text-slate-700 hover:text-blue-700 hover:bg-blue-50 transition-colors flex items-center justify-between"
               >
-                {link.label}
+                <span>{link.label}</span>
+                {link.external && (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                )}
               </button>
             ))}
             <div className="pt-2 pb-1">
