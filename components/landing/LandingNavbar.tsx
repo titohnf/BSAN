@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 
 const navLinks = [
   { label: "Beranda", href: "/", anchor: false },
+  { label: "Sumber Dukungan", href: "/sumber-dukungan", anchor: false },
   { label: "Tentang", href: "https://cerdasberkarakter.kemendikdasmen.go.id/budayasekolahamannyaman/", external: true },
 ]
 
