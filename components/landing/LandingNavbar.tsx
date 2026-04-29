@@ -7,9 +7,9 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
 const navLinks = [
-  { label: "Beranda", href: "/", anchor: false },
-  { label: "Sumber Dukungan", href: "/sumber-dukungan", anchor: false },
-  { label: "Kegiatandi", href: "/kegiatandi", anchor: false },
+  { label: "Beranda", href: "/" },
+  { label: "Sumber Dukungan", href: "/sumber-dukungan" },
+  { label: "Kegiatan", href: "/kegiatandi" },
 ]
 
 export function LandingNavbar() {
@@ -17,7 +17,8 @@ export function LandingNavbar() {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
 
-  const handleNavClick = (link: { href: string; anchor: boolean }) => {
+  const handleNavClick = (link: { href: string }) => {
+    setMobileOpen(false)
     router.push(link.href)
   }
 
@@ -35,12 +36,14 @@ export function LandingNavbar() {
           {navLinks.map((link) => (
             <button key={link.href} onClick={() => handleNavClick(link)}
               className={cn(
-                "px-3 py-2 rounded-md text-sm font-medium",
-                pathname === link.href ? "text-blue-700" : "text-slate-600"
+                "px-3 py-2 rounded-md text-sm transition-colors",
+                pathname === link.href
+                  ? "text-blue-700 font-semibold"
+                  : "text-slate-600 font-medium hover:bg-slate-100 hover:text-slate-900"
               )}>{link.label}</button>
           ))}
           <div className="w-px h-4 bg-slate-300 mx-2" />
-          <Button onClick={() => router.push("/login")} className="bg-blue-600 text-white px-5" size="sm">Masuk</Button>
+          <Button onClick={() => router.push("/login")} className="bg-blue-600 hover:bg-blue-800 text-white px-5" size="sm">Masuk</Button>
         </nav>
 
         <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 text-slate-700">
@@ -52,9 +55,9 @@ export function LandingNavbar() {
         <div className="md:hidden bg-white border-b border-slate-100">
           <div className="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-1">
             {navLinks.map((link) => (
-              <button key={link.href} onClick={() => handleNavClick(link)} className="text-left px-3 py-2.5 text-sm text-slate-700">{link.label}</button>
+              <button key={link.href} onClick={() => handleNavClick(link)} className="text-left px-3 py-2.5 text-sm text-slate-700 rounded-md transition-colors hover:bg-slate-100 hover:text-slate-900">{link.label}</button>
             ))}
-            <div className="pt-2"><Button onClick={() => router.push("/login")} className="w-full bg-blue-600 text-white">Masuk ke Sistem</Button></div>
+            <div className="pt-2"><Button onClick={() => router.push("/login")} className="w-full bg-blue-600 hover:bg-blue-800 text-white">Masuk ke Sistem</Button></div>
           </div>
         </div>
       )}

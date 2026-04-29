@@ -21,6 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
+import { LandingNavbar } from "@/components/landing/LandingNavbar"
 
 interface Kegiatan {
   id: string
@@ -60,7 +61,7 @@ export default function KegiatanPage() {
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
   const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [kegiatans, setKegiatans] = useState<Kegiatanyangdiinputkan[]>([])
+  const [kegiatans, setKegiatans] = useState<Kegiatan[]>([])
 
   // Load data activities Indo
   useEffect(() => {
@@ -89,6 +90,7 @@ export default function KegiatanPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      <LandingNavbar />
       <div className="pt-16">
         <div className="bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 py-14">
           <div className="max-w-6xl mx-auto px-4">
