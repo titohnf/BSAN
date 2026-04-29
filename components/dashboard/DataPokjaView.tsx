@@ -28,7 +28,7 @@ const REGION = "Provinsi Aceh"
 // Helpers
 // ---------------------------------------------------------------------------
 const STATUS_CONFIG = {
-  "draf": { label: "Draf", variant: "warning" as const, icon: Clock },
+  "draf": { label: "Draf", variant: "neutral" as const, icon: Clock },
   "belum-dibentuk": { label: "Belum Dibentuk", variant: "neutral" as const, icon: Clock },
   "masih-diverifikasi": { label: "Perlu Diperiksa", variant: "warning" as const, icon: Clock },
   aktif: { label: "Aktif", variant: "success" as const, icon: CheckCircle2 },
@@ -315,12 +315,12 @@ export function DataPokjaView({ pokjaList, onBuatPokja, onContinueDraft, isAdmin
         )}
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
         {activePokjaList.length === 0 ? (
           <EmptyStatePokja onBuatPokja={onBuatPokja} />
         ) : pokja ? (
           /* Detail view untuk admin dinas yang punya 1 pokja */
-          <div className="p-6 space-y-6">
+          <div className="p-6 space-y-6 rounded-xl border border-gray-100 bg-white">
             {/* Header pokja */}
             <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 pb-5 border-b border-gray-100">
               <div className="flex-1">
@@ -389,99 +389,100 @@ export function DataPokjaView({ pokjaList, onBuatPokja, onContinueDraft, isAdmin
               )
             })()}
 
-            {/* Grid info utama */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Ketua Kelompok Kerja */}
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl p-4 border border-blue-200">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                    <Users className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-1">Ketua Kelompok Kerja</p>
-                    {pokja.data?.members?.ketua?.nama ? (
-                      <>
-                        <p className="text-base font-bold text-gray-900 truncate">{pokja.data.members.ketua.nama}</p>
-                        {pokja.data.members.ketua.instansi && (
-                          <p className="text-xs text-gray-600 mt-0.5 truncate">{pokja.data.members.ketua.instansi}</p>
-                        )}
-                      </>
-                    ) : (
-                      <p className="text-sm font-medium text-gray-400">Data belum diinput</p>
-                    )}
-                  </div>
-                </div>
-              </div>
+            {/* Grid info utama — warna mengikuti status */}
+            {(() => {
+              const cardColor = {
+                "draf":               { bg: "from-gray-50 to-gray-100/50",     border: "border-gray-200",   icon: "bg-gray-500",   label: "text-gray-600"   },
+                "masih-diverifikasi": { bg: "from-amber-50 to-amber-100/50",   border: "border-amber-200",  icon: "bg-amber-500",  label: "text-amber-700"  },
+                "aktif":              { bg: "from-green-50 to-green-100/50",   border: "border-green-200",  icon: "bg-green-600",  label: "text-green-700"  },
+                "butuh-perbaikan":    { bg: "from-red-50 to-red-100/50",       border: "border-red-200",    icon: "bg-red-500",    label: "text-red-700"    },
+                "belum-dibentuk":     { bg: "from-gray-50 to-gray-100/50",     border: "border-gray-200",   icon: "bg-gray-400",   label: "text-gray-600"   },
+              }[pokja.status] ?? { bg: "from-gray-50 to-gray-100/50", border: "border-gray-200", icon: "bg-gray-400", label: "text-gray-600" }
 
-              {/* Jumlah Anggota */}
-              <div className="bg-gradient-to-br from-green-50 to-green-100/50 rounded-xl p-4 border border-green-200">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
-                    <Users className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-1">Total Anggota</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {pokja.data?.members ? Object.values(pokja.data.members).filter(m => m && m.nama?.trim()).length : 0}
-                    </p>
-                    <p className="text-xs text-gray-600 mt-0.5">Orang terdaftar</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Nomor SK */}
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-4 border border-purple-200">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0">
-                    <FileText className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-purple-700 uppercase tracking-wide mb-1">Nomor SK</p>
-                    {pokja.data?.sk?.nomorSK ? (
-                      <>
-                        <p className="text-sm font-bold text-gray-900 truncate">{pokja.data.sk.nomorSK}</p>
-                        {pokja.data.sk.tanggalSK && (
-                          <p className="text-xs text-gray-600 mt-0.5">Tgl: {pokja.data.sk.tanggalSK}</p>
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Ketua Kelompok Kerja */}
+                  <div className={`bg-gradient-to-br ${cardColor.bg} rounded-xl p-4 border ${cardColor.border}`}>
+                    <div className="flex items-start gap-3">
+                      <div className={`w-10 h-10 rounded-full ${cardColor.icon} flex items-center justify-center flex-shrink-0`}>
+                        <Users className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-xs font-semibold ${cardColor.label} uppercase tracking-wide mb-1`}>Ketua Kelompok Kerja</p>
+                        {pokja.data?.members?.ketua?.nama ? (
+                          <>
+                            <p className="text-base font-bold text-gray-900 truncate">{pokja.data.members.ketua.nama}</p>
+                            {pokja.data.members.ketua.instansi && (
+                              <p className="text-xs text-gray-600 mt-0.5 truncate">{pokja.data.members.ketua.instansi}</p>
+                            )}
+                          </>
+                        ) : (
+                          <p className="text-sm font-medium text-gray-400">Data belum diinput</p>
                         )}
-                        {pokja.data.sk.periodeSelesai && (
-                          <p className="text-xs text-gray-600">s.d. {pokja.data.sk.periodeSelesai}</p>
-                        )}
-                      </>
-                    ) : (
-                      <p className="text-sm font-medium text-gray-400">Data belum diinput</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Kanal Pengaduan */}
-            {pokja.data?.nomorKanal && (
-              <div className="rounded-xl border-2 border-green-200 bg-green-50 p-5">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
-                      <MessageCircle className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-1">
-                        Kanal Pengaduan &amp; Aspirasi
-                      </p>
-                      <p className="text-lg font-bold text-gray-900">{pokja.data.nomorKanal}</p>
+                      </div>
                     </div>
                   </div>
-                  <a
-                    href={`https://wa.me/62${pokja.data.nomorKanal.replace(/^0/, "")}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-lg bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition-colors flex-shrink-0"
-                  >
-                    <Phone className="w-4 h-4" />
-                    Hubungi via WhatsApp
-                  </a>
+
+                  {/* Total Anggota */}
+                  <div className={`bg-gradient-to-br ${cardColor.bg} rounded-xl p-4 border ${cardColor.border}`}>
+                    <div className="flex items-start gap-3">
+                      <div className={`w-10 h-10 rounded-full ${cardColor.icon} flex items-center justify-center flex-shrink-0`}>
+                        <Users className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className={`text-xs font-semibold ${cardColor.label} uppercase tracking-wide mb-1`}>Total Anggota</p>
+                        <p className="text-2xl font-bold text-gray-900">
+                          {pokja.data?.members ? Object.values(pokja.data.members).filter(m => m && m.nama?.trim()).length : 0}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Nomor SK */}
+                  <div className={`bg-gradient-to-br ${cardColor.bg} rounded-xl p-4 border ${cardColor.border}`}>
+                    <div className="flex items-start gap-3">
+                      <div className={`w-10 h-10 rounded-full ${cardColor.icon} flex items-center justify-center flex-shrink-0`}>
+                        <FileText className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-xs font-semibold ${cardColor.label} uppercase tracking-wide mb-1`}>Nomor SK</p>
+                        {pokja.data?.sk?.nomorSK ? (
+                          <>
+                            <p className="text-sm font-bold text-gray-900 truncate">{pokja.data.sk.nomorSK}</p>
+                            {(pokja.data.sk.tanggalSK || pokja.data.sk.periodeSelesai) && (
+                              <p className="text-xs text-gray-600 mt-0.5">
+                                {pokja.data.sk.tanggalSK && `Tgl: ${pokja.data.sk.tanggalSK}`}
+                                {pokja.data.sk.tanggalSK && pokja.data.sk.periodeSelesai && " — "}
+                                {pokja.data.sk.periodeSelesai && `s.d. ${pokja.data.sk.periodeSelesai}`}
+                              </p>
+                            )}
+                          </>
+                        ) : (
+                          <p className="text-sm font-medium text-gray-400">Data belum diinput</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Kanal Pengaduan */}
+                  <div className={`bg-gradient-to-br ${cardColor.bg} rounded-xl p-4 border ${cardColor.border}`}>
+                    <div className="flex items-start gap-3">
+                      <div className={`w-10 h-10 rounded-full ${cardColor.icon} flex items-center justify-center flex-shrink-0`}>
+                        <MessageCircle className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-xs font-semibold ${cardColor.label} uppercase tracking-wide mb-1`}>Kanal Pengaduan &amp; Aspirasi</p>
+                        {pokja.data?.nomorKanal ? (
+                          <p className="text-base font-bold text-gray-900">{pokja.data.nomorKanal}</p>
+                        ) : (
+                          <p className="text-sm font-medium text-gray-400">Data belum diinput</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            )}
+              )
+            })()}
 
             {/* Daftar Anggota */}
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
