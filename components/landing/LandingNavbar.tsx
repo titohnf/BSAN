@@ -84,7 +84,7 @@ export function LandingNavbar() {
           <div className="w-px h-4 bg-slate-300 mx-2" />
           <Button
             onClick={() => router.push("/login")}
-            className="bg-amber-400 hover:bg-amber-500 text-slate-900 font-semibold px-5 shadow-none"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 shadow-none"
             size="sm"
           >
             Masuk
@@ -119,7 +119,7 @@ export function LandingNavbar() {
             <div className="pt-2 pb-1">
               <Button
                 onClick={() => router.push("/login")}
-                className="w-full bg-amber-400 hover:bg-amber-500 text-slate-900 font-semibold shadow-none"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-none"
               >
                 Masuk ke Sistem
               </Button>
