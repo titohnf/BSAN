@@ -6,9 +6,9 @@ import {
   MapPin,
   Building2,
   BarChart3,
-  Clock,
   Search,
   Download,
+  X,
   ChevronDown,
   ChevronUp,
 } from "lucide-react"
@@ -90,6 +90,7 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [showWilayahModal, setShowWilayahModal] = useState(false)
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase()
@@ -187,19 +188,21 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
           </div>
 
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-8">
-            <div className="px-5 py-4 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                <h2 className="font-semibold text-slate-900">Kelompok Kerja: {search || "Seluruh Indonesia"}</h2>
-                <Button variant="outline" size="sm" onClick={() => { setSearch(""); setPage(1) }} className="w-fit h-7 text-xs gap-1">
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  Ganti
-                </Button>
+              <div className="px-5 py-4 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                  <h2 className="font-semibold text-slate-900">Kelompok Kerja: {search || "Seluruh Indonesia"}</h2>
+                  <Button variant="outline" size="sm" onClick={() => setShowWilayahModal(true)} className="w-fit h-7 text-xs gap-1">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Ganti
+                  </Button>
+                </div>
+                <p className="text-slate-400 text-xs mt-1">
+                  {filtered.length} provinsi ditemukan
+                </p>
               </div>
-              <p className="text-slate-400 text-xs">
-                {filtered.length} provinsi ditemukan
-              </p>
               <div className="flex items-center gap-2 w-full sm:w-auto">
                 <div className="relative flex-1 sm:flex-none sm:w-56">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -227,11 +230,9 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
               <TableHeader>
                 <TableRow className="bg-slate-50/70 hover:bg-slate-50/70">
                   <TableHead className="w-10 text-slate-500 text-xs pl-5">No</TableHead>
-                  <TableHead className="text-slate-500 text-xs">Provinsi</TableHead>
+                  <TableHead className="text-slate-500 text-xs">Wilayah</TableHead>
                   <TableHead className="text-slate-500 text-xs">Status Kelompok Kerja</TableHead>
-                  <TableHead className="text-slate-500 text-xs text-right">Jml Kab/Kota</TableHead>
-                  <TableHead className="text-slate-500 text-xs text-right">Kelompok Kerja Kab/Kota</TableHead>
-                  <TableHead className="text-slate-500 text-xs text-right">Persentase</TableHead>
+                  <TableHead className="text-slate-500 text-xs">Bidang Tersedia</TableHead>
                   <TableHead className="w-10" />
                 </TableRow>
               </TableHeader>
@@ -245,29 +246,20 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
                     <React.Fragment key={row.no}>
                       <TableRow className="group">
                         <TableCell className="text-slate-400 text-xs pl-5">{row.no}</TableCell>
-                        <TableCell className="font-medium text-slate-900">{row.provinsi}</TableCell>
+                        <TableCell className="font-medium text-slate-900">
+                          {row.provinsi.includes(" - ") ? `Kabupaten/Kota` : `Provinsi`} {row.provinsi}
+                        </TableCell>
                         <TableCell>{statusBadge(row.statusPokja)}</TableCell>
-                        <TableCell className="text-slate-600 text-right">{row.jumlahKabKota}</TableCell>
-                        <TableCell className="text-slate-600 text-right">{row.pokjaKabKota}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                              <div
-                                className={cn(
-                                  "h-full rounded-full",
-                                  row.persentase >= 50
-                                    ? "bg-emerald-500"
-                                    : row.persentase > 0
-                                    ? "bg-amber-400"
-                                    : "bg-slate-200"
-                                )}
-                                style={{ width: `${row.persentase}%` }}
-                              />
+                        <TableCell>
+                          {row.statusPokja === "Terbentuk" ? (
+                            <div className="flex flex-wrap gap-1">
+                              <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">Pendidikan</span>
+                              <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">Sosial</span>
+                              <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">Kesehatan</span>
                             </div>
-                            <span className="text-slate-600 text-xs w-8 text-right">
-                              {row.persentase}%
-                            </span>
-                          </div>
+                          ) : (
+                            <span className="text-slate-400">-</span>
+                          )}
                         </TableCell>
                         <TableCell>
                           {pokja && (
@@ -388,6 +380,98 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
           </div>
         </div>
       </div>
+
+      {/* Wilayah Modal */}
+      {showWilayahModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowWilayahModal(false)} />
+          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
+              <h3 className="text-base font-bold text-gray-900">Filter Wilayah</h3>
+              <button onClick={() => setShowWilayahModal(false)} className="p-1 hover:bg-gray-100 rounded-lg">
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <div className="flex h-full max-h-[400px]">
+                <div className="w-1/2 border-r border-gray-100 overflow-y-auto">
+                  <div className="p-2">
+                    <button
+                      onClick={() => { setSearch(""); setPage(1); setShowWilayahModal(false) }}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium ${!search ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50"}`}
+                    >
+                      Semua Wilayah
+                    </button>
+                    {PROVINSI_DATA.map((prov) => {
+                      const isSelected = search === prov.provinsi
+                      return (
+                        <button
+                          key={prov.provinsi}
+                          onClick={() => { setSearch(prov.provinsi); setPage(1); setShowWilayahModal(false) }}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between ${
+                            isSelected ? "bg-blue-50 text-blue-700 font-medium" : "hover:bg-gray-50"
+                          }`}
+                        >
+                          <span className="truncate">{prov.provinsi}</span>
+                          <span className="text-xs text-gray-400">{prov.jumlahKabKota}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+                <div className="w-1/2 overflow-y-auto bg-white">
+                  <div className="p-2">
+                    {search ? (
+                      (() => {
+                        const prov = PROVINSI_DATA.find(p => p.provinsi === search)
+                        const kabCount = prov?.jumlahKabKota ?? 0
+                        if (kabCount === 0) {
+                          return <p className="text-sm text-gray-400 p-3">Tidak ada kabupaten/kota</p>
+                        }
+                        return (
+                          <>
+                            <button
+                              onClick={() => { setSearch(search); setPage(1); setShowWilayahModal(false) }}
+                              className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-gray-100"
+                            >
+                              Semua Kabupaten/Kota
+                            </button>
+                            {Array.from({ length: kabCount }, (_, i) => (
+                              <button
+                                key={i}
+                                onClick={() => { setSearch(`${search} - Kab/Kota ${i + 1}`); setPage(1); setShowWilayahModal(false) }}
+                                className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-gray-100"
+                              >
+                                Kab/Kota {i + 1}
+                              </button>
+                            ))}
+                          </>
+                        )
+                      })()
+                    ) : (
+                      <p className="text-sm text-gray-400 p-3">Pilih wilayah di kiri</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="px-5 py-4 border-t border-gray-200 flex justify-end gap-2">
+              <button
+                onClick={() => setShowWilayahModal(false)}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition"
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => setShowWilayahModal(false)}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition"
+              >
+                Terapkan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
