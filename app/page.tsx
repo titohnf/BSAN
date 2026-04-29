@@ -2,7 +2,6 @@
 
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { DevBanner } from "@/components/landing/DevBanner"
 import { LandingNavbar } from "@/components/landing/LandingNavbar"
 import { LandingFooter } from "@/components/landing/LandingFooter"
 import { DataPublikContent } from "@/components/landing/DataPublikContent"
@@ -25,7 +24,6 @@ export default function LandingPage() {
 
   return (
     <main>
-      <DevBanner />
       <LandingNavbar />
       <DataPublikContent />
       <LandingFooter />
