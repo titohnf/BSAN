@@ -256,11 +256,29 @@ function ReviewMemberCard({ label, member }: { label: string; member: MemberFiel
   )
 }
 
-function ReviewTable({ members, anggotaList, onEdit }: { members: Members; anggotaList: AnggotaItem[]; onEdit: () => void }) {
+function isMemberComplete(m: MemberField): boolean {
+  return !!(m.nama && m.email && m.jenisKelamin && m.noWhatsapp && m.instansi)
+}
+
+function isAnggotaComplete(a: AnggotaItem): boolean {
+  return !!(a.nama && a.email && a.jenisKelamin && a.noWhatsapp && a.instansi)
+}
+
+function getMemberStatus(m: MemberField): string {
+  const hasName = !!m.nama
+  if (!hasName) return "Belum diisi"
+  return isMemberComplete(m) ? "Lengkap" : "Tidak Lengkap"
+}
+
+function getAnggotaStatus(a: AnggotaItem): string {
+  const hasName = !!a.nama
+  if (!hasName) return "Belum diisi"
+  return isAnggotaComplete(a) ? "Lengkap" : "Tidak Lengkap"
+}
+
+function ReviewTable({ members, anggotaList, onEdit, onDelete, onResetMember }: { members: Members; anggotaList: AnggotaItem[]; onEdit: () => void; onDelete?: (idx: number) => void; onResetMember?: (kategori: string) => void }) {
   const scrollRef = useRef<HTMLDivElement>(null)
-  const noColRef = useRef<HTMLTableCellElement>(null)
   const [isScrolled, setIsScrolled] = useState(false)
-  const [namaLeft, setNamaLeft] = useState(40)
 
   useEffect(() => {
     const el = scrollRef.current
@@ -270,15 +288,11 @@ function ReviewTable({ members, anggotaList, onEdit }: { members: Members; anggo
     return () => el.removeEventListener("scroll", handleScroll)
   }, [])
 
-  useEffect(() => {
-    if (noColRef.current) setNamaLeft(noColRef.current.offsetWidth)
-  }, [])
-
-  const allData: { no: number; kategori: string; nama: string; jenisKelamin: string; instansi: string; email: string; noHp: string; status: string; isCategory: boolean }[] = []
+const allData: { no: number; kategori: string; nama: string; jenisKelamin: string; instansi: string; email: string; noHp: string; status: string; isCategory: boolean; deleteIdx?: number; roleKey?: string; jabatan: string }[] = []
   
   let no = 1
   
-  allData.push({ no: 0, kategori: "PIMPINAN", nama: "", jenisKelamin: "", instansi: "", email: "", noHp: "", status: "", isCategory: true })
+  allData.push({ no: 0, kategori: "PIMPINAN", nama: "", jenisKelamin: "", instansi: "", email: "", noHp: "", status: "", isCategory: true, jabatan: "" })
   PIMPINAN_ROLES.forEach((r) => {
     const m = members[r.key]
     allData.push({
@@ -289,14 +303,16 @@ function ReviewTable({ members, anggotaList, onEdit }: { members: Members; anggo
       instansi: m.instansi || "-",
       email: m.email || "-",
       noHp: m.noWhatsapp || "-",
-      status: m.nama ? "Lengkap" : "Belum diisi",
-      isCategory: false
+      status: getMemberStatus(m),
+      isCategory: false,
+      roleKey: r.key,
+      jabatan: m.jabatan || "-"
     })
   })
 
   const bidangWithExtra: { key: string; label: string }[] = BIDANG_ROLES.map(r => ({ key: r.key, label: r.label }))
   bidangWithExtra.forEach((b) => {
-    allData.push({ no: 0, kategori: b.label.toUpperCase(), nama: "", jenisKelamin: "", instansi: "", email: "", noHp: "", status: "", isCategory: true })
+    allData.push({ no: 0, kategori: b.label.toUpperCase(), nama: "", jenisKelamin: "", instansi: "", email: "", noHp: "", status: "", isCategory: true, jabatan: "" })
     const m = members[b.key as keyof Members]
     allData.push({
       no: no++,
@@ -306,30 +322,36 @@ function ReviewTable({ members, anggotaList, onEdit }: { members: Members; anggo
       instansi: m.instansi || "-",
       email: m.email || "-",
       noHp: m.noWhatsapp || "-",
-      status: m.nama ? "Lengkap" : "Belum diisi",
-      isCategory: false
-    })
+      status: getMemberStatus(m),
+      isCategory: false,
+      roleKey: b.key,
+      jabatan: m.jabatan || "-"
+})
     
-    const extraMembers = anggotaList.filter(a => a.bidang === b.label)
-    extraMembers.forEach((a) => {
-      allData.push({
-        no: no++,
-        kategori: "Anggota",
-        nama: a.nama,
-        jenisKelamin: a.jenisKelamin || "-",
-        instansi: a.instansi || "-",
-        email: a.email || "-",
-        noHp: a.noWhatsapp || "-",
-        status: "Lengkap",
-        isCategory: false
-      })
+    anggotaList.forEach((a, origIdx) => {
+      if (a.bidang === b.label) {
+        allData.push({
+          no: no++,
+          kategori: "Anggota",
+          nama: a.nama,
+          jenisKelamin: a.jenisKelamin || "-",
+          instansi: a.instansi || "-",
+          email: a.email || "-",
+          noHp: a.noWhatsapp || "-",
+          status: getAnggotaStatus(a),
+          isCategory: false,
+          deleteIdx: origIdx,
+          jabatan: a.jabatan || "-"
+        })
+      }
     })
   })
 
   const lainnya = anggotaList.filter(a => a.bidang === "Lainnya (Tokoh Masyarakat, Akademisi, Kepolisian, dan sebagainya..)" || a.bidang === "Lainnya" || !BIDANG_ROLES.some(b => b.label === a.bidang))
   if ( lainnya.length > 0) {
-    allData.push({ no: 0, kategori: "LAINNYA", nama: "", jenisKelamin: "", instansi: "", email: "", noHp: "", status: "", isCategory: true })
+    allData.push({ no: 0, kategori: "LAINNYA", nama: "", jenisKelamin: "", instansi: "", email: "", noHp: "", status: "", isCategory: true, jabatan: "" })
     lainnya.forEach((a) => {
+      const origIdx = anggotaList.indexOf(a)
       allData.push({
         no: no++,
         kategori: "Anggota",
@@ -338,8 +360,10 @@ function ReviewTable({ members, anggotaList, onEdit }: { members: Members; anggo
         instansi: a.instansi || "-",
         email: a.email || "-",
         noHp: a.noWhatsapp || "-",
-        status: "Lengkap",
-        isCategory: false
+        status: getAnggotaStatus(a),
+        isCategory: false,
+        deleteIdx: origIdx,
+        jabatan: a.jabatan || "-"
       })
     })
   }
@@ -359,16 +383,17 @@ function ReviewTable({ members, anggotaList, onEdit }: { members: Members; anggo
       <table className="w-full text-sm border-separate border-spacing-0">
         <thead className="bg-gray-50">
           <tr>
-            <th ref={noColRef} className="w-10 px-2 py-3 text-center font-semibold text-gray-500 whitespace-nowrap bg-gray-50 sticky left-0 z-20 border-b border-gray-200">No</th>
-            <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap bg-gray-50 border-b border-gray-200 sticky z-10 relative" style={{ left: namaLeft }}>
-              Nama
+            <th className="w-10 px-2 py-3 text-center font-semibold text-gray-500 whitespace-nowrap bg-gray-50 sticky left-0 z-20 border-b border-gray-200">No</th>
+            <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap bg-gray-50 border-b border-gray-200 sticky z-20" style={{ left: "2.5rem" }}>
+              Nama *
               <Cue />
             </th>
-            <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap bg-gray-50 border-b border-gray-200">Jabatan Kelompok Kerja</th>
-            <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap border-b border-gray-200">Jenis Kelamin</th>
-            <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap border-b border-gray-200">Instansi</th>
-            <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap border-b border-gray-200">Email</th>
-            <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap border-b border-gray-200">No. HP</th>
+            <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap bg-gray-50 border-b border-gray-200">Jabatan Kelompok Kerja *</th>
+            <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap border-b border-gray-200">Jenis Kelamin *</th>
+            <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap border-b border-gray-200">Instansi *</th>
+            <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap border-b border-gray-200">Jabatan Instansi *</th>
+            <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap border-b border-gray-200">Email *</th>
+            <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap border-b border-gray-200">No. HP *</th>
             <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap border-b border-gray-200">Status</th>
             <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap border-b border-gray-200">Aksi</th>
           </tr>
@@ -379,35 +404,69 @@ function ReviewTable({ members, anggotaList, onEdit }: { members: Members; anggo
             if (isCategoryRow) {
               return (
                 <tr key={idx} className="bg-gray-50">
-                  <td colSpan={2} className="px-4 py-2 text-[11px] font-semibold text-gray-400 uppercase tracking-widest bg-gray-50 sticky left-0 z-20 border-b border-gray-100 min-w-[280px] relative">
+                  <td colSpan={2} className="px-4 py-2 text-[11px] font-semibold text-gray-400 uppercase tracking-widest bg-gray-50 sticky left-0 z-20 border-b border-gray-100 min-w-[280px]">
                     {row.kategori}
                     <Cue />
                   </td>
-                  <td colSpan={7} className="px-4 py-2 bg-gray-50 border-b border-gray-100"></td>
+                  <td colSpan={8} className="px-4 py-2 bg-gray-50 border-b border-gray-100"></td>
                 </tr>
               )
             }
             return (
-              <tr key={idx} className="hover:bg-blue-50/30">
-                <td className="w-10 px-2 py-3 text-center whitespace-nowrap text-gray-400 text-xs bg-white sticky left-0 z-20 border-b border-gray-100">{row.no}</td>
-                <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap bg-white sticky z-10 border-b border-gray-100 relative" style={{ left: namaLeft }}>
-                  {row.nama}
+              <tr key={idx} className={cn("hover:bg-blue-50/30", (row.status === "Belum diisi" || row.status === "Tidak Lengkap") && "bg-red-50")}>
+                <td
+                  colSpan={2}
+                  className={cn(
+                    "whitespace-nowrap sticky left-0 z-20 border-b border-gray-100",
+                    (row.status === "Belum diisi" || row.status === "Tidak Lengkap") ? "bg-red-50" : "bg-white"
+                  )}
+                >
+                  <div className="flex items-center py-3">
+                    <span className={cn("w-10 px-2 text-center text-xs flex-shrink-0", (row.status === "Belum diisi" || row.status === "Tidak Lengkap") ? "text-red-400" : "text-gray-400")}>
+                      {row.no}
+                    </span>
+                    <span className={cn("pl-4 pr-10 font-medium", (row.status === "Belum diisi" || row.status === "Tidak Lengkap") ? "text-red-700" : "text-gray-900")}>
+                      {row.nama}
+                    </span>
+                  </div>
                   <Cue />
                 </td>
-                <td className="px-4 py-3 text-gray-500 whitespace-nowrap bg-white border-b border-gray-100">{row.kategori}</td>
-                <td className="px-4 py-3 text-gray-500 whitespace-nowrap bg-white border-b border-gray-100">{row.jenisKelamin}</td>
-                <td className="px-4 py-3 text-gray-500 whitespace-nowrap bg-white border-b border-gray-100">{row.instansi}</td>
-                <td className="px-4 py-3 text-gray-500 whitespace-nowrap bg-white border-b border-gray-100">{row.email}</td>
-                <td className="px-4 py-3 text-gray-500 whitespace-nowrap bg-white border-b border-gray-100">{row.noHp}</td>
-                <td className="px-4 py-3 whitespace-nowrap bg-white border-b border-gray-100">
+                <td className={cn("px-4 py-3 whitespace-nowrap border-b border-gray-100", (row.status === "Belum diisi" || row.status === "Tidak Lengkap") ? "text-red-600 bg-red-50" : "text-gray-500 bg-white")}>{row.kategori}</td>
+                <td className={cn("px-4 py-3 whitespace-nowrap border-b border-gray-100", (row.status === "Belum diisi" || row.status === "Tidak Lengkap") ? "text-red-600 bg-red-50" : "text-gray-500 bg-white")}>{row.jenisKelamin}</td>
+                <td className={cn("px-4 py-3 whitespace-nowrap border-b border-gray-100", (row.status === "Belum diisi" || row.status === "Tidak Lengkap") ? "text-red-600 bg-red-50" : "text-gray-500 bg-white")}>{row.instansi}</td>
+                <td className={cn("px-4 py-3 whitespace-nowrap border-b border-gray-100", (row.status === "Belum diisi" || row.status === "Tidak Lengkap") ? "text-red-600 bg-red-50" : "text-gray-500 bg-white")}>{row.jabatan}</td>
+                <td className={cn("px-4 py-3 whitespace-nowrap border-b border-gray-100", (row.status === "Belum diisi" || row.status === "Tidak Lengkap") ? "text-red-600 bg-red-50" : "text-gray-500 bg-white")}>{row.email}</td>
+                <td className={cn("px-4 py-3 whitespace-nowrap border-b border-gray-100", (row.status === "Belum diisi" || row.status === "Tidak Lengkap") ? "text-red-600 bg-red-50" : "text-gray-500 bg-white")}>{row.noHp}</td>
+                <td className={cn("px-4 py-3 whitespace-nowrap border-b border-gray-100", (row.status === "Belum diisi" || row.status === "Tidak Lengkap") ? "bg-red-50" : "bg-white")}>
                   {row.status && (
-                    <span className={cn("px-2 py-1 rounded-full text-xs font-medium", row.status === "Lengkap" ? "bg-green-50 text-green-700" : "bg-amber-50 text-amber-600")}>
+                    <span className={cn(
+                      "px-2 py-1 rounded-full text-xs font-medium",
+                      row.status === "Lengkap" ? "bg-green-50 text-green-700" :
+                      row.status === "Tidak Lengkap" ? "bg-red-100 text-red-600" :
+                      "bg-amber-50 text-amber-600"
+                    )}>
                       {row.status}
                     </span>
                   )}
                 </td>
-                <td className="px-4 py-3 whitespace-nowrap bg-white border-b border-gray-100">
-                  {row.nama && <button onClick={onEdit} className="text-xs text-blue-600 hover:underline">Ubah</button>}
+                <td className={cn("px-4 py-3 whitespace-nowrap border-b border-gray-100", (row.status === "Belum diisi" || row.status === "Tidak Lengkap") ? "bg-red-50" : "bg-white")}>
+                  <div className="flex items-center gap-2">
+                    {!row.isCategory && <button onClick={onEdit} className="text-xs text-blue-600 hover:underline">Ubah</button>}
+                    {onDelete && (
+                      <button 
+                        onClick={() => {
+                          if (row.deleteIdx !== undefined) {
+                            onDelete(row.deleteIdx)
+                          } else if (!row.isCategory && row.nama && row.nama !== "-" && row.roleKey) {
+                            onResetMember(row.roleKey)
+                          }
+                        }} 
+                        className="text-xs text-red-600 hover:underline"
+                      >
+                        Hapus
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             )
@@ -1225,7 +1284,13 @@ export default function BuatPokjaPage() {
                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Susunan Pengurus</p>
                     <button onClick={() => setStep(2)} className="text-xs text-blue-600 hover:underline flex items-center gap-1"><Eye className="w-3 h-3" /> Ubah</button>
                   </div>
-                  <ReviewTable members={members} anggotaList={anggotaList} onEdit={() => setStep(2)} />
+                  <ReviewTable 
+                    members={members} 
+                    anggotaList={anggotaList} 
+                    onEdit={() => setStep(2)} 
+                    onDelete={(idx) => setAnggotaList(prev => prev.filter((_, i) => i !== idx))}
+                    onResetMember={(roleKey) => setMembers(prev => ({ ...prev, [roleKey]: emptyMember() }))}
+                  />
                 </div>
 
                 {/* SK */}
