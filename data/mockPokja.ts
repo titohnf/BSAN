@@ -42,7 +42,68 @@ export interface PengajuanPokja {
 // Helpers
 // ---------------------------------------------------------------------------
 function makeMember(jabatan: string, nama: string, email: string, jk: JenisKelamin, wa: string, instansi: string): MemberData {
-  return { jabatan, nama, email, jenisKelamin: jk, noWhatsapp: wa, instansi, status: "pending" }
+  return { jabatan, nama, email, jenisKelamin: jk, noWhatsapp: wa, instansi, status: "approved" }
+}
+
+// ---------------------------------------------------------------------------
+// Dummy pokja generator for Aktif rows without real pokjaId
+// ---------------------------------------------------------------------------
+const NAMA_POOL = [
+  ["Dr. Ahmad Fauzi, M.Pd", "Siti Rahayu, S.Pd", "Budi Santoso, M.Si", "Nurul Hidayah, S.Pd", "Andi Pratama, S.H"],
+  ["Prof. Hendra Wijaya", "Dewi Lestari, M.Pd", "Rudi Hartono, S.H", "Fitri Andini, M.Si", "Agus Setiawan, S.Sos"],
+  ["Dr. Slamet Riyadi", "Wulandari, M.Pd", "Bambang Susilo, S.H", "Indah Permata, M.Si", "Faisal Rahman, S.Kom"],
+  ["Dr. Rizki Mahendra", "Kartini Wahyuni, M.Pd", "Denny Prasetyo, S.H", "Yuni Astuti, M.Si", "Hendra Gunawan, S.Sos"],
+  ["Prof. Andi Kurniawan", "Mardiana Lubis, M.Pd", "Syahrul Efendi, S.H", "Erna Sitompul, M.Si", "Taufik Hidayat, S.Kom"],
+]
+
+const BIDANG_LIST = [
+  "Ketua Kelompok Kerja",
+  "Wakil Ketua Kelompok Kerja",
+  "Bidang Pendidikan",
+  "Bidang Sosial",
+  "Bidang Kesehatan",
+  "Bidang PPPA",
+  "Bidang Kominfo",
+]
+
+function seedInt(seed: number, max: number) {
+  const x = Math.abs(Math.sin(seed * 127.1 + 311.7) * 43758.5)
+  return Math.floor(x - Math.floor(x)) * max | 0
+}
+
+export function generateDummyPokja(no: number, provinsi: string, kontak?: string): PengajuanPokja {
+  const slug = provinsi.toLowerCase().replace(/[^a-z]/g, "")
+  const nomorUrut = String(no).padStart(3, "0")
+  const tahun = 2023 + seedInt(no, 3)
+  const bulanMulai = 1 + seedInt(no + 1, 11)
+  const periodeMulai = `${tahun}-${String(bulanMulai).padStart(2, "0")}-01`
+  const periodeSelesai = `${tahun + 3}-${String(bulanMulai).padStart(2, "0")}-01`
+  const phone = kontak ?? `0812${String(Math.abs(Math.sin(no) * 1e8 | 0)).padStart(8, "0")}`
+  const namaPool = NAMA_POOL[seedInt(no, NAMA_POOL.length)]
+
+  const members: MemberData[] = BIDANG_LIST.map((bidang, i) => {
+    const nama = namaPool[i % namaPool.length]
+    const jk: JenisKelamin = i % 2 === 0 ? "Laki-Laki" : "Perempuan"
+    const dinas = bidang.startsWith("Bidang")
+      ? `Dinas ${bidang.replace("Bidang ", "")} ${provinsi.split(" - ")[0] ?? provinsi}`
+      : `Sekretariat Daerah ${provinsi.split(" - ")[0] ?? provinsi}`
+    return makeMember(bidang, nama, `${nama.split(",")[0].toLowerCase().replace(/ /g, ".")}@${slug}.go.id`, jk, phone, dinas)
+  })
+
+  return {
+    id: `dummy-${no}`,
+    wilayah: provinsi,
+    provinsi: provinsi.split(" - ")[0] ?? provinsi,
+    kanalPengaduan: phone,
+    nomorSK: `420/${nomorUrut}/${tahun}`,
+    tanggalSK: `${tahun}-${String(bulanMulai).padStart(2, "0")}-15`,
+    periodeMulai,
+    periodeSelesai,
+    skFileName: `SK_Kelompok_Kerja_${provinsi.replace(/[ \-]/g, "_")}.pdf`,
+    members,
+    status: "disetujui",
+    tanggalPengajuan: `${tahun}-${String(bulanMulai).padStart(2, "0")}-10`,
+  }
 }
 
 // ---------------------------------------------------------------------------

@@ -3,7 +3,7 @@ import { MOCK_PENGAJUAN } from "./mockPokja"
 export interface ProvinsiRow {
   no: number
   provinsi: string
-  statusPokja: "Terbentuk" | "Dalam Proses" | "Belum Terbentuk"
+  statusPokja: "Aktif" | "Perlu Diperiksa" | "Perlu Perbaikan" | "Belum Dibentuk" | "Belum Terbentuk"
   jumlahKabKota: number
   pokjaKabKota: number
   persentase: number
@@ -56,19 +56,18 @@ const ALL_PROVINSI: { name: string; kabKota: number }[] = [
 ]
 
 function getStatus(provinsi: string): {
-  status: "Terbentuk" | "Dalam Proses" | "Belum Terbentuk"
+  status: "Aktif" | "Perlu Diperiksa" | "Belum Terbentuk"
   pokjaId?: string
 } {
   if (provinsi.includes(" - ")) {
-    const statuses: Array<"Terbentuk" | "Dalam Proses" | "Belum Terbentuk"> = ["Terbentuk", "Terbentuk", "Dalam Proses", "Dalam Proses", "Belum Terbentuk"]
+    const statuses: Array<"Aktif" | "Perlu Diperiksa" | "Belum Terbentuk"> = ["Aktif", "Aktif", "Perlu Diperiksa", "Perlu Diperiksa", "Belum Terbentuk"]
     const idx = Math.abs(provinsi.charCodeAt(provinsi.length - 1)) % 5
     return { status: statuses[idx] }
   }
   const match = MOCK_PENGAJUAN.find((p) => p.provinsi === provinsi)
   if (!match) return { status: "Belum Terbentuk" }
-  if (match.status === "disetujui") return { status: "Terbentuk", pokjaId: match.id }
-  if (match.status === "menunggu-validasi") return { status: "Dalam Proses", pokjaId: match.id }
-  return { status: "Dalam Proses", pokjaId: match.id }
+  if (match.status === "disetujui") return { status: "Aktif", pokjaId: match.id }
+  return { status: "Perlu Diperiksa", pokjaId: match.id }
 }
 
 const KAB_TO_INCLUDE: Record<string, string[]> = {
@@ -105,17 +104,13 @@ function generateRows(): ProvinsiRow[] {
 
   for (const p of ALL_PROVINSI) {
     const { status, pokjaId } = getStatus(p.name)
-    const pokjaKabKota = status === "Terbentuk" ? Math.floor(p.kabKota * 0.3) : 0
+    const pokjaKabKota = status === "Aktif" ? Math.floor(p.kabKota * 0.3) : 0
     no++
-    const skor = status === "Terbentuk"
-      ? seedScore(no, 60, 100)
-      : status === "Dalam Proses"
-      ? seedScore(no, 30, 59)
-      : undefined
-    const bidangTersedia = status === "Terbentuk" ? 3 + (no % 3) : undefined
+    const skor = status === "Aktif" ? seedScore(no, 60, 100) : undefined
+    const bidangTersedia = status === "Aktif" ? 3 + (no % 3) : undefined
     const skorDelta = skor != null ? seedDelta(no) : undefined
     const matchPokja = MOCK_PENGAJUAN.find((p2) => p2.id === pokjaId)
-    const kontak = status === "Terbentuk"
+    const kontak = status === "Aktif"
       ? (matchPokja?.kanalPengaduan ?? seedPhone(no))
       : undefined
     rows.push({
@@ -136,23 +131,19 @@ function generateRows(): ProvinsiRow[] {
       for (const kabName of KAB_TO_INCLUDE[p.name]) {
         const fullName = `${p.name} - ${kabName}`
         const { status: kabStatus, pokjaId: kabPokjaId } = getStatus(fullName)
-        const isTerbentuk = kabStatus === "Terbentuk"
+        const isAktif = kabStatus === "Aktif"
         const kabNo = ++no
-        const kabSkor = isTerbentuk
-          ? seedScore(kabNo, 60, 100)
-          : kabStatus === "Dalam Proses"
-          ? seedScore(kabNo, 30, 59)
-          : undefined
-        const kabBidang = isTerbentuk ? 3 + (kabNo % 3) : undefined
-        const kabSkorDelta = kabSkor != null ? seedDelta(kabNo) : undefined
-        const kabKontak = isTerbentuk ? seedPhone(kabNo) : undefined
+        const kabSkor = isAktif ? seedScore(kabNo, 60, 100) : undefined
+        const kabBidang = isAktif ? 3 + (kabNo % 3) : undefined
+        const kabSkorDelta = isAktif ? seedDelta(kabNo) : undefined
+        const kabKontak = isAktif ? seedPhone(kabNo) : undefined
         rows.push({
           no: kabNo,
           provinsi: fullName,
           statusPokja: kabStatus,
           jumlahKabKota: 1,
-          pokjaKabKota: isTerbentuk ? 1 : 0,
-          persentase: isTerbentuk ? 100 : 0,
+          pokjaKabKota: isAktif ? 1 : 0,
+          persentase: isAktif ? 100 : 0,
           pokjaId: kabPokjaId,
           skor: kabSkor,
           skorDelta: kabSkorDelta,
@@ -166,11 +157,65 @@ function generateRows(): ProvinsiRow[] {
   return rows
 }
 
-export const PROVINSI_DATA: ProvinsiRow[] = generateRows()
+const PLACEHOLDER_ROWS: ProvinsiRow[] = [
+  {
+    no: 9001, provinsi: "Kalimantan Barat - Pontianak", statusPokja: "Aktif",
+    jumlahKabKota: 1, pokjaKabKota: 1, persentase: 100,
+    skor: 88, skorDelta: 5, bidangTersedia: 4, kontak: "081234560001",
+  },
+  {
+    no: 9002, provinsi: "Sulawesi Tengah - Palu", statusPokja: "Aktif",
+    jumlahKabKota: 1, pokjaKabKota: 1, persentase: 100,
+    skor: 76, skorDelta: -2, bidangTersedia: 3, kontak: "081234560002",
+  },
+  {
+    no: 9003, provinsi: "Nusa Tenggara Barat - Mataram", statusPokja: "Aktif",
+    jumlahKabKota: 1, pokjaKabKota: 1, persentase: 100,
+    skor: 92, skorDelta: 8, bidangTersedia: 5, kontak: "081234560003",
+  },
+  {
+    no: 9004, provinsi: "Bengkulu - Kota Bengkulu", statusPokja: "Perlu Diperiksa",
+    jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
+  },
+  {
+    no: 9005, provinsi: "Jambi - Kota Jambi", statusPokja: "Perlu Diperiksa",
+    jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
+  },
+  {
+    no: 9006, provinsi: "Lampung - Bandar Lampung", statusPokja: "Perlu Diperiksa",
+    jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
+  },
+  {
+    no: 9007, provinsi: "Maluku - Ambon", statusPokja: "Perlu Perbaikan",
+    jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
+  },
+  {
+    no: 9008, provinsi: "Papua Barat - Manokwari", statusPokja: "Perlu Perbaikan",
+    jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
+  },
+  {
+    no: 9009, provinsi: "Gorontalo - Kota Gorontalo", statusPokja: "Perlu Perbaikan",
+    jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
+  },
+  {
+    no: 9010, provinsi: "Papua Tengah - Nabire", statusPokja: "Belum Dibentuk",
+    jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
+  },
+  {
+    no: 9011, provinsi: "Papua Pegunungan - Wamena", statusPokja: "Belum Dibentuk",
+    jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
+  },
+  {
+    no: 9012, provinsi: "Sulawesi Barat - Mamuju", statusPokja: "Belum Dibentuk",
+    jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
+  },
+]
+
+export const PROVINSI_DATA: ProvinsiRow[] = [...generateRows(), ...PLACEHOLDER_ROWS]
 
 export const TOTAL_PROVINSI = ALL_PROVINSI.length
 export const TOTAL_KAB_KOTA = ALL_PROVINSI.reduce((s, p) => s + p.kabKota, 0)
-export const PROVINSI_TERBENTUK = PROVINSI_DATA.filter((p) => p.statusPokja === "Terbentuk").length
+export const PROVINSI_TERBENTUK = PROVINSI_DATA.filter((p) => p.statusPokja === "Aktif").length
 export const KAB_KOTA_TERBENTUK = PROVINSI_DATA.reduce((s, p) => s + p.pokjaKabKota, 0)
 export const PERSENTASE_NASIONAL =
   TOTAL_PROVINSI > 0 ? Math.round((PROVINSI_TERBENTUK / TOTAL_PROVINSI) * 100) : 0
