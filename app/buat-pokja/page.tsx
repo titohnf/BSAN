@@ -82,19 +82,31 @@ function InputField({
   )
 }
 
-function MemberSection({ label, value, onChange }: {
+function MemberSection({ label, value, onChange, isCollapsed, onToggleCollapse }: {
   label: string; value: MemberField
   onChange: (field: keyof MemberField, val: string) => void
+  isCollapsed?: boolean
+  onToggleCollapse?: () => void
 }) {
   return (
     <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-      <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 border-b border-gray-200">
-        <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-          <User className="w-3.5 h-3.5 text-blue-700" />
+      <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+            <User className="w-3.5 h-3.5 text-blue-700" />
+          </div>
+          <span className="text-sm font-semibold text-gray-800">{label}</span>
         </div>
-        <span className="text-sm font-semibold text-gray-800">{label}</span>
+        {onToggleCollapse && (
+          <button
+            onClick={onToggleCollapse}
+            className="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition"
+          >
+            {isCollapsed ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+        )}
       </div>
-      {/* Order: Nama, Jenis Kelamin, Instansi, Jabatan, Email, No. WhatsApp */}
+      {!isCollapsed && (
       <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
         <InputField label="Nama" required placeholder="Nama lengkap" value={value.nama} onChange={(v) => onChange("nama", v)} />
         <div className="flex flex-col gap-1.5">
@@ -128,25 +140,38 @@ function MemberSection({ label, value, onChange }: {
           </div>
         </div>
       </div>
+      )}
     </div>
   )
 }
 
 // MemberSection with disabled bidang field for mandatory members
-function MandatoryMemberSection({ label, value, onChange, bidangValue }: {
+function MandatoryMemberSection({ label, value, onChange, bidangValue, isCollapsed, onToggleCollapse }: {
   label: string; value: MemberField
   onChange: (field: keyof MemberField, val: string) => void
   bidangValue: string
+  isCollapsed?: boolean
+  onToggleCollapse?: () => void
 }) {
   return (
     <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-      <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 border-b border-gray-200">
-        <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-          <User className="w-3.5 h-3.5 text-blue-700" />
+      <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+            <User className="w-3.5 h-3.5 text-blue-700" />
+          </div>
+          <span className="text-sm font-semibold text-gray-800">{label}</span>
         </div>
-        <span className="text-sm font-semibold text-gray-800">{label}</span>
+        {onToggleCollapse && (
+          <button
+            onClick={onToggleCollapse}
+            className="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition"
+          >
+            {isCollapsed ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+        )}
       </div>
-      {/* Order: Nama, Jenis Kelamin, Instansi, Jabatan, Email, No. WhatsApp */}
+      {!isCollapsed && (
       <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
         <InputField label="Nama" required placeholder="Nama lengkap" value={value.nama} onChange={(v) => onChange("nama", v)} />
         <div className="flex flex-col gap-1.5">
@@ -180,6 +205,7 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue }: {
           </div>
         </div>
       </div>
+      )}
     </div>
   )
 }
@@ -301,12 +327,46 @@ export default function BuatPokjaPage() {
 
   // Step 2 – anggota tambahan (opsional)
   const [anggotaList, setAnggotaList] = useState<AnggotaItem[]>([])
+  const [collapsedAnggota, setCollapsedAnggota] = useState<Set<number>>(new Set())
 
   const updateAnggota = (index: number, field: keyof AnggotaItem, val: string) => {
     setAnggotaList((prev) => prev.map((a, i) => i === index ? { ...a, [field]: val } : a))
   }
   const addAnggota = () => setAnggotaList((prev) => [...prev, emptyAnggota()])
-  const removeAnggota = (index: number) => setAnggotaList((prev) => prev.filter((_, i) => i !== index))
+  const removeAnggota = (index: number) => {
+    setAnggotaList((prev) => prev.filter((_, i) => i !== index))
+    setCollapsedAnggota((prev) => { const s = new Set(prev); s.delete(index); return s })
+  }
+  const toggleCollapse = (index: number) => {
+    setCollapsedAnggota((prev) => {
+      const s = new Set(prev)
+      if (s.has(index)) s.delete(index)
+      else s.add(index)
+      return s
+    })
+  }
+
+  // Collapse state for pimpinan and anggota wajib
+  const [collapsedPimpinan, setCollapsedPimpinan] = useState<Set<string>>(new Set())
+  const [collapsedBidang, setCollapsedBidang] = useState<Set<string>>(new Set())
+
+  const toggleCollapsePimpinan = (key: string) => {
+    setCollapsedPimpinan((prev) => {
+      const s = new Set(prev)
+      if (s.has(key)) s.delete(key)
+      else s.add(key)
+      return s
+    })
+  }
+
+  const toggleCollapseBidang = (key: string) => {
+    setCollapsedBidang((prev) => {
+      const s = new Set(prev)
+      if (s.has(key)) s.delete(key)
+      else s.add(key)
+      return s
+    })
+  }
 
   // Step 3
   const [skFile, setSkFile] = useState<File | null>(null)
@@ -568,7 +628,7 @@ export default function BuatPokjaPage() {
                 {isPerbaikanMode ? (
                   <span className="text-red-600 bg-red-50 border border-red-200">Mode Perbaikan</span>
                 ) : (
-                  <span className="text-amber-600 bg-yellow-50 border border-yellow-200">Mode Draf</span>
+                  <span className="text-gray-600 bg-gray-100 border border-gray-300">Mode Draf</span>
                 )}
               </span>
             )}
@@ -676,7 +736,14 @@ export default function BuatPokjaPage() {
                 <div className="flex flex-col gap-4">
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Pimpinan</p>
                   {PIMPINAN_ROLES.map((r) => (
-                    <MemberSection key={r.key} label={r.label} value={members[r.key]} onChange={(f, v) => updateMember(r.key, f, v)} />
+                    <MemberSection 
+                      key={r.key} 
+                      label={r.label} 
+                      value={members[r.key]} 
+                      onChange={(f, v) => updateMember(r.key, f, v)}
+                      isCollapsed={collapsedPimpinan.has(r.key)}
+                      onToggleCollapse={() => toggleCollapsePimpinan(r.key)}
+                    />
                   ))}
                 </div>
                 {/* Anggota per Bidang - 6 Wajib */}
@@ -689,6 +756,8 @@ export default function BuatPokjaPage() {
                     value={members.pendidikan} 
                     onChange={(f, v) => updateMember("pendidikan", f, v)}
                     bidangValue="Bidang Pendidikan"
+                    isCollapsed={collapsedBidang.has("pendidikan")}
+                    onToggleCollapse={() => toggleCollapseBidang("pendidikan")}
                   />
 
                   {/* Anggota Wajib 2: PPPA */}
@@ -697,6 +766,8 @@ export default function BuatPokjaPage() {
                     value={members.pppa} 
                     onChange={(f, v) => updateMember("pppa", f, v)}
                     bidangValue="Bidang PPPA"
+                    isCollapsed={collapsedBidang.has("pppa")}
+                    onToggleCollapse={() => toggleCollapseBidang("pppa")}
                   />
 
                   {/* Anggota Wajib 3: Sosial */}
@@ -705,6 +776,8 @@ export default function BuatPokjaPage() {
                     value={members.sosial} 
                     onChange={(f, v) => updateMember("sosial", f, v)}
                     bidangValue="Bidang Sosial"
+                    isCollapsed={collapsedBidang.has("sosial")}
+                    onToggleCollapse={() => toggleCollapseBidang("sosial")}
                   />
 
                   {/* Anggota Wajib 4: Kesehatan */}
@@ -713,6 +786,8 @@ export default function BuatPokjaPage() {
                     value={members.kesehatan} 
                     onChange={(f, v) => updateMember("kesehatan", f, v)}
                     bidangValue="Bidang Kesehatan"
+                    isCollapsed={collapsedBidang.has("kesehatan")}
+                    onToggleCollapse={() => toggleCollapseBidang("kesehatan")}
                   />
 
                   {/* Anggota Wajib 5: Dukbangga */}
@@ -721,6 +796,8 @@ export default function BuatPokjaPage() {
                     value={members.dukbangga} 
                     onChange={(f, v) => updateMember("dukbangga", f, v)}
                     bidangValue="Bidang Dukbangga"
+                    isCollapsed={collapsedBidang.has("dukbangga")}
+                    onToggleCollapse={() => toggleCollapseBidang("dukbangga")}
                   />
 
                   {/* Anggota Wajib 6: Kominfo */}
@@ -729,6 +806,8 @@ export default function BuatPokjaPage() {
                     value={members.kominfo} 
                     onChange={(f, v) => updateMember("kominfo", f, v)}
                     bidangValue="Bidang Kominfo"
+                    isCollapsed={collapsedBidang.has("kominfo")}
+                    onToggleCollapse={() => toggleCollapseBidang("kominfo")}
                   />
                 </div>
 
@@ -738,111 +817,131 @@ export default function BuatPokjaPage() {
                     <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Anggota Lainnya (Opsional)</p>
                   )}
                   
-                  {anggotaList.map((anggota, index) => (
+                  {anggotaList.map((anggota, index) => {
+                    const isBidangSelected = !!anggota.bidang
+                    const isCollapsed = collapsedAnggota.has(index)
+                    return (
                     <div key={index} className="rounded-xl border border-gray-200 bg-white overflow-hidden">
                       <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3 flex-1">
                           <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
                             <User className="w-3.5 h-3.5 text-blue-700" />
                           </div>
                           <span className="text-sm font-semibold text-gray-800">Anggota Lainnya {index + 1}</span>
+                          <div className="flex flex-col gap-1 flex-1 max-w-xs">
+                            <div className="relative">
+                              <select
+                                value={anggota.bidang}
+                                onChange={(e) => updateAnggota(index, "bidang", e.target.value)}
+                                className={cn(
+                                  "w-full h-8 pl-3 pr-8 text-xs border rounded-lg appearance-none transition text-gray-700",
+                                  isBidangSelected 
+                                    ? "bg-green-50 border-green-300 text-green-700 font-medium" 
+                                    : "bg-white border-gray-300"
+                                )}
+                              >
+                                <option value="">Pilih bidang</option>
+                                <option value="Bidang Pendidikan">Bidang Pendidikan</option>
+                                <option value="Bidang PPPA">Bidang PPPA</option>
+                                <option value="Bidang Sosial">Bidang Sosial</option>
+                                <option value="Bidang Kesehatan">Bidang Kesehatan</option>
+                                <option value="Bidang Dukbangga">Bidang Dukbangga</option>
+                                <option value="Bidang Kominfo">Bidang Kominfo</option>
+                                <option value="Lainnya (Tokoh Masyarakat, Akademisi, Kepolisian, dan sebagainya..)">Lainnya</option>
+                              </select>
+                              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                            </div>
+                          </div>
                         </div>
-                        <button
-                          onClick={() => removeAnggota(index)}
-                          className="p-1 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => toggleCollapse(index)}
+                            className="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition"
+                          >
+                            {isCollapsed ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
+                          </button>
+                          <button
+                            onClick={() => removeAnggota(index)}
+                            className="p-1 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
-                      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <InputField 
-                          label="Nama" 
-                          required 
-                          placeholder="Nama lengkap" 
-                          value={anggota.nama} 
-                          onChange={(v) => updateAnggota(index, "nama", v)} 
-                        />
-                        <InputField 
-                          label="Email" 
-                          required 
-                          type="email" 
-                          placeholder="nama@instansi.go.id" 
-                          value={anggota.email} 
-                          onChange={(v) => updateAnggota(index, "email", v)} 
-                        />
-                        <InputField 
-                          label="Jabatan pada Instansi" 
-                          required 
-                          placeholder="Contoh: Kepala Bidang, Staff, dll" 
-                          value={anggota.jabatan || ""} 
-                          onChange={(v) => updateAnggota(index, "jabatan", v)} 
-                        />
-                        <div className="flex flex-col gap-1.5">
-                          <label className="text-xs font-semibold text-gray-600">
-                            Bidang <span className="text-red-500">*</span>
-                          </label>
-                          <div className="relative">
-                            <select
-                              value={anggota.bidang}
-                              onChange={(e) => updateAnggota(index, "bidang", e.target.value)}
-                              className="w-full h-9 pl-3 pr-8 text-sm border border-gray-300 rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-gray-700"
-                            >
-                              <option value="" disabled>Pilih bidang</option>
-                              <option value="Bidang Pendidikan">Bidang Pendidikan</option>
-                              <option value="Bidang PPPA">Bidang PPPA</option>
-                              <option value="Bidang Sosial">Bidang Sosial</option>
-                              <option value="Bidang Kesehatan">Bidang Kesehatan</option>
-                              <option value="Bidang Dukbangga">Bidang Dukbangga</option>
-                              <option value="Bidang Kominfo">Bidang Kominfo</option>
-                              <option value="Lainnya (Tokoh Masyarakat, Akademisi, Kepolisian, dan sebagainya..)">Lainnya (Tokoh Masyarakat, Akademisi, Kepolisian, dan sebagainya..)</option>
-                            </select>
-                            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                      {!isCollapsed && (
+                        <>
+                          {!isBidangSelected && (
+                            <div className="px-4 py-2 bg-amber-50 border-b border-amber-100 text-xs text-amber-700">
+                              Silakan pilih bidang terlebih dahulu untuk mengaktifkan form anggota
+                            </div>
+                          )}
+                          <div className={cn("p-4 grid grid-cols-1 sm:grid-cols-2 gap-4", !isBidangSelected && "opacity-40 pointer-events-none")}>
+                          <InputField 
+                            label="Nama" 
+                            required 
+                            placeholder="Nama lengkap" 
+                            value={anggota.nama} 
+                            onChange={(v) => updateAnggota(index, "nama", v)} 
+                          />
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-gray-600">
+                              Jenis Kelamin <span className="text-red-500">*</span>
+                            </label>
+                            <div className="relative">
+                              <select
+                                value={anggota.jenisKelamin}
+                                onChange={(e) => updateAnggota(index, "jenisKelamin", e.target.value)}
+                                className="w-full h-9 pl-3 pr-8 text-sm border border-gray-300 rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-gray-700"
+                              >
+                                <option value="" disabled>Pilih jenis kelamin</option>
+                                <option value="Laki-Laki">Laki-Laki</option>
+                                <option value="Perempuan">Perempuan</option>
+                              </select>
+                              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                            </div>
+                          </div>
+                          <InputField 
+                            label="Instansi" 
+                            required 
+                            placeholder="Nama instansi / lembaga" 
+                            value={anggota.instansi || ""} 
+                            onChange={(v) => updateAnggota(index, "instansi", v)} 
+                          />
+                          <InputField 
+                            label="Jabatan pada Instansi" 
+                            placeholder="Contoh: Kepala Bidang, Staff, dll" 
+                            value={anggota.jabatan || ""} 
+                            onChange={(v) => updateAnggota(index, "jabatan", v)} 
+                          />
+                          <InputField 
+                            label="Email" 
+                            required 
+                            type="email" 
+                            placeholder="nama@instansi.go.id" 
+                            value={anggota.email} 
+                            onChange={(v) => updateAnggota(index, "email", v)} 
+                          />
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-gray-600">
+                              Nomor HP <span className="text-red-500">*</span>
+                            </label>
+                            <div className="relative">
+                              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                              <input
+                                type="tel"
+                                inputMode="numeric"
+                                value={anggota.noWhatsapp}
+                                onChange={(e) => updateAnggota(index, "noWhatsapp", e.target.value.replace(/\D/g, ""))}
+                                placeholder="08xxxxxxxxxx"
+                                className="w-full h-9 pl-9 pr-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                              />
+                            </div>
                           </div>
                         </div>
-                        <div className="flex flex-col gap-1.5">
-                          <label className="text-xs font-semibold text-gray-600">
-                            Jenis Kelamin <span className="text-red-500">*</span>
-                          </label>
-                          <div className="relative">
-                            <select
-                              value={anggota.jenisKelamin}
-                              onChange={(e) => updateAnggota(index, "jenisKelamin", e.target.value)}
-                              className="w-full h-9 pl-3 pr-8 text-sm border border-gray-300 rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-gray-700"
-                            >
-                              <option value="" disabled>Pilih jenis kelamin</option>
-                              <option value="Laki-Laki">Laki-Laki</option>
-                              <option value="Perempuan">Perempuan</option>
-                            </select>
-                            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
-                          </div>
-                        </div>
-                        <div className="flex flex-col gap-1.5">
-                          <label className="text-xs font-semibold text-gray-600">
-                            Nomor HP <span className="text-red-500">*</span>
-                          </label>
-                          <div className="relative">
-                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
-                            <input
-                              type="tel"
-                              inputMode="numeric"
-                              value={anggota.noWhatsapp}
-                              onChange={(e) => updateAnggota(index, "noWhatsapp", e.target.value.replace(/\D/g, ""))}
-                              placeholder="08xxxxxxxxxx"
-                              className="w-full h-9 pl-9 pr-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                            />
-                          </div>
-                        </div>
-                        <InputField 
-                          label="Instansi" 
-                          required 
-                          placeholder="Nama instansi / lembaga" 
-                          value={anggota.instansi || ""} 
-                          onChange={(v) => updateAnggota(index, "instansi", v)} 
-                          className="sm:col-span-2"
-                        />
-                      </div>
+                        </>
+                      )}
                     </div>
-                  ))}
+                    )})}
                   
                   <button
                     onClick={addAnggota}
@@ -954,9 +1053,9 @@ export default function BuatPokjaPage() {
                   </div>
                 )}
               </div>
-            )}
-          </div>
-        </div>
+)}
+                      </div>
+                    </div>
 
         {/* Navigation buttons */}
         <div className="flex items-center justify-between pb-8">
