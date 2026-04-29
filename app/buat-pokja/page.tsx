@@ -276,7 +276,7 @@ function getAnggotaStatus(a: AnggotaItem): string {
   return isAnggotaComplete(a) ? "Lengkap" : "Tidak Lengkap"
 }
 
-function ReviewTable({ members, anggotaList, onEdit, onDelete, onResetMember }: { members: Members; anggotaList: AnggotaItem[]; onEdit: () => void; onDelete?: (idx: number) => void; onResetMember?: (kategori: string) => void }) {
+function ReviewTable({ members, anggotaList, onEdit, onDelete, onResetMember }: { members: Members; anggotaList: AnggotaItem[]; onEdit: (segment: string) => void; onDelete?: (idx: number) => void; onResetMember?: (kategori: string) => void }) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [isScrolled, setIsScrolled] = useState(false)
 
@@ -288,11 +288,11 @@ function ReviewTable({ members, anggotaList, onEdit, onDelete, onResetMember }: 
     return () => el.removeEventListener("scroll", handleScroll)
   }, [])
 
-const allData: { no: number; kategori: string; nama: string; jenisKelamin: string; instansi: string; email: string; noHp: string; status: string; isCategory: boolean; deleteIdx?: number; roleKey?: string; jabatan: string }[] = []
+  const allData: { no: number; kategori: string; nama: string; jenisKelamin: string; instansi: string; email: string; noHp: string; status: string; isCategory: boolean; deleteIdx?: number; roleKey?: string; jabatan: string; sectionKey?: string }[] = []
   
   let no = 1
   
-  allData.push({ no: 0, kategori: "PIMPINAN", nama: "", jenisKelamin: "", instansi: "", email: "", noHp: "", status: "", isCategory: true, jabatan: "" })
+  allData.push({ no: 0, kategori: "PIMPINAN", nama: "", jenisKelamin: "", instansi: "", email: "", noHp: "", status: "", isCategory: true, jabatan: "", sectionKey: "pimpinan" })
   PIMPINAN_ROLES.forEach((r) => {
     const m = members[r.key]
     allData.push({
@@ -306,13 +306,14 @@ const allData: { no: number; kategori: string; nama: string; jenisKelamin: strin
       status: getMemberStatus(m),
       isCategory: false,
       roleKey: r.key,
-      jabatan: m.jabatan || "-"
+      jabatan: m.jabatan || "-",
+      sectionKey: "pimpinan"
     })
   })
 
   const bidangWithExtra: { key: string; label: string }[] = BIDANG_ROLES.map(r => ({ key: r.key, label: r.label }))
   bidangWithExtra.forEach((b) => {
-    allData.push({ no: 0, kategori: b.label.toUpperCase(), nama: "", jenisKelamin: "", instansi: "", email: "", noHp: "", status: "", isCategory: true, jabatan: "" })
+    allData.push({ no: 0, kategori: b.label.toUpperCase(), nama: "", jenisKelamin: "", instansi: "", email: "", noHp: "", status: "", isCategory: true, jabatan: "", sectionKey: b.key })
     const m = members[b.key as keyof Members]
     allData.push({
       no: no++,
@@ -325,8 +326,9 @@ const allData: { no: number; kategori: string; nama: string; jenisKelamin: strin
       status: getMemberStatus(m),
       isCategory: false,
       roleKey: b.key,
-      jabatan: m.jabatan || "-"
-})
+      jabatan: m.jabatan || "-",
+      sectionKey: b.key
+    })
     
     anggotaList.forEach((a, origIdx) => {
       if (a.bidang === b.label) {
@@ -341,7 +343,8 @@ const allData: { no: number; kategori: string; nama: string; jenisKelamin: strin
           status: getAnggotaStatus(a),
           isCategory: false,
           deleteIdx: origIdx,
-          jabatan: a.jabatan || "-"
+          jabatan: a.jabatan || "-",
+          sectionKey: `anggotaIndex:${origIdx}`
         })
       }
     })
@@ -349,7 +352,7 @@ const allData: { no: number; kategori: string; nama: string; jenisKelamin: strin
 
   const lainnya = anggotaList.filter(a => a.bidang === "Lainnya (Tokoh Masyarakat, Akademisi, Kepolisian, dan sebagainya..)" || a.bidang === "Lainnya" || !BIDANG_ROLES.some(b => b.label === a.bidang))
   if ( lainnya.length > 0) {
-    allData.push({ no: 0, kategori: "LAINNYA", nama: "", jenisKelamin: "", instansi: "", email: "", noHp: "", status: "", isCategory: true, jabatan: "" })
+    allData.push({ no: 0, kategori: "LAINNYA", nama: "", jenisKelamin: "", instansi: "", email: "", noHp: "", status: "", isCategory: true, jabatan: "", sectionKey: "lainnya" })
     lainnya.forEach((a) => {
       const origIdx = anggotaList.indexOf(a)
       allData.push({
@@ -363,7 +366,8 @@ const allData: { no: number; kategori: string; nama: string; jenisKelamin: strin
         status: getAnggotaStatus(a),
         isCategory: false,
         deleteIdx: origIdx,
-        jabatan: a.jabatan || "-"
+        jabatan: a.jabatan || "-",
+        sectionKey: `anggotaIndex:${origIdx}`
       })
     })
   }
@@ -451,7 +455,20 @@ const allData: { no: number; kategori: string; nama: string; jenisKelamin: strin
                 </td>
                 <td className={cn("px-4 py-3 whitespace-nowrap border-b border-gray-100", (row.status === "Belum diisi" || row.status === "Tidak Lengkap") ? "bg-red-50" : "bg-white")}>
                   <div className="flex items-center gap-2">
-                    {!row.isCategory && <button onClick={onEdit} className="text-xs text-blue-600 hover:underline">Ubah</button>}
+                    {!row.isCategory && (
+                      <button 
+                        onClick={() => {
+                          if (row.deleteIdx !== undefined) {
+                            onEdit(`anggotaIndex:${row.deleteIdx}`)
+                          } else if (row.roleKey) {
+                            onEdit(row.roleKey)
+                          }
+                        }} 
+                        className="text-xs text-blue-600 hover:underline"
+                      >
+                        Ubah
+                      </button>
+                    )}
                     {onDelete && (
                       <button 
                         onClick={() => {
@@ -625,6 +642,33 @@ export default function BuatPokjaPage() {
     + ["pendidikan", "pppa", "sosial", "kesehatan", "dukbangga", "kominfo"].filter(k => isMemberComplete(members[k as keyof Members])).length
     + anggotaList.filter(a => isBidangSelected(a) && isMemberComplete({ nama: a.nama, email: a.email, noWhatsapp: a.noWhatsapp, jenisKelamin: a.jenisKelamin as "Laki-Laki" | "Perempuan", instansi: a.instansi || "" })).length
   const totalCount = 9 + anggotaList.length
+
+  // Fungsi untuk navigasi ke Step 2 dengan target segmen tertentu
+  const goToStep2WithSegment = (segment: string) => {
+    // Tutup semua dulu
+    setCollapsedPimpinan(new Set(PIMPINAN_ROLES.map(r => r.key)))
+    setCollapsedBidang(new Set(["pendidikan", "pppa", "sosial", "kesehatan", "dukbangga", "kominfo"]))
+    setCollapsedAnggota(new Set(anggotaList.map((_, i) => i)))
+
+    // Expand segmen target saja
+    // PIMPINAN roles (ketua, wakil, koordinator) - expand pimpinan section
+    if (PIMPINAN_ROLES.some(r => r.key === segment)) {
+      const newCollapsedPimpinan = new Set(PIMPINAN_ROLES.map(r => r.key))
+      newCollapsedPimpinan.delete(segment)
+      setCollapsedPimpinan(newCollapsedPimpinan)
+    } else if (["pendidikan", "pppa", "sosial", "kesehatan", "dukbangga", "kominfo"].includes(segment)) {
+      const newCollapsedBidang = new Set(["pendidikan", "pppa", "sosial", "kesehatan", "dukbangga", "kominfo"])
+      newCollapsedBidang.delete(segment)
+      setCollapsedBidang(newCollapsedBidang)
+    } else if (segment.startsWith("anggotaIndex:")) {
+      const idx = parseInt(segment.replace("anggotaIndex:", ""), 10)
+      const newCollapsedAnggota = new Set(anggotaList.map((_, i) => i))
+      newCollapsedAnggota.delete(idx)
+      setCollapsedAnggota(newCollapsedAnggota)
+    }
+
+    setStep(2)
+  }
 
   // Step 3
   const [skFile, setSkFile] = useState<File | null>(null)
@@ -1287,7 +1331,7 @@ export default function BuatPokjaPage() {
                   <ReviewTable 
                     members={members} 
                     anggotaList={anggotaList} 
-                    onEdit={() => setStep(2)} 
+                    onEdit={(segment) => goToStep2WithSegment(segment)} 
                     onDelete={(idx) => setAnggotaList(prev => prev.filter((_, i) => i !== idx))}
                     onResetMember={(roleKey) => setMembers(prev => ({ ...prev, [roleKey]: emptyMember() }))}
                   />
