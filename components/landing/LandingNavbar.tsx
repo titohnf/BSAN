@@ -18,7 +18,6 @@ export function LandingNavbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const handleNavClick = (link: { href: string; anchor: boolean }) => {
-    setMobileOpen(false)
     router.push(link.href)
   }
 
