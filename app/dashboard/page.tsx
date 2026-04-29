@@ -21,6 +21,7 @@ import { SekolahDashboard } from "@/components/sekolah/SekolahDashboard"
 
 import { MOCK_PENGAJUAN, PengajuanPokja } from "@/data/mockPokja"
 import type { PokjaItem, PokjaData } from "@/types/pokja"
+import { getDrafts, clearDraft } from "@/lib/draft-storage"
 
 type AdminRole = "dinas" | "pusat" | "sekolah"
 type DinaMenu = "dashboard" | "data-pokja" | "sumber-rujukan" | "kActivities"
@@ -247,6 +248,57 @@ function DashboardPageInner() {
     setMounted(true)
   }, [])
 
+  // Check if we're coming from a recent submission
+  const justSubmitted = searchParams.get("pokjaSubmitted") === "1" || searchParams.get("pokjaCreated") === "1"
+
+  // Load draft only if: mounted, not just submitted, and no submitted pokja for this region
+  useEffect(() => {
+    if (!mounted) return
+    if (justSubmitted) return  // Skip loading draft right after submission
+    
+    // Check if there's already a submitted pokja for this region (exclude draf)
+    const hasSubmittedPokja = pokjaList.some(p => 
+      p.data.region === REGION && 
+      p.status !== "draf" &&
+      (p.status === "masih-diverifikasi" || p.status === "aktif" || p.status === "butuh-perbaikan")
+    )
+    
+    // If already submitted, don't load draft
+    if (hasSubmittedPokja) return
+    
+    // Remove any existing draft pokja first (cleanup)
+    setPokjaList(prev => prev.filter(p => p.id !== "draft_ongoing"))
+    
+    // Otherwise load draft if exists
+    try {
+      const draft = getDrafts()
+      if (draft) {
+        const draftPokja: PokjaItem = {
+          id: "draft_ongoing",
+          nama: REGION,
+          status: "draf",
+          data: {
+            region: REGION,
+            nomorKanal: draft.kanalPengaduan,
+            members: draft.members,
+            sk: {
+              file: null,
+              nomorSK: draft.sk.nomorSK,
+              tanggalSK: draft.sk.tanggalSK,
+              periodeMultai: draft.sk.periodeMulai,
+              periodeSelesai: draft.sk.periodeSelesai,
+            },
+          },
+          validasiLog: [],
+        }
+        setPokjaList(prev => {
+          const filtered = prev.filter(p => p.id !== "draft_ongoing")
+          return [draftPokja, ...filtered]
+        })
+      }
+    } catch {}
+  }, [mounted])
+
   useEffect(() => {
     if (!mounted) return
     try {
@@ -322,9 +374,11 @@ function DashboardPageInner() {
             data: newPokja.data,
             validasiLog: [newLog],
           }
+          clearDraft()
           return updated
         }
         if (deduped.some(p => p.id === newId)) return deduped
+        clearDraft()
         return [...deduped, newPokja]
       })
 
@@ -438,12 +492,14 @@ function DashboardPageInner() {
                   onViewSumberRujukan={() => setDinasMenu("sumber-rujukan")}
                   onViewActivities={() => setDinasMenu("kActivities")}
                   onPerbaikiPokja={handlePerbaikiPokja}
+                  onContinueDraft={() => router.push("/buat-pokja?draftId=draft_ongoing")}
                 />
               )}
               {dinasMenu === "data-pokja" && (
                 <DataPokjaView
-                  pokjaList={pokjaList.filter((p) => p.data.region === REGION)}
+                  pokjaList={pokjaList}
                   onBuatPokja={navigateToBuatPokja}
+                  onContinueDraft={() => router.push("/buat-pokja?draftId=draft_ongoing")}
                   isAdminPusat={false}
                   onValidatePusat={(p) => setValidatingPokja(p)}
                   onPerbaikiPokja={handlePerbaikiPokja}

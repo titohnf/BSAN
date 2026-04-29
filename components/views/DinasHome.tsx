@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { ChevronRight, AlertTriangle, CheckCircle2 } from "lucide-react"
+import { ChevronRight, AlertTriangle, CheckCircle2, Pencil } from "lucide-react"
 import { PieChart, Pie, Cell } from "recharts"
 
 export type { PokjaStatus, PokjaItem } from "@/types/pokja"
@@ -29,7 +29,8 @@ type Props = {
   kegiatanStatus?: { total: number; berlangsung: number; menunggu: number; selesai: number }
   isAdminPusat?: boolean
   onValidatePusat?: (pokja: PokjaItem) => void
-  onPerbaikiPokja?: (pokja: PokjaItem) => void
+  onPerbaikiPokja?: (pokja:PokjaItem) => void
+  onContinueDraft?: () => void
 }
 
 function Panel({ children }: { children: React.ReactNode }) {
@@ -153,6 +154,7 @@ export function DashboardView({
   isAdminPusat,
   onValidatePusat,
   onPerbaikiPokja,
+  onContinueDraft,
 }: Props) {
   const [mounted, setMounted] = useState(false)
   const [selectedItem, setSelectedItem] = useState<{ nama: string; jenis: string; kontak: string } | null>(null)
@@ -160,12 +162,21 @@ export function DashboardView({
 
   useEffect(() => { setMounted(true) }, [])
 
-  // Abaikan entry placeholder "belum-dibentuk" dari MOCK — dinas dianggap belum punya pokja
-  const activePokjaList = pokjaList.filter((p) => p.status !== "belum-dibentuk")
+  // Filter: hanya Region ini & tidak tampil placeholder
+  const filteredList = pokjaList.filter((p) => 
+    p.data.region === region && p.status !== "belum-dibentuk"
+  )
+  
+  // Jika ada draf, tampilkan hanya draf (yang terbaru). Jika tidak ada, tampilkan yang sudah disubmit
+  const draftPokja = filteredList.find(p => p.status === "draf")
+  const activePokjaList = draftPokja 
+    ? [draftPokja] 
+    : filteredList.filter(p => p.status !== "draf").slice(0, 1)
+  
   const total    = activePokjaList.length
-  const aktif    = activePokjaList.filter((p) => p.status === "aktif").length
-  const menunggu = activePokjaList.filter((p) => p.status === "masih-diverifikasi").length
-  const butuhPerbaikan = activePokjaList.filter((p) => p.status === "butuh-perbaikan").length
+  const aktif    = draftPokja ? 0 : (activePokjaList[0]?.status === "aktif" ? 1 : 0)
+  const menunggu = draftPokja ? 0 : (activePokjaList[0]?.status === "masih-diverifikasi" ? 1 : 0)
+  const butuhPerbaikan = draftPokja ? 0 : (activePokjaList[0]?.status === "butuh-perbaikan" ? 1 : 0)
   const pending  = sumberRujukanStatus.menungguVerifikasi
 
   const pendingData = [
@@ -205,33 +216,44 @@ export function DashboardView({
           <div className="px-5 py-4">
             {activePokjaList.map((pokja) => {
               const statusConfig = {
-                "aktif": { 
-                  bg: "bg-green-50", 
-                  border: "border-green-200", 
-                  text: "text-green-700",
-                  badge: "bg-green-100 text-green-800" 
-                },
-                "masih-diverifikasi": { 
-                  bg: "bg-amber-50", 
-                  border: "border-amber-200", 
-                  text: "text-amber-700",
-                  badge: "bg-amber-100 text-amber-800" 
-                },
-                "butuh-perbaikan": { 
-                  bg: "bg-red-50", 
-                  border: "border-red-200", 
-                  text: "text-red-700",
-                  badge: "bg-red-100 text-red-800" 
-                },
-                "belum-dibentuk": { 
-                  bg: "bg-gray-50", 
-                  border: "border-gray-200", 
+                "draf": {
+                  bg: "bg-gray-50",
+                  border: "border-gray-200",
                   text: "text-gray-700",
-                  badge: "bg-gray-100 text-gray-800" 
+                  badge: "bg-gray-100 text-gray-800",
+                  label: "Draf",
+                },
+                "aktif": {
+                  bg: "bg-green-50",
+                  border: "border-green-200",
+                  text: "text-green-700",
+                  badge: "bg-green-100 text-green-800",
+                  label: "Aktif",
+                },
+                "masih-diverifikasi": {
+                  bg: "bg-amber-50",
+                  border: "border-amber-200",
+                  text: "text-amber-700",
+                  badge: "bg-amber-100 text-amber-800",
+                  label: "Perlu Diperiksa",
+                },
+                "butuh-perbaikan": {
+                  bg: "bg-red-50",
+                  border: "border-red-200",
+                  text: "text-red-700",
+                  badge: "bg-red-100 text-red-800",
+                  label: "Perlu Perbaikan",
+                },
+                "belum-dibentuk": {
+                  bg: "bg-gray-50",
+                  border: "border-gray-200",
+                  text: "text-gray-700",
+                  badge: "bg-gray-100 text-gray-800",
+                  label: "Belum Dibentuk",
                 }
               }
-              
-              const config = statusConfig[pokja.status] || statusConfig["belum-dibentuk"]
+
+              const config = statusConfig[pokja.status as keyof typeof statusConfig] || statusConfig["belum-dibentuk"]
               const ketua = pokja.data?.members?.ketua
               const sk = pokja.data?.sk
               const kanal = pokja.data?.nomorKanal
@@ -247,43 +269,49 @@ export function DashboardView({
                       <h3 className="text-lg font-bold text-gray-900 mb-1">{pokja.nama}</h3>
                       <p className="text-sm text-gray-600">{region}</p>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${config.badge}`}>
-                      {pokja.status === "aktif" ? "Aktif" : 
-                       pokja.status === "masih-diverifikasi" ? "Perlu Diperiksa" :
-                       pokja.status === "butuh-perbaikan" ? "Perlu Perbaikan" : "Draf"}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${config.badge}`}>{config.label}</span>
+                    </div>
                   </div>
 
-                  {/* Detail Grid */}
+                  {/* Detail Grid - selalu tampil semua placeholders */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Ketua Kelompok Kerja */}
-                    {ketua?.nama && (
-                      <div className="bg-white/60 rounded-lg p-3 border border-gray-200">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Ketua Kelompok Kerja</p>
-                        <p className="text-sm font-bold text-gray-900">{ketua.nama}</p>
-                        {ketua.instansi && <p className="text-xs text-gray-600 mt-0.5">{ketua.instansi}</p>}
-                      </div>
-                    )}
+                    <div className="bg-white/60 rounded-lg p-3 border border-gray-200">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Ketua Kelompok Kerja</p>
+                      {ketua?.nama ? (
+                        <>
+                          <p className="text-sm font-bold text-gray-900">{ketua.nama}</p>
+                          {ketua.instansi && <p className="text-xs text-gray-600 mt-0.5">{ketua.instansi}</p>}
+                        </>
+                      ) : (
+                        <p className="text-sm font-bold text-gray-400">Data belum diinput</p>
+                      )}
+                    </div>
 
                     {/* Jumlah Anggota */}
                     <div className="bg-white/60 rounded-lg p-3 border border-gray-200">
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Jumlah Anggota</p>
-                      <p className="text-sm font-bold text-gray-900">{memberCount} Orang</p>
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Jumlah Angggota</p>
+                      <p className="text-sm font-bold text-gray-900">{memberCount > 0 ? `${memberCount} Orang` : "0"}</p>
                     </div>
 
                     {/* Nomor SK */}
-                    {sk?.nomorSK && (
-                      <div className="bg-white/60 rounded-lg p-3 border border-gray-200">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Nomor SK</p>
-                        <p className="text-sm font-bold text-gray-900">{sk.nomorSK}</p>
-                        {sk.periodeSelesai && <p className="text-xs text-gray-600 mt-0.5">Berlaku s.d. {sk.periodeSelesai}</p>}
-                      </div>
-                    )}
+                    <div className="bg-white/60 rounded-lg p-3 border border-gray-200">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Nomor SK</p>
+                      {sk?.nomorSK ? (
+                        <>
+                          <p className="text-sm font-bold text-gray-900">{sk.nomorSK}</p>
+                          {sk.periodeSelesai && <p className="text-xs text-gray-600 mt-0.5">Berlaku s.d. {sk.periodeSelesai}</p>}
+                        </>
+                      ) : (
+                        <p className="text-sm font-bold text-gray-400">Data belum diinput</p>
+                      )}
+                    </div>
 
                     {/* Kanal Pengaduan */}
-                    {kanal && (
-                      <div className="bg-white/60 rounded-lg p-3 border border-gray-200">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Kanal Pengaduan</p>
+                    <div className="bg-white/60 rounded-lg p-3 border border-gray-200">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Kanal Pengaduan</p>
+                      {kanal ? (
                         <a 
                           href={`https://wa.me/62${kanal.replace(/^0/, "")}`}
                           target="_blank"
@@ -295,9 +323,23 @@ export function DashboardView({
                           </svg>
                           {kanal}
                         </a>
-                      </div>
-                    )}
+                      ) : (
+                        <p className="text-sm font-bold text-gray-400">0</p>
+                      )}
+                    </div>
                   </div>
+
+                  {/* Button Lanjutkan untuk status draf */}
+                  {pokja.status === "draf" && onContinueDraft && (
+                    <button
+                      type="button"
+                      onClick={onContinueDraft}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors"
+                    >
+                      <Pencil className="w-4 h-4" />
+                      Lanjutkan Pengisian
+                    </button>
+                  )}
 
                   {/* Info tambahan untuk status tertentu */}
                   {pokja.status === "masih-diverifikasi" && (

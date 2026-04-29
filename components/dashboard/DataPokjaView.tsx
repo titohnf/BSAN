@@ -21,10 +21,14 @@ import { Badge } from "@/components/ds/Badge"
 import type { PokjaItem, MemberField, RoleKey } from "@/types/pokja"
 import { ALL_ROLES } from "@/types/pokja"
 
+// Region untuk Dinas - hardcoded sesuai login
+const REGION = "Provinsi Aceh"
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 const STATUS_CONFIG = {
+  "draf": { label: "Draf", variant: "warning" as const, icon: Clock },
   "belum-dibentuk": { label: "Belum Dibentuk", variant: "neutral" as const, icon: Clock },
   "masih-diverifikasi": { label: "Perlu Diperiksa", variant: "warning" as const, icon: Clock },
   aktif: { label: "Aktif", variant: "success" as const, icon: CheckCircle2 },
@@ -268,12 +272,13 @@ function PokjaDetailDrawer({ pokja, onClose }: { pokja: PokjaItem; onClose: () =
 interface DataPokjaViewProps {
   pokjaList: PokjaItem[]
   onBuatPokja: () => void
+  onContinueDraft?: () => void
   isAdminPusat?: boolean
   onValidatePusat?: (pokja: PokjaItem) => void
   onPerbaikiPokja?: (pokja: PokjaItem) => void
 }
 
-export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidatePusat, onPerbaikiPokja }: DataPokjaViewProps) {
+export function DataPokjaView({ pokjaList, onBuatPokja, onContinueDraft, isAdminPusat, onValidatePusat, onPerbaikiPokja }: DataPokjaViewProps) {
   const [detailPokja, setDetailPokja] = useState<PokjaItem | null>(null)
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
@@ -289,14 +294,13 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
     )
   })
 
-  // Untuk admin dinas: abaikan entry belum-dibentuk (entry placeholder dari MOCK)
+  // Untuk admin Dinas: hanya lihat dari region mereka dan hanya 1 Kelompok Kerja
   const activePokjaList = !isAdminPusat
-    ? pokjaList.filter(p => p.status !== "belum-dibentuk")
+    ? pokjaList.filter(p => p.data.region === REGION && p.status !== "belum-dibentuk")
     : pokjaList
 
-  // Untuk admin dinas yang hanya punya 1 pokja aktif/menunggu/butuh-perbaikan, tampilkan detail view
-  const isDinasWithOnePokja = !isAdminPusat && activePokjaList.length === 1
-  const pokja = isDinasWithOnePokja ? activePokjaList[0] : null
+  // Untuk admin Dinas: selalu tampilkan detail view (hanya 1 Kelompok Kerja per region)
+  const pokja = !isAdminPusat && activePokjaList.length > 0 ? activePokjaList[0] : null
 
   return (
     <div className="space-y-6">
@@ -314,7 +318,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
         {activePokjaList.length === 0 ? (
           <EmptyStatePokja onBuatPokja={onBuatPokja} />
-        ) : isDinasWithOnePokja && pokja ? (
+        ) : pokja ? (
           /* Detail view untuk admin dinas yang punya 1 pokja */
           <div className="p-6 space-y-6">
             {/* Header pokja */}
@@ -330,6 +334,16 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
                   <p className="text-sm text-gray-500">Wilayah: {pokja.data.region}</p>
                 )}
               </div>
+              {!isAdminPusat && pokja.status === "draf" && onContinueDraft && (
+                <button
+                  type="button"
+                  onClick={onContinueDraft}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 transition-colors flex-shrink-0"
+                >
+                  <Pencil className="w-4 h-4" />
+                  Lanjutkan Pengisian
+                </button>
+              )}
               {!isAdminPusat && (pokja.status === "aktif" || pokja.status === "butuh-perbaikan") && (
                 <button
                   type="button"
@@ -378,22 +392,26 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
             {/* Grid info utama */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Ketua Kelompok Kerja */}
-              {pokja.data?.members?.ketua?.nama && (
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl p-4 border border-blue-200">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                      <Users className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-1">Ketua Kelompok Kerja</p>
-                      <p className="text-base font-bold text-gray-900 truncate">{pokja.data.members.ketua.nama}</p>
-                      {pokja.data.members.ketua.instansi && (
-                        <p className="text-xs text-gray-600 mt-0.5 truncate">{pokja.data.members.ketua.instansi}</p>
-                      )}
-                    </div>
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl p-4 border border-blue-200">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                    <Users className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-1">Ketua Kelompok Kerja</p>
+                    {pokja.data?.members?.ketua?.nama ? (
+                      <>
+                        <p className="text-base font-bold text-gray-900 truncate">{pokja.data.members.ketua.nama}</p>
+                        {pokja.data.members.ketua.instansi && (
+                          <p className="text-xs text-gray-600 mt-0.5 truncate">{pokja.data.members.ketua.instansi}</p>
+                        )}
+                      </>
+                    ) : (
+                      <p className="text-sm font-medium text-gray-400">Data belum diinput</p>
+                    )}
                   </div>
                 </div>
-              )}
+              </div>
 
               {/* Jumlah Anggota */}
               <div className="bg-gradient-to-br from-green-50 to-green-100/50 rounded-xl p-4 border border-green-200">
@@ -412,25 +430,29 @@ export function DataPokjaView({ pokjaList, onBuatPokja, isAdminPusat, onValidate
               </div>
 
               {/* Nomor SK */}
-              {pokja.data?.sk?.nomorSK && (
-                <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-4 border border-purple-200">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0">
-                      <FileText className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-purple-700 uppercase tracking-wide mb-1">Nomor SK</p>
-                      <p className="text-sm font-bold text-gray-900 truncate">{pokja.data.sk.nomorSK}</p>
-                      {pokja.data.sk.tanggalSK && (
-                        <p className="text-xs text-gray-600 mt-0.5">Tgl: {pokja.data.sk.tanggalSK}</p>
-                      )}
-                      {pokja.data.sk.periodeSelesai && (
-                        <p className="text-xs text-gray-600">s.d. {pokja.data.sk.periodeSelesai}</p>
-                      )}
-                    </div>
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-4 border border-purple-200">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0">
+                    <FileText className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-purple-700 uppercase tracking-wide mb-1">Nomor SK</p>
+                    {pokja.data?.sk?.nomorSK ? (
+                      <>
+                        <p className="text-sm font-bold text-gray-900 truncate">{pokja.data.sk.nomorSK}</p>
+                        {pokja.data.sk.tanggalSK && (
+                          <p className="text-xs text-gray-600 mt-0.5">Tgl: {pokja.data.sk.tanggalSK}</p>
+                        )}
+                        {pokja.data.sk.periodeSelesai && (
+                          <p className="text-xs text-gray-600">s.d. {pokja.data.sk.periodeSelesai}</p>
+                        )}
+                      </>
+                    ) : (
+                      <p className="text-sm font-medium text-gray-400">Data belum diinput</p>
+                    )}
                   </div>
                 </div>
-              )}
+              </div>
             </div>
 
             {/* Kanal Pengaduan */}

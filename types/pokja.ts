@@ -51,6 +51,7 @@ export interface PokjaData {
 }
 
 export type PokjaStatus =
+  | "draf"
   | "belum-dibentuk"
   | "masih-diverifikasi"
   | "aktif"
@@ -85,4 +86,45 @@ export const emptyMember = (): MemberField => ({
 
 export function getRoleLabel(key: RoleKey): string {
   return ALL_ROLES.find((r) => r.key === key)?.label ?? key
+}
+
+// ---------------------------------------------------------------------------
+// Draft types for "Save as Draft" feature
+// ---------------------------------------------------------------------------
+
+export type AnggotaItem = {
+  nama: string
+  email: string
+  jenisKelamin: string
+  bidang: string
+  noWhatsapp: string
+  instansi: string
+  jabatan: string
+}
+
+export const emptyAnggota = (): AnggotaItem => ({
+  nama: "",
+  email: "",
+  jenisKelamin: "",
+  bidang: "",
+  noWhatsapp: "",
+  instansi: "",
+  jabatan: "",
+})
+
+export interface PokjaDraft {
+  id: string
+  region: string
+  createdAt: string
+  updatedAt: string
+  kanalPengaduan: string
+  members: Members
+  anggotaList: AnggotaItem[]
+  sk: {
+    fileName: string
+    nomorSK: string
+    tanggalSK: string
+    periodeMulai: string
+    periodeSelesai: string
+  }
 }

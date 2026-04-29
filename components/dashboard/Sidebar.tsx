@@ -20,7 +20,7 @@ const navItems = [
   },
   {
     id: "data-pokja" as ActiveMenu,
-    label: "Data Kelompok Kerja",
+    label: "Kelompok Kerja",
     icon: Users,
   },
   {

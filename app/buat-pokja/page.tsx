@@ -8,8 +8,16 @@ import {
 import { cn } from "@/lib/utils"
 import {
   MemberField, Members, RoleKey, PIMPINAN_ROLES, BIDANG_ROLES,
-  emptyMember, PokjaData,
+  emptyMember, PokjaData, PokjaDraft, AnggotaItem, emptyAnggota,
 } from "@/types/pokja"
+import { getDrafts, saveDraftToStorage, createDraftId, clearDraft } from "@/lib/draft-storage"
+
+function formatDateForDraftName(date: Date): string {
+  const d = date.getDate().toString().padStart(2, "0")
+  const m = (date.getMonth() + 1).toString().padStart(2, "0")
+  const y = date.getFullYear()
+  return `${d}-${m}-${y}`
+}
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -292,8 +300,6 @@ export default function BuatPokjaPage() {
   }))
 
   // Step 2 – anggota tambahan (opsional)
-  type AnggotaItem = { nama: string; email: string; jenisKelamin: string; bidang: string; noWhatsapp: string; instansi: string; jabatan: string }
-  const emptyAnggota = (): AnggotaItem => ({ nama: "", email: "", jenisKelamin: "", bidang: "", noWhatsapp: "", instansi: "", jabatan: "" })
   const [anggotaList, setAnggotaList] = useState<AnggotaItem[]>([])
 
   const updateAnggota = (index: number, field: keyof AnggotaItem, val: string) => {
@@ -308,9 +314,43 @@ export default function BuatPokjaPage() {
   const [skDetail, setSkDetail] = useState({ nomorSK: "", tanggalSK: "", periodeMulai: "", periodeSelesai: "" })
 
   // ---------------------------------------------------------------------------
-  // Mount: baca perbaikanPokjaData dari sessionStorage untuk mode perbaikan
+  // Draft state
+  // ---------------------------------------------------------------------------
+  const [draftId, setDraftId] = useState<string | null>(null)
+  const [isDraftMode, setIsDraftMode] = useState(false)
+  const [isSavingDraft, setIsSavingDraft] = useState(false)
+  const [showSavedToast, setShowSavedToast] = useState(false)
+
+  // ---------------------------------------------------------------------------
+  // Mount: baca perbaikanPokjaData dari sessionStorage untuk mode perbaikan & load draft
   // ---------------------------------------------------------------------------
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const loadDraftId = params.get("draftId")
+
+    // Load draft mode - hanya satu draft
+    if (loadDraftId === "draft_ongoing" || loadDraftId) {
+      const draft = getDrafts()
+      if (draft) {
+        setDraftId(draft.id)
+        setIsDraftMode(true)
+        setKanalPengaduan(draft.kanalPengaduan)
+        setMembers(draft.members)
+        setAnggotaList(draft.anggotaList || [])
+        setSkDetail({
+          nomorSK: draft.sk.nomorSK,
+          tanggalSK: draft.sk.tanggalSK,
+          periodeMulai: draft.sk.periodeMulai,
+          periodeSelesai: draft.sk.periodeSelesai,
+        })
+        if (draft.sk.fileName) {
+          setSkFile(null)
+        }
+        return
+      }
+    }
+
+    // Perbaikan mode
     try {
       const raw = sessionStorage.getItem("perbaikanPokjaData")
       if (!raw) return
@@ -378,19 +418,71 @@ export default function BuatPokjaPage() {
       sk: { file: skFile, nomorSK: skDetail.nomorSK, tanggalSK: skDetail.tanggalSK, periodeMultai: skDetail.periodeMulai, periodeSelesai: skDetail.periodeSelesai },
     }
     try {
+      const role = (() => {
+        try { return JSON.parse(sessionStorage.getItem("auth") || "{}").role } catch { return null }
+      })()
+      const pokjaStatus = isPerbaikanMode ? undefined : (role === "pusat" ? "aktif" : "masih-diverifikasi")
       const serialisable = {
         ...payload,
         sk: { ...payload.sk, file: payload.sk.file?.name ?? null },
         ...(isPerbaikanMode && { deskripsiPerbaikan: deskripsiPerbaikan.trim() }),
       }
-      const role = (() => {
-        try { return JSON.parse(sessionStorage.getItem("auth") || "{}").role } catch { return null }
-      })()
-      const pokjaStatus = isPerbaikanMode ? undefined : (role === "pusat" ? "aktif" : "masih-diverifikasi")
-      const key = isPerbaikanMode ? "perbaikanSubmitData" : "newPokjaData"
-      sessionStorage.setItem(key, JSON.stringify({ ...serialisable, ...(pokjaStatus ? { pokjaStatus } : {}) }))
+      clearDraft()  // Clear draft BEFORE redirect
+      const storageKey = isPerbaikanMode ? "perbaikanSubmitData" : "newPokjaData"
+      sessionStorage.setItem(storageKey, JSON.stringify({ ...serialisable, ...(pokjaStatus ? { pokjaStatus } : {}) }))
     } catch {}
     setSubmitted(true)
+  }
+
+  // ---------------------------------------------------------------------------
+  // Draft functions - hanya satu draft
+  // ---------------------------------------------------------------------------
+  const handleSaveDraft = async () => {
+    setIsSavingDraft(true)
+    const now = new Date().toISOString()
+    const newDraftId = draftId || createDraftId()
+    const existingDraft = getDrafts()
+
+    const draft: PokjaDraft = {
+      id: newDraftId,
+      region: REGION,
+      createdAt: existingDraft?.createdAt || now,
+      updatedAt: now,
+      kanalPengaduan,
+      members,
+      anggotaList: anggotaList,
+      sk: {
+        fileName: skFile?.name || "",
+        nomorSK: skDetail.nomorSK,
+        tanggalSK: skDetail.tanggalSK,
+        periodeMulai: skDetail.periodeMulai,
+        periodeSelesai: skDetail.periodeSelesai,
+      },
+    }
+
+    saveDraftToStorage(draft)
+
+    setDraftId(newDraftId)
+    setIsDraftMode(true)
+    setIsSavingDraft(false)
+    setShowSavedToast(true)
+    setTimeout(() => setShowSavedToast(false), 3000)
+  }
+
+  const handleDeleteDraft = () => {
+    clearDraft()
+    setDraftId(null)
+    setIsDraftMode(false)
+    setKanalPengaduan("")
+    setMembers({
+      ketua: emptyMember(), wakil: emptyMember(), koordinator: emptyMember(),
+      pendidikan: emptyMember(), pppa: emptyMember(), sosial: emptyMember(),
+      kesehatan: emptyMember(), kominfo: emptyMember(), dukbangga: emptyMember(),
+    })
+    setAnggotaList([])
+    setSkDetail({ nomorSK: "", tanggalSK: "", periodeMulai: "", periodeSelesai: "" })
+    setSkFile(null)
+    router.push("/dashboard?menu=Data Kelompok Kerja")
   }
 
   // Navigate after success screen
@@ -471,9 +563,13 @@ export default function BuatPokjaPage() {
             <h1 className="text-sm font-semibold text-gray-900">
               {isPerbaikanMode ? "Perbaikan Data Kelompok Kerja" : "Pembentukan Kelompok Kerja"} {REGION}
             </h1>
-            {isPerbaikanMode && (
-              <span className="text-xs font-medium text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">
-                Mode Perbaikan
+            {(isPerbaikanMode || isDraftMode) && (
+              <span className="text-xs font-medium px-2 py-0.5 rounded-full">
+                {isPerbaikanMode ? (
+                  <span className="text-red-600 bg-red-50 border border-red-200">Mode Perbaikan</span>
+                ) : (
+                  <span className="text-amber-600 bg-yellow-50 border border-yellow-200">Mode Draf</span>
+                )}
               </span>
             )}
           </div>
@@ -486,8 +582,25 @@ export default function BuatPokjaPage() {
             <Wand2 className="w-3.5 h-3.5" />
             Isi Otomatis (Demo)
           </button>
+
+          {/* Save Draft button - always visible in header */}
+          <button
+            onClick={handleSaveDraft}
+            disabled={isSavingDraft}
+            className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition"
+          >
+            {isSavingDraft ? "Menyimpan..." : "Simpan Draf"}
+          </button>
         </div>
       </header>
+
+      {/* Toast notification for draft saved */}
+      {showSavedToast && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg shadow-lg animate-pulse">
+          <CheckCircle2 className="w-4 h-4" />
+          <span className="text-sm font-medium">Draf berhasil disimpan!</span>
+        </div>
+      )}
 
       <div className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 py-8 flex flex-col gap-8">
         {/* Step indicator */}
@@ -867,13 +980,15 @@ export default function BuatPokjaPage() {
               Selanjutnya <ChevronRight className="w-4 h-4" />
             </button>
           ) : (
-            <button
-              onClick={handleSubmit}
-              className="flex items-center gap-2 px-6 py-2 text-sm font-semibold bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              {isPerbaikanMode ? "Kirim Perbaikan" : "Ajukan"}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleSubmit}
+                className="flex items-center gap-2 px-6 py-2 text-sm font-semibold bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                {isPerbaikanMode ? "Kirim Perbaikan" : "Ajukan"}
+              </button>
+            </div>
           )}
         </div>
       </div>

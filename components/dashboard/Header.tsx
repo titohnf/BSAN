@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { ChevronDown, LogOut, RotateCcw, UserCircle2 } from "lucide-react"
 import { NotificationBell } from "@/components/ui/NotificationBell"
 import { clearAuthAndRedirectToLogin } from "@/lib/logout"
+import { clearDraft } from "@/lib/draft-storage"
 
 interface HeaderProps {
   userName?: string
@@ -27,6 +28,7 @@ export function Header({ userName = "Admin Dinas" }: HeaderProps) {
 
   const reset = () => {
     localStorage.removeItem("pokjaList")
+    clearDraft()
     setOpen(false)
     window.location.reload()
   }
