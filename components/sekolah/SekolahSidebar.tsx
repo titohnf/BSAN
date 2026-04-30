@@ -13,7 +13,7 @@ interface SekolahSidebarProps {
 }
 
 const navItems: { id: SekolahMenu; label: string; icon: typeof BookOpenCheck }[] = [
-  { id: "sumber-rujukan", label: "SumberDukungan", icon: BookOpenCheck },
+  { id: "sumber-rujukan", label: "Sumber Dukungan", icon: BookOpenCheck },
   { id: "kegiatan", label: "Kegiatan", icon: CalendarCheck },
 ]
 
