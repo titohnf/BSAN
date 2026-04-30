@@ -351,7 +351,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, onContinueDraft, isAdmin
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex-shrink-0"
                 >
                   <Pencil className="w-4 h-4" />
-                  Edit Data Kelompok Kerja
+                  Edit Kelompok Kerja
                 </button>
               )}
             </div>
@@ -382,7 +382,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, onContinueDraft, isAdmin
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors"
                     >
                       <FileText className="w-4 h-4" />
-                      Perbaiki Data Kelompok Kerja
+                      Perbaiki Kelompok Kerja
                     </button>
                   </div>
                 </div>

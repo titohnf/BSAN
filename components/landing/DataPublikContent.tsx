@@ -309,7 +309,7 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
         </div>
 
         <div className="max-w-6xl mx-auto px-4 pb-0 mb-16">
-          <h2 className="text-xl font-bold text-slate-900 mb-6 mt-16">Data Kelompok Kerja</h2>
+          <h2 className="text-xl font-bold text-slate-900 mb-6 mt-16">Kelompok Kerja</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <StatCard
               icon={MapPin}

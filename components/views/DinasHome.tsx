@@ -193,7 +193,7 @@ export function DashboardView({
       </div>
 
       <Panel>
-        <PanelHeader title="Data Kelompok Kerja">
+        <PanelHeader title="Kelompok Kerja">
           {/* Tampilkan tombol Buat Kelompok Kerja jika: Admin Pusat (bisa banyak) atau Dinas belum punya */}
           {total === 0 && <ViewBtn label="Buat Kelompok Kerja" onClick={onBuatPokja} />}
         </PanelHeader>
@@ -371,7 +371,7 @@ export function DashboardView({
                           onClick={() => onPerbaikiPokja?.(pokja)}
                           className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors"
                         >
-                          Perbaiki Data Kelompok Kerja
+                          Perbaiki Kelompok Kerja
                         </button>
                       </div>
                     )
@@ -390,7 +390,7 @@ export function DashboardView({
                         onClick={() => onPerbaikiPokja?.(pokja)}
                         className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                       >
-                        Edit Data Kelompok Kerja
+                        Edit Kelompok Kerja
                       </button>
                     </div>
                   )}
