@@ -381,16 +381,16 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
               </div>
             </div>
 
-            <Table>
+            <Table className="text-sm">
               <TableHeader>
                 <TableRow className="bg-slate-50/70 hover:bg-slate-50/70">
-                  <TableHead className="w-10 text-slate-500 text-xs pl-5">No</TableHead>
-                  <TableHead className="text-slate-500 text-xs">Wilayah</TableHead>
-                  <TableHead className="text-slate-500 text-xs">Provinsi</TableHead>
-                  <TableHead className="w-36 text-slate-500 text-xs">Status Kelompok Kerja</TableHead>
-                  <TableHead className="w-36 text-slate-500 text-xs text-center">Jumlah Bidang</TableHead>
-                  <TableHead className="w-36 text-slate-500 text-xs">Kontak</TableHead>
-                  <TableHead className="w-36 text-slate-500 text-xs text-center">Skor Terakhir</TableHead>
+                  <TableHead className="w-10 text-slate-500 text-xs font-semibold uppercase tracking-wide pl-5">No</TableHead>
+                  <TableHead className="text-slate-500 text-xs font-semibold uppercase tracking-wide">Wilayah</TableHead>
+                  <TableHead className="text-slate-500 text-xs font-semibold uppercase tracking-wide">Provinsi</TableHead>
+                  <TableHead className="w-36 text-slate-500 text-xs font-semibold uppercase tracking-wide">Status Kelompok Kerja</TableHead>
+                  <TableHead className="w-36 text-slate-500 text-xs font-semibold uppercase tracking-wide text-center">Jumlah Bidang</TableHead>
+                  <TableHead className="w-36 text-slate-500 text-xs font-semibold uppercase tracking-wide">Kontak</TableHead>
+                  <TableHead className="w-36 text-slate-500 text-xs font-semibold uppercase tracking-wide text-center">Skor Terakhir</TableHead>
                   <TableHead className="w-28" />
                 </TableRow>
               </TableHeader>
@@ -399,7 +399,7 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
                   return (
                     <React.Fragment key={row.no}>
                       <TableRow className="group">
-                        <TableCell className="text-slate-400 text-xs pl-5">{(page - 1) * PAGE_SIZE + idx + 1}</TableCell>
+                        <TableCell className="text-slate-400 text-sm pl-5 font-medium">{(page - 1) * PAGE_SIZE + idx + 1}</TableCell>
                         <TableCell className="font-medium text-slate-900">
                           {row.provinsi.includes(" - ") ? `Kota ${row.provinsi.split(" - ")[1]}` : `Provinsi ${row.provinsi}`}
                         </TableCell>
@@ -414,7 +414,7 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
                             <span className="text-slate-400">-</span>
                           )}
                         </TableCell>
-                        <TableCell className="text-slate-600 text-xs">
+                        <TableCell className="text-slate-600 text-sm">
                           {row.kontak ?? "-"}
                         </TableCell>
                         <TableCell className="text-center">
@@ -451,9 +451,9 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
             {totalPages >= 1 && (
               <div className="px-5 py-4 border-t border-slate-100 flex items-center justify-between gap-4">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
-                  <p className="text-slate-400 text-xs">
-                    Menampilkan {(page - 1) * PAGE_SIZE + 1} - {Math.min(page * PAGE_SIZE, filtered.length)} dari {filtered.length}
-                  </p>
+<p className="text-slate-400 text-sm">
+                      Menampilkan {(page - 1) * PAGE_SIZE + 1} - {Math.min(page * PAGE_SIZE, filtered.length)} dari {filtered.length}
+                    </p>
                   <div className="flex items-center gap-1">
                     <select
                       value={PAGE_SIZE}
@@ -464,7 +464,7 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
                       <option value={20}>20</option>
                       <option value={50}>50</option>
                     </select>
-                    <span className="text-slate-400 text-xs">baris/halaman</span>
+                    <span className="text-slate-400 text-sm">baris/halaman</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5">

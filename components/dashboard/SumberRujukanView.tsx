@@ -195,10 +195,11 @@ export const SEED: SumberRujukan[] = [
     logTerakhir: RUJUKAN_LOG.dibuatTerverifikasiPusat,
   },
   {
-    id: "sr-mks-1", namaInstansi: "Yayasan Lembaga Konsumen Indonesia — Makassar",
+    id: "sr-mks-1", namaInstansi: "Yayasan Lembaga Konsumen",
     kategoriBentukDukungan: "Konseling", kategoriPenyedia: "OMS",
-    provinsi: "Sulawesi Selatan", kabupatenKota: "Makassar", namaJalan: "Jl. AP. Pettarani",
+    provinsi: "Sulawesi Selatan", kabupatenKota: "Makassar", namaJalan: "Jl. AP. Pettarani", nomorJalan: "No. 4",
     nomorCallCenter: "04114119600", aksesInfo: "publik", status: "terverifikasi",
+    tautanGoogleMaps: "https://www.google.com/maps/embed?pb=!1v1699999999999!3d-5.157!4d119.422",
     dibuatOleh: "Admin Pusat", usulanDari: "pusat",
     logTerakhir: RUJUKAN_LOG.dibuatTerverifikasiPusat,
   },
