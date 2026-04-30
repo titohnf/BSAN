@@ -411,7 +411,7 @@ function DashboardPageInner() {
       const today = new Date().toISOString().slice(0, 10)
       const isEdit = parsed.prevStatus === "aktif"
       const defaultAlasan = isEdit
-        ? "Data Kelompok Kerja diperbarui dan diajukan ulang untuk verifikasi"
+        ? "Kelompok Kerja diperbarui dan diajukan ulang untuk verifikasi"
         : "Data diperbaiki dan diajukan kembali"
       const logPerbaiki = {
         tanggal: today,

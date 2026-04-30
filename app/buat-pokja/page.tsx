@@ -104,7 +104,7 @@ function MemberSection({ label, value, onChange, isCollapsed, onToggleCollapse }
         {onToggleCollapse && (
           <div className="flex items-center gap-2">
             <span className={cn("text-xs font-medium", isComplete ? "text-green-600" : "text-amber-600")}>
-              {isComplete ? "Field wajib diisi lengkap" : "Field wajib belum terisi"}
+              {isComplete ? "Seluruh kolom wajib diisi" : "Field wajib belum terisi"}
             </span>
             <div className="p-1 rounded-lg text-gray-400 hover:text-gray-600 transition">
               {isCollapsed ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
@@ -175,7 +175,7 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue, isCollaps
         {onToggleCollapse && (
           <div className="flex items-center gap-2">
             <span className={cn("text-xs font-medium", isComplete ? "text-green-600" : "text-amber-600")}>
-              {isComplete ? "Field wajib diisi lengkap" : "Field wajib belum terisi"}
+              {isComplete ? "Seluruh kolom wajib diisi" : "Field wajib belum terisi"}
             </span>
             <div className="p-1 rounded-lg text-gray-400 hover:text-gray-600 transition">
               {isCollapsed ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
@@ -844,7 +844,7 @@ export default function BuatPokjaPage() {
     setAnggotaList([])
     setSkDetail({ nomorSK: "", tanggalSK: "", periodeMulai: "", periodeSelesai: "" })
     setSkFile(null)
-    router.push("/dashboard?menu=Data Kelompok Kerja")
+    router.push("/dashboard?menu=Kelompok Kerja")
   }
 
   // Navigate after success screen
@@ -889,14 +889,14 @@ export default function BuatPokjaPage() {
               ? "Perbaikan Berhasil Dikirim!"
               : isPusat
                 ? "Kelompok Kerja Berhasil Dibuat!"
-                : "Data Kelompok Kerja Berhasil Dikirim!"}
+                : "Kelompok Kerja Berhasil Dikirim!"}
           </h3>
           <p className="text-sm text-gray-500 leading-relaxed">
             {isPerbaikanMode
               ? `Perbaikan data Kelompok Kerja wilayah ${REGION} telah dikirim dan kembali menunggu verifikasi Admin Pusat.`
               : isPusat
                 ? `Kelompok Kerja untuk wilayah ${REGION} telah dibuat dan aktif.`
-                : `Data Kelompok Kerja wilayah ${REGION} sedang menunggu verifikasi dari Admin Pusat.`
+                : `Kelompok Kerja wilayah ${REGION} sedang menunggu verifikasi dari Admin Pusat.`
             }
           </p>
           <p className="text-xs text-gray-400">Mengalihkan ke dashboard...</p>
@@ -923,7 +923,7 @@ export default function BuatPokjaPage() {
             </button>
             <span className="text-gray-300">/</span>
             <h1 className="text-sm font-semibold text-gray-900">
-              {isPerbaikanMode ? "Perbaikan Data Kelompok Kerja" : "Pembentukan Kelompok Kerja"} {REGION}
+              {isPerbaikanMode ? "Perbaikan Kelompok Kerja" : "Pembentukan Kelompok Kerja"} {REGION}
             </h1>
             {(isPerbaikanMode || isDraftMode) && (
               <span className="text-xs font-medium px-2 py-0.5 rounded-full">
@@ -1172,7 +1172,7 @@ export default function BuatPokjaPage() {
                         <div className="flex items-center gap-2">
                           {isBidangSelected && (
                             <span className={cn("text-xs font-medium", isComplete ? "text-green-600" : "text-amber-600")}>
-                              {isComplete ? "Field wajib diisi lengkap" : "Field wajib belum terisi"}
+                              {isComplete ? "Seluruh kolom wajib diisi" : "Field wajib belum terisi"}
                             </span>
                           )}
                           <div

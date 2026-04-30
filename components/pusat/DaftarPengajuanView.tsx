@@ -88,7 +88,7 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Data Kelompok Kerja</h1>
+          <h1 className="text-xl font-bold text-gray-900">Kelompok Kerja</h1>
           <p className="text-sm text-gray-500 mt-0.5">Kelola data Kelompok Kerja di seluruh Indonesia</p>
         </div>
       </div>

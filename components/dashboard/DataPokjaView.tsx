@@ -67,7 +67,7 @@ function EmptyStatePokja({ onBuatPokja }: { onBuatPokja: () => void }) {
       <div className="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center mb-5">
         <Users className="w-9 h-9 text-blue-400" />
       </div>
-      <h3 className="text-lg font-bold text-gray-800 mb-2">Kelompok Kerja Belum Dibentuk</h3>
+      <h3 className="text-lg font-bold text-gray-800 mb-2">Belum Ada Kelompok Kerja</h3>
       <p className="text-sm text-gray-500 max-w-sm leading-relaxed mb-6">
         Silakan mulai membuat dan mengajukan pembentukan Kelompok Kerja di wilayah Anda.
       </p>
@@ -351,7 +351,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, onContinueDraft, isAdmin
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex-shrink-0"
                 >
                   <Pencil className="w-4 h-4" />
-                  Edit Data Kelompok Kerja
+                  Edit Kelompok Kerja
                 </button>
               )}
             </div>
@@ -382,7 +382,7 @@ export function DataPokjaView({ pokjaList, onBuatPokja, onContinueDraft, isAdmin
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors"
                     >
                       <FileText className="w-4 h-4" />
-                      Perbaiki Data Kelompok Kerja
+                      Perbaiki Kelompok Kerja
                     </button>
                   </div>
                 </div>

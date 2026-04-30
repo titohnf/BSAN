@@ -189,11 +189,11 @@ export function DashboardView({
   return (
     <main className="space-y-4">
       <div className="px-1">
-        <h1 className="text-2xl font-bold text-gray-900">Selamat Datang Admin Dinas {region}</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Dasbor BSAN {region}</h1>
       </div>
 
       <Panel>
-        <PanelHeader title="Data Kelompok Kerja">
+        <PanelHeader title="Kelompok Kerja">
           {/* Tampilkan tombol Buat Kelompok Kerja jika: Admin Pusat (bisa banyak) atau Dinas belum punya */}
           {total === 0 && <ViewBtn label="Buat Kelompok Kerja" onClick={onBuatPokja} />}
         </PanelHeader>
@@ -235,7 +235,7 @@ export function DashboardView({
                   border: "border-amber-200",
                   text: "text-amber-700",
                   badge: "bg-amber-100 text-amber-800",
-                  label: "Perlu Diperiksa",
+                  label: "Sedang Diajukan",
                 },
                 "butuh-perbaikan": {
                   bg: "bg-red-50",
@@ -371,7 +371,7 @@ export function DashboardView({
                           onClick={() => onPerbaikiPokja?.(pokja)}
                           className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors"
                         >
-                          Perbaiki Data Kelompok Kerja
+                          Perbaiki Kelompok Kerja
                         </button>
                       </div>
                     )
@@ -390,7 +390,7 @@ export function DashboardView({
                         onClick={() => onPerbaikiPokja?.(pokja)}
                         className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                       >
-                        Edit Data Kelompok Kerja
+                        Edit Kelompok Kerja
                       </button>
                     </div>
                   )}
@@ -474,7 +474,7 @@ export function DashboardView({
                         <div className="rounded-lg bg-amber-50 border border-amber-200 p-2.5 flex items-start gap-2.5">
                           <AlertTriangle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0 mt-0.5" />
                           <div>
-                            <p className="text-xs font-semibold text-amber-800">{pending} Perlu Diperiksa</p>
+                            <p className="text-xs font-semibold text-amber-800">{pending} Sedang Diajukan</p>
                             <p className="text-xs text-amber-700 mt-0.5">Cek untuk verifikasi data.</p>
                           </div>
                         </div>
