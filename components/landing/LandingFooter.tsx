@@ -1,4 +1,4 @@
-import { GraduationCap, Mail, Phone, MapPin } from "lucide-react"
+import { GraduationCap, Mail, Phone, MapPin, ExternalLink } from "lucide-react"
 
 const quickLinks = [
   { label: "Tentang BSAN", href: "https://cerdasberkarakter.kemendikdasmen.go.id/budayasekolahamannyaman/" },
@@ -39,9 +39,10 @@ export function LandingFooter() {
                 <li key={link.href}>
                   <button
                     onClick={() => handleClick(link.href)}
-                    className="text-slate-400 text-sm hover:text-amber-400 transition-colors"
+                    className="text-slate-400 text-sm hover:text-amber-400 transition-colors flex items-center gap-1.5"
                   >
                     {link.label}
+                    <ExternalLink className="w-3 h-3" />
                   </button>
                 </li>
               ))}
