@@ -104,7 +104,7 @@ function MemberSection({ label, value, onChange, isCollapsed, onToggleCollapse }
         {onToggleCollapse && (
           <div className="flex items-center gap-2">
             <span className={cn("text-xs font-medium", isComplete ? "text-green-600" : "text-amber-600")}>
-              {isComplete ? "Field wajib diisi lengkap" : "Field wajib belum terisi"}
+              {isComplete ? "Seluruh kolom wajib diisi" : "Field wajib belum terisi"}
             </span>
             <div className="p-1 rounded-lg text-gray-400 hover:text-gray-600 transition">
               {isCollapsed ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
@@ -175,7 +175,7 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue, isCollaps
         {onToggleCollapse && (
           <div className="flex items-center gap-2">
             <span className={cn("text-xs font-medium", isComplete ? "text-green-600" : "text-amber-600")}>
-              {isComplete ? "Field wajib diisi lengkap" : "Field wajib belum terisi"}
+              {isComplete ? "Seluruh kolom wajib diisi" : "Field wajib belum terisi"}
             </span>
             <div className="p-1 rounded-lg text-gray-400 hover:text-gray-600 transition">
               {isCollapsed ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
@@ -1172,7 +1172,7 @@ export default function BuatPokjaPage() {
                         <div className="flex items-center gap-2">
                           {isBidangSelected && (
                             <span className={cn("text-xs font-medium", isComplete ? "text-green-600" : "text-amber-600")}>
-                              {isComplete ? "Field wajib diisi lengkap" : "Field wajib belum terisi"}
+                              {isComplete ? "Seluruh kolom wajib diisi" : "Field wajib belum terisi"}
                             </span>
                           )}
                           <div

@@ -235,7 +235,7 @@ export function DashboardView({
                   border: "border-amber-200",
                   text: "text-amber-700",
                   badge: "bg-amber-100 text-amber-800",
-                  label: "Perlu Diperiksa",
+                  label: "Sedang Diajukan",
                 },
                 "butuh-perbaikan": {
                   bg: "bg-red-50",
@@ -474,7 +474,7 @@ export function DashboardView({
                         <div className="rounded-lg bg-amber-50 border border-amber-200 p-2.5 flex items-start gap-2.5">
                           <AlertTriangle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0 mt-0.5" />
                           <div>
-                            <p className="text-xs font-semibold text-amber-800">{pending} Perlu Diperiksa</p>
+                            <p className="text-xs font-semibold text-amber-800">{pending} Sedang Diajukan</p>
                             <p className="text-xs text-amber-700 mt-0.5">Cek untuk verifikasi data.</p>
                           </div>
                         </div>
