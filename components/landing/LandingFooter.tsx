@@ -5,8 +5,6 @@ const quickLinks = [
   { label: "Panduan Membuat Kelompok Kerja", href: "https://www.youtube.com/watch?v=1YfsiZxJw4A" },
 ]
 
-const partners = ["G7KAIH", "Smart Character", "Ramah"]
-
 export function LandingFooter() {
   const handleClick = (href: string) => {
     if (href.startsWith("http")) {
@@ -26,22 +24,12 @@ export function LandingFooter() {
               <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center">
                 <GraduationCap className="w-5 h-5 text-white" />
               </div>
-              <span className="font-bold text-lg">BSAN</span>
+              <span className="font-bold text-lg">Portal BSAN</span>
             </div>
-            <p className="text-slate-400 text-sm leading-relaxed mb-5">
+            <p className="text-slate-400 text-sm leading-relaxed">
               Sistem Informasi Budaya Sekolah Aman dan Nyaman — Platform pengelolaan
               Kelompok Kerja dan pemantauan program perlindungan peserta didik.
             </p>
-            <div className="flex gap-2 flex-wrap">
-              {partners.map((p) => (
-                <span
-                  key={p}
-                  className="px-3 py-1 rounded-full bg-white/10 text-slate-300 text-xs font-medium"
-                >
-                  {p}
-                </span>
-              ))}
-            </div>
           </div>
 
           <div>
@@ -64,17 +52,17 @@ export function LandingFooter() {
             <p className="font-semibold text-sm text-slate-200 mb-4">Kontak</p>
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
+                <MapPin className="w-4 h-4 text-blue-300 mt-0.5 shrink-0" />
                 <span className="text-slate-400 text-sm">
                   Pusat Penguatan Karakter, Kementerian Pendidikan, Kebudayaan, Riset dan Teknologi
                 </span>
               </li>
               <li className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-amber-400 shrink-0" />
+                <Mail className="w-4 h-4 text-blue-300 shrink-0" />
                 <span className="text-slate-400 text-sm">bsan@kemdikbud.go.id</span>
               </li>
               <li className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-amber-400 shrink-0" />
+                <Phone className="w-4 h-4 text-blue-300 shrink-0" />
                 <span className="text-slate-400 text-sm">(021) 5703303</span>
               </li>
             </ul>
