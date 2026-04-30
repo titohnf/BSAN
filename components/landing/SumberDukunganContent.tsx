@@ -133,7 +133,7 @@ export function SumberDukunganContent() {
                 </p>
               </div>
               <div className="hidden md:block self-end">
-                <img src="/herobsan.png" alt="Ilustrasi BSAN" className="w-full h-auto rounded-2xl" />
+                <img src="/ilusdukungan.png" alt="Ilustrasi Sumber Dukungan" className="w-full h-auto rounded-2xl" />
               </div>
             </div>
           </div>
