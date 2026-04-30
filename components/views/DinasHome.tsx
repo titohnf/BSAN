@@ -189,7 +189,7 @@ export function DashboardView({
   return (
     <main className="space-y-4">
       <div className="px-1">
-        <h1 className="text-2xl font-bold text-gray-900">Selamat Datang Admin Dinas {region}</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Dasbor BSAN {region}</h1>
       </div>
 
       <Panel>
