@@ -937,7 +937,7 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
       {/* Table */}
       {totalRows === 0 ? (
         <div className="bg-white rounded-xl border border-dashed border-gray-300 p-10 text-center">
-          <p className="font-semibold text-gray-700 text-sm">Tidak ada sumber dukungan ditemukan</p>
+          <p className="font-semibold text-gray-700 text-sm">Data Tidak Tersedia</p>
           <p className="text-gray-500 text-xs mt-1">Coba ubah filter atau kata kunci pencarian.</p>
         </div>
       ) : (

@@ -509,10 +509,10 @@ function RujukanFormInner() {
             {!isReadOnly && (
               <div className="rounded-lg bg-blue-50 border border-blue-100 px-3 py-2.5 space-y-1">
                 <p className="text-xs text-blue-700">
-                  <span className="font-semibold">Nomor call center</span> dapat ditambahkan lebih dari satu.
+                  <span className="font-semibold">Nomor Call Center</span> bisa lebih dari satu.
                 </p>
                 <p className="text-xs text-blue-600">
-                  Bila call center tidak tersedia, nomor pribadi Anda akan menjadi kontak rujukan dan dapat diakses publik.
+                  Jika tidak tersedia, gunakan nomor HP pribadi yang dapat menjadi rujukan dan dapat diakses publik.
                 </p>
               </div>
             )}
@@ -520,7 +520,7 @@ function RujukanFormInner() {
             {/* Label row */}
             {!isReadOnly && (
               <div className="flex gap-2 items-center">
-                <span className="flex-1 text-xs font-semibold text-gray-700">Nomor <span className="text-red-500">*</span></span>
+                <span className="flex-1 text-xs font-semibold text-gray-700">Nomor Kontak <span className="text-red-500">*</span></span>
                 <span className="w-36 text-xs font-semibold text-gray-700">Tipe Kontak</span>
                 {form.kontak.length > 1 && <span className="w-9" />}
               </div>
