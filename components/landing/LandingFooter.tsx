@@ -1,19 +1,20 @@
 import { GraduationCap, Mail, Phone, MapPin } from "lucide-react"
 
 const quickLinks = [
-  { label: "Beranda", href: "#beranda" },
-  { label: "Urgensi Program", href: "#urgensi" },
-  { label: "Tentang BSAN", href: "#tentang" },
-  { label: "Ringkasan Regulasi", href: "#regulasi" },
-  { label: "FAQ", href: "#faq" },
+  { label: "Tentang BSAN", href: "https://cerdasberkarakter.kemendikdasmen.go.id/budayasekolahamannyaman/" },
+  { label: "Panduan Membuat Kelompok Kerja", href: "https://www.youtube.com/watch?v=1YfsiZxJw4A" },
 ]
 
 const partners = ["G7KAIH", "Smart Character", "Ramah"]
 
 export function LandingFooter() {
   const handleClick = (href: string) => {
-    const el = document.querySelector(href)
-    if (el) el.scrollIntoView({ behavior: "smooth" })
+    if (href.startsWith("http")) {
+      window.open(href, "_blank", "noopener,noreferrer")
+    } else {
+      const el = document.querySelector(href)
+      if (el) el.scrollIntoView({ behavior: "smooth" })
+    }
   }
 
   return (
