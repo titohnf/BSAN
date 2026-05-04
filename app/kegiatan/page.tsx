@@ -8,7 +8,7 @@ export default function KegiatanPage() {
   return (
     <main>
       <LandingNavbar />
-      <KegiatanContent />
+      <KegiatanContent hideHeroPrefix={true} />
       <LandingFooter />
     </main>
   )

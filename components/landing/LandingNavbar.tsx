@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/button"
 
 const navLinks = [
   { label: "Beranda", href: "/" },
+  { label: "Kelompok Kerja", href: "/kelompok-kerja" },
   { label: "Sumber Dukungan", href: "/sumber-dukungan" },
-  { label: "Kegiatan", href: "/kegiatandi" },
+  { label: "Kegiatan", href: "/kegiatan" },
 ]
 
 export function LandingNavbar() {

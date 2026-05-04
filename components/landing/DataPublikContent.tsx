@@ -4,8 +4,6 @@ import React, { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import {
   MapPin,
-  Building2,
-  BarChart3,
   Search,
   Download,
   X,
@@ -23,12 +21,6 @@ import {
 } from "@/components/ui/table"
 import {
   PROVINSI_DATA,
-  TOTAL_PROVINSI,
-  TOTAL_KAB_KOTA,
-  PROVINSI_TERBENTUK,
-  KAB_KOTA_TERBENTUK,
-  PERSENTASE_NASIONAL,
-  LAST_UPDATED,
   type ProvinsiRow,
 } from "@/data/provinsiData"
 import { MOCK_PENGAJUAN, generateDummyPokja } from "@/data/mockPokja"
@@ -48,34 +40,6 @@ function statusBadge(status: ProvinsiRow["statusPokja"]) {
   return <Badge className={className}>{label}</Badge>
 }
 
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  sub,
-  color,
-}: {
-  icon: React.ElementType
-  label: string
-  value: string | number
-  sub?: string
-  color: string
-}) {
-  return (
-    <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5 flex flex-col h-full">
-      <div className="flex items-center gap-4">
-        <div className={`w-10 h-10 rounded-lg ${color} flex items-center justify-center shrink-0 self-start`}>
-          <Icon className="w-5 h-5 text-white" />
-        </div>
-        <div className="flex-1">
-          <p className="text-sm font-medium text-slate-900 leading-tight">{label}</p>
-          <p className="text-4xl font-extrabold text-slate-900">{value}</p>
-          {sub && <p className="text-sm text-slate-500">{sub}</p>}
-        </div>
-      </div>
-    </div>
-  )
-}
 
 function DetailModal({ row, onClose }: { row: ProvinsiRow; onClose: () => void }) {
   const pokja = row.pokjaId
@@ -223,7 +187,14 @@ function DetailModal({ row, onClose }: { row: ProvinsiRow; onClose: () => void }
   )
 }
 
-export function DataPublikContent({ showBackButton = false }: { showBackButton?: boolean }) {
+type DataPublikContentProps = {
+  showBackButton?: boolean
+  heroTitle?: string
+  heroSubtitle?: string
+  hideHeroPrefix?: boolean
+}
+
+export function DataPublikContent({ showBackButton = false, heroTitle, heroSubtitle, hideHeroPrefix = false }: DataPublikContentProps) {
   const router = useRouter()
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
@@ -287,51 +258,18 @@ export function DataPublikContent({ showBackButton = false }: { showBackButton?:
             )}
             <div className="grid md:grid-cols-2 gap-8 items-end">
               <div className="pb-16 pt-16">
-                <h1 className="text-sm md:text-base font-bold text-slate-800">Selamat Datang di</h1>
-                <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mt-1">Portal Budaya Sekolah Aman dan Nyaman (BSAN)</h1>
+                {!hideHeroPrefix && <h1 className="text-sm md:text-base font-bold text-slate-800">Selamat Datang di</h1>}
+                <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mt-1">{heroTitle ?? "Portal Budaya Sekolah Aman dan Nyaman (BSAN)"}</h1>
                 <p className="mt-3 text-slate-700 text-base max-w-xl">
-                  Lihat informasi pembentukan kelompok kerja BSAN beserta beragam informasi
-                  dan Sumber Dukungan di Daerah Anda.
+                  {heroSubtitle ?? "Lihat informasi pembentukan kelompok kerja BSAN beserta beragam informasi dan Sumber Dukungan di Daerah Anda."}
                 </p>
-              </div>
-              <div className="hidden md:block self-end">
-                <img
-                  src="/herobsan.png"
-                  alt="Ilustrasi BSAN"
-                  className="w-full h-auto rounded-2xl"
-                />
               </div>
             </div>
           </div>
         </div>
 
         <div className="max-w-6xl mx-auto px-4 pb-0 mb-16">
-          <h2 className="text-xl font-bold text-slate-900 mb-6 mt-16">Kelompok Kerja</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <StatCard
-              icon={MapPin}
-              label="Provinsi Terbentuk"
-              value={PROVINSI_TERBENTUK}
-              sub={`dari ${TOTAL_PROVINSI} provinsi`}
-              color="bg-blue-600"
-            />
-            <StatCard
-              icon={Building2}
-              label="Kab/Kota Terbentuk"
-              value={KAB_KOTA_TERBENTUK}
-              sub={`dari ${TOTAL_KAB_KOTA} kab/kota`}
-              color="bg-amber-500"
-            />
-            <StatCard
-              icon={BarChart3}
-              label="Persentase Nasional"
-              value={`${PERSENTASE_NASIONAL}%`}
-              sub="capaian di Indonesia"
-              color="bg-emerald-600"
-            />
-          </div>
-
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-8">
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-16">
               <div className="px-5 py-4 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2">

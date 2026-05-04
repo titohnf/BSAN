@@ -8,7 +8,7 @@ export default function SumberDukunganPage() {
   return (
     <main>
       <LandingNavbar />
-      <SumberDukunganContent />
+      <SumberDukunganContent hideHeroPrefix={true} />
       <LandingFooter />
     </main>
   )

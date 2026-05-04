@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useMemo } from "react"
-import { Calendar, MapPin, Users, Search, CheckCircle2 } from "lucide-react"
+import { MapPin, Users, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -22,7 +22,7 @@ interface Kegiatan {
   deskripsi: string
 }
 
-const MOCK_KEGIATAN: Kegiatan[] = [
+export const MOCK_KEGIATAN: Kegiatan[] = [
   { no: 1, nama: "Pelatihan Fasilitator BSAN Tingkat Nasional", penyelenggara: "Kemendikdasmen", wilayah: "Jakarta", tanggal: "2025-03-10", status: "Selesai", peserta: 120, deskripsi: "Pelatihan bagi fasilitator BSAN dari seluruh Indonesia untuk meningkatkan kapasitas dalam implementasi program." },
   { no: 2, nama: "Workshop Pembentukan Pokja BSAN Provinsi Jawa Barat", penyelenggara: "Dinas Pendidikan Jawa Barat", wilayah: "Bandung", tanggal: "2025-04-05", status: "Selesai", peserta: 45, deskripsi: "Workshop khusus untuk membantu pembentukan Kelompok Kerja BSAN di wilayah Jawa Barat." },
   { no: 3, nama: "Sosialisasi Program BSAN di Aceh", penyelenggara: "Dinas Pendidikan Aceh", wilayah: "Banda Aceh", tanggal: "2025-04-18", status: "Selesai", peserta: 80, deskripsi: "Kegiatan sosialisasi program BSAN kepada seluruh pemangku kepentingan di Provinsi Aceh." },
@@ -35,6 +35,8 @@ const MOCK_KEGIATAN: Kegiatan[] = [
   { no: 10, nama: "Seminar Nasional: Perlindungan Peserta Didik", penyelenggara: "Kemendikdasmen", wilayah: "Yogyakarta", tanggal: "2025-07-15", status: "Akan Datang", peserta: 300, deskripsi: "Seminar nasional yang membahas isu perlindungan peserta didik dari berbagai perspektif." },
   { no: 11, nama: "Pelatihan Pokja BSAN Kalimantan", penyelenggara: "Dinas Pendidikan Kaltim", wilayah: "Samarinda", tanggal: "2025-07-22", status: "Akan Datang", peserta: 55, deskripsi: "Pelatihan pembentukan dan penguatan Pokja BSAN di wilayah Kalimantan." },
   { no: 12, nama: "Forum BSAN Kawasan Timur Indonesia", penyelenggara: "Kemendikdasmen", wilayah: "Makassar", tanggal: "2025-08-05", status: "Akan Datang", peserta: 110, deskripsi: "Forum khusus untuk daerah-daerah di kawasan timur Indonesia dalam mengakselerasi program BSAN." },
+  { no: 13, nama: "Rapat Pokja BSAN Tingkat Nasional", penyelenggara: "Kemendikdasmen", wilayah: "Jakarta", tanggal: "2026-05-04", status: "Berlangsung", peserta: 80, deskripsi: "Rapat koordinasi pokja BSAN tingkat nasional." },
+  { no: 14, nama: "Sosialisasi Kebijakan BSAN untuk Dinas Pendidikan", penyelenggara: "Pusat Penguatan Karakter", wilayah: "Online", tanggal: "2026-05-04", status: "Berlangsung", peserta: 250, deskripsi: "Sosialisasi kebijakan BSAN terbaru kepada seluruh dinas pendidikan provinsi." },
 ]
 
 const STATUS_OPTIONS = ["Semua", "Berlangsung", "Selesai", "Akan Datang"] as const
@@ -45,24 +47,9 @@ const STATUS_BADGE: Record<Kegiatan["status"], string> = {
   "Akan Datang": "bg-amber-50 text-amber-700 border-amber-200",
 }
 
-function StatCard({ icon: Icon, label, value, sub, color }: { icon: React.ElementType; label: string; value: number; sub?: string; color: string }) {
-  return (
-    <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5 flex flex-col h-full">
-      <div className="flex items-center gap-4">
-        <div className={`w-10 h-10 rounded-lg ${color} flex items-center justify-center shrink-0 self-start`}>
-          <Icon className="w-5 h-5 text-white" />
-        </div>
-        <div className="flex-1">
-          <p className="text-sm font-medium text-slate-900 leading-tight">{label}</p>
-          <p className="text-4xl font-extrabold text-slate-900">{value}</p>
-          {sub && <p className="text-sm text-slate-500">{sub}</p>}
-        </div>
-      </div>
-    </div>
-  )
-}
 
-export function KegiatanContent() {
+type KegiatanContentProps = { hideHeroPrefix?: boolean }
+export function KegiatanContent({ hideHeroPrefix = false }: KegiatanContentProps) {
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
   const [statusFilter, setStatusFilter] = useState<string>("Semua")
@@ -79,10 +66,6 @@ export function KegiatanContent() {
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
-  const totalBerlangsung = MOCK_KEGIATAN.filter(k => k.status === "Berlangsung").length
-  const totalSelesai = MOCK_KEGIATAN.filter(k => k.status === "Selesai").length
-  const totalAkanDatang = MOCK_KEGIATAN.filter(k => k.status === "Akan Datang").length
-
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="pt-16">
@@ -90,27 +73,17 @@ export function KegiatanContent() {
           <div className="max-w-6xl mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-8 items-end">
               <div className="pb-16 pt-16">
-                <h1 className="text-sm md:text-base font-bold text-slate-800">Program &amp; Aktivitas</h1>
+                {!hideHeroPrefix && <h1 className="text-sm md:text-base font-bold text-slate-800">Program &amp; Aktivitas</h1>}
                 <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mt-1">Kegiatan BSAN</h1>
                 <p className="mt-3 text-slate-700 text-base max-w-xl">
                   Daftar kegiatan pelatihan, workshop, sosialisasi, dan forum koordinasi program Budaya Sekolah Aman dan Nyaman di seluruh Indonesia.
                 </p>
-              </div>
-              <div className="hidden md:block self-end">
-                <img src="/herobsan.png" alt="Ilustrasi BSAN" className="w-full h-auto rounded-2xl" />
               </div>
             </div>
           </div>
         </div>
 
         <div className="max-w-6xl mx-auto px-4 pb-0 mb-16">
-          <h2 className="text-xl font-bold text-slate-900 mb-6 mt-16">Data Kegiatan</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <StatCard icon={Calendar} label="Berlangsung" value={totalBerlangsung} sub="kegiatan aktif saat ini" color="bg-blue-600" />
-            <StatCard icon={CheckCircle2} label="Selesai" value={totalSelesai} sub="kegiatan telah terlaksana" color="bg-emerald-600" />
-            <StatCard icon={MapPin} label="Akan Datang" value={totalAkanDatang} sub="kegiatan terjadwal" color="bg-amber-500" />
-          </div>
-
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-8">
             <div className="px-5 py-4 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>

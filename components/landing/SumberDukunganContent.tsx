@@ -37,7 +37,11 @@ const PROVINSI_LIST = [
 
 type FilterWilayah = { province: string; kabupaten: string } | null
 
-export function SumberDukunganContent() {
+type SumberDukunganContentProps = {
+  hideHeroPrefix?: boolean
+}
+
+export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukunganContentProps) {
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
   const [filterKategori, setFilterKategori] = useState<KategoriDukungan | "semua">("semua")
@@ -126,41 +130,17 @@ export function SumberDukunganContent() {
           <div className="max-w-6xl mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-8 items-end">
               <div className="pb-16 pt-16">
-                <h1 className="text-sm md:text-base font-bold text-slate-800">Informasi &amp; Referensi</h1>
+                {!hideHeroPrefix && <h1 className="text-sm md:text-base font-bold text-slate-800">Informasi &amp; Referensi</h1>}
                 <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mt-1">Sumber Dukungan BSAN</h1>
                 <p className="mt-3 text-slate-700 text-base max-w-xl">
                   Daftar kontak layanan untuk membangun lingkungan sekolah yang aman, nyaman, dan inklusif.
                 </p>
-              </div>
-              <div className="hidden md:block self-end">
-                <img src="/ilusdukungan.png" alt="Ilustrasi Sumber Dukungan" className="w-full h-auto rounded-2xl" />
               </div>
             </div>
           </div>
         </div>
 
         <div className="max-w-6xl mx-auto px-4 pb-0 mb-16">
-          <h2 className="text-xl font-bold text-slate-900 mb-6 mt-16">Daftar Sumber Dukungan</h2>
-
-          {/* Stat cards — 8 kategori */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {KATEGORI_KEYS.map((key) => {
-              const cfg = KATEGORI_CONFIG[key]
-              const count = filtered.filter((i) => i.kategoriBentukDukungan === key).length
-              return (
-                <div key={key} className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm flex items-center gap-3">
-                  <div className={`w-9 h-9 rounded-full ${cfg.bg} ${cfg.color} flex items-center justify-center flex-shrink-0`}>
-                    {cfg.icon}
-                  </div>
-                  <div>
-                    <p className="text-xl font-bold text-gray-900">{count}</p>
-                    <p className="text-xs text-gray-500 leading-tight">{cfg.label}</p>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-
           {/* Table card */}
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-8">
             {/* Filter bar */}

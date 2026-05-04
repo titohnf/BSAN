@@ -214,7 +214,9 @@ const PLACEHOLDER_ROWS: ProvinsiRow[] = [
 export const PROVINSI_DATA: ProvinsiRow[] = [...generateRows(), ...PLACEHOLDER_ROWS]
 
 export const TOTAL_PROVINSI = ALL_PROVINSI.length
-export const TOTAL_KAB_KOTA = ALL_PROVINSI.reduce((s, p) => s + p.kabKota, 0)
+export const TOTAL_KAB_KOTA = 514
+export const KAB_KOTA_PER_PROVINSI: Record<string, number> =
+  Object.fromEntries(ALL_PROVINSI.map(p => [p.name, p.kabKota]))
 export const PROVINSI_TERBENTUK = PROVINSI_DATA.filter((p) => p.statusPokja === "Aktif").length
 export const KAB_KOTA_TERBENTUK = PROVINSI_DATA.reduce((s, p) => s + p.pokjaKabKota, 0)
 export const PERSENTASE_NASIONAL =
