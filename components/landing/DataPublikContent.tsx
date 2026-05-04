@@ -8,9 +8,11 @@ import {
   Download,
   X,
   Phone,
+  ChevronDown,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 import {
   Table,
   TableBody,
@@ -26,7 +28,18 @@ import {
 import { MOCK_PENGAJUAN, generateDummyPokja } from "@/data/mockPokja"
 import { cn } from "@/lib/utils"
 
-const PAGE_SIZE = 10
+const PAGE_SIZE = 20
+
+const ALL_BIDANG = ["Bidang Pendidikan", "Bidang Sosial", "Bidang Kesehatan", "Bidang PPPA", "Bidang Kominfo", "Bidang Dukbangga"]
+
+function getBidangList(row: ProvinsiRow): string[] {
+  if (row.pokjaId) {
+    const pokja = MOCK_PENGAJUAN.find((p) => p.id === row.pokjaId)
+    if (pokja) return pokja.members.map((m) => m.jabatan).filter((j) => j.startsWith("Bidang"))
+  }
+  if (row.bidangTersedia != null) return ALL_BIDANG.slice(0, row.bidangTersedia)
+  return []
+}
 
 function statusBadge(status: ProvinsiRow["statusPokja"]) {
   const map: Record<ProvinsiRow["statusPokja"], { label: string; className: string }> = {
@@ -76,31 +89,6 @@ function DetailModal({ row, onClose }: { row: ProvinsiRow; onClose: () => void }
 
         <div className="flex-1 overflow-y-auto divide-y divide-slate-100">
 
-          {/* Stat Cards */}
-          <div className="px-6 py-5 space-y-4">
-            <div className="grid grid-cols-3 gap-3">
-            <div className="bg-slate-50 rounded-xl p-4 flex flex-col gap-1">
-              <p className="text-xs text-slate-500">Jumlah Bidang</p>
-              <p className="text-2xl font-bold text-slate-900">{row.bidangTersedia ?? pokja?.members.filter(m => m.jabatan.startsWith("Bidang")).length ?? "-"}</p>
-            </div>
-            <div className="bg-slate-50 rounded-xl p-4 flex flex-col gap-1">
-              <p className="text-xs text-slate-500">Jumlah Anggota</p>
-              <p className="text-2xl font-bold text-slate-900">{pokja?.members.length ?? "-"}</p>
-            </div>
-            <div className="bg-slate-50 rounded-xl p-4 flex flex-col gap-1">
-              <p className="text-xs text-slate-500">Skor</p>
-              <p className={cn(
-                "text-2xl font-bold",
-                row.skor != null && row.skor >= 75 ? "text-emerald-600"
-                  : row.skor != null && row.skor >= 50 ? "text-amber-600"
-                  : "text-slate-900"
-              )}>
-                {row.skor ?? "-"}
-              </p>
-            </div>
-            </div>
-          </div>
-
           {/* SK Detail */}
           {pokja && (
             <div className="px-6 py-5">
@@ -134,10 +122,17 @@ function DetailModal({ row, onClose }: { row: ProvinsiRow; onClose: () => void }
             </div>
           )}
 
-          {/* Tabel Pokja */}
+          {/* Pengurus Kelompok Kerja */}
           {pokja && pokja.members.length > 0 && (
             <div className="px-6 py-5">
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Anggota Kelompok Kerja</p>
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pengurus Kelompok Kerja</p>
+                <div className="flex items-center gap-3 text-xs text-slate-500">
+                  <span>{row.bidangTersedia ?? pokja.members.filter(m => m.jabatan.startsWith("Bidang")).length} Bidang</span>
+                  <span className="text-slate-300">·</span>
+                  <span>{pokja.members.length} Pengurus</span>
+                </div>
+              </div>
               <div className="border border-slate-100 rounded-lg overflow-hidden">
                 <table className="w-full text-sm">
                   <thead className="bg-slate-50">
@@ -150,7 +145,7 @@ function DetailModal({ row, onClose }: { row: ProvinsiRow; onClose: () => void }
                     {pokja.members.map((m, i) => (
                       <tr key={i} className="border-t border-slate-100">
                         <td className="px-4 py-2.5 text-slate-900 text-xs font-medium">
-                          {m.jabatan.startsWith("Bidang") ? `anggota ${m.jabatan}` : m.jabatan}
+                          {m.jabatan.startsWith("Bidang") ? `Anggota ${m.jabatan}` : m.jabatan}
                         </td>
                         <td className="px-4 py-2.5 text-slate-600 text-xs">{m.instansi}</td>
                       </tr>
@@ -173,7 +168,7 @@ function DetailModal({ row, onClose }: { row: ProvinsiRow; onClose: () => void }
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
               </svg>
-              Hubungi melalui Whatsapp
+              Hubungi Layanan Pengaduan ({`0${waNumber.slice(2)}`})
             </a>
           )}
           <div className="flex justify-end">
@@ -201,15 +196,54 @@ export function DataPublikContent({ showBackButton = false, heroTitle, heroSubti
   const [showWilayahModal, setShowWilayahModal] = useState(false)
   const [selectedRow, setSelectedRow] = useState<ProvinsiRow | null>(null)
   const [statusFilter, setStatusFilter] = useState<ProvinsiRow["statusPokja"] | "Semua">("Semua")
+  // "all" | "provinsi_only" | exact r.provinsi value
+  const [wilayahFilter, setWilayahFilter] = useState<string>("all")
+  // modal-internal state
+  const [modalPending, setModalPending] = useState<string>("all")
+  const [modalBrowseProvince, setModalBrowseProvince] = useState<string | null>(null)
+
+  const PROVINSI_ONLY = useMemo(() => PROVINSI_DATA.filter(r => !r.provinsi.includes(" - ")), [])
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase()
-    return PROVINSI_DATA.filter((r) =>
-      r.provinsi.toLowerCase().includes(q) &&
-      r.statusPokja !== "Belum Terbentuk" &&
-      (statusFilter === "Semua" || r.statusPokja === statusFilter)
-    )
-  }, [search, statusFilter])
+    return PROVINSI_DATA.filter((r) => {
+      if (r.statusPokja === "Belum Terbentuk") return false
+      if (!r.provinsi.toLowerCase().includes(q)) return false
+      if (statusFilter !== "Semua" && r.statusPokja !== statusFilter) return false
+      if (wilayahFilter === "all") return true
+      if (wilayahFilter === "provinsi_only") return !r.provinsi.includes(" - ")
+      if (wilayahFilter.startsWith("semua_kab:")) {
+        const prov = wilayahFilter.slice("semua_kab:".length)
+        return r.provinsi === prov || r.provinsi.startsWith(prov + " - ")
+      }
+      return r.provinsi === wilayahFilter
+    })
+  }, [search, statusFilter, wilayahFilter])
+
+  const openWilayahModal = () => {
+    setModalPending(wilayahFilter)
+    if (wilayahFilter !== "all" && wilayahFilter !== "provinsi_only") {
+      const provName = wilayahFilter.includes(" - ") ? wilayahFilter.split(" - ")[0] : wilayahFilter
+      setModalBrowseProvince(provName)
+    } else {
+      setModalBrowseProvince(null)
+    }
+    setShowWilayahModal(true)
+  }
+
+  const applyWilayahFilter = () => {
+    setWilayahFilter(modalPending)
+    setPage(1)
+    setShowWilayahModal(false)
+  }
+
+  const wilayahLabel = useMemo(() => {
+    if (wilayahFilter === "all") return "Seluruh Indonesia"
+    if (wilayahFilter === "provinsi_only") return "Hanya Tingkat Provinsi"
+    if (wilayahFilter.startsWith("semua_kab:")) return `${wilayahFilter.slice("semua_kab:".length)} (semua kab/kota)`
+    if (wilayahFilter.includes(" - ")) return `Kota/Kab ${wilayahFilter.split(" - ")[1]}`
+    return `Provinsi ${wilayahFilter}`
+  }, [wilayahFilter])
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
@@ -271,19 +305,16 @@ export function DataPublikContent({ showBackButton = false, heroTitle, heroSubti
         <div className="max-w-6xl mx-auto px-4 pb-0 mb-16">
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-16">
               <div className="px-5 py-4 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <h2 className="font-semibold text-slate-900">Kelompok Kerja: {search || "Seluruh Indonesia"}</h2>
-                  <Button variant="outline" size="sm" onClick={() => setShowWilayahModal(true)} className="w-fit h-7 text-xs gap-1">
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    Ganti
-                  </Button>
-                </div>
-                <p className="text-slate-400 text-xs mt-1">
-                  {filtered.length} provinsi ditemukan
-                </p>
+              <div className="flex items-center gap-2">
+                <h2 className="font-semibold text-slate-900 shrink-0">Data Kelompok Kerja</h2>
+                <button
+                  onClick={openWilayahModal}
+                  className="h-8 px-3 text-sm border border-slate-400 rounded-lg bg-white text-slate-800 font-medium hover:bg-slate-50 hover:border-slate-500 transition-colors flex items-center gap-2"
+                >
+                  <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                  <span className="max-w-[200px] truncate">{wilayahLabel}</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                </button>
               </div>
               <div className="flex items-center gap-2 w-full sm:w-auto">
                 <select
@@ -319,16 +350,14 @@ export function DataPublikContent({ showBackButton = false, heroTitle, heroSubti
               </div>
             </div>
 
-            <Table className="text-sm">
+            <Table className="text-sm table-fixed w-full">
               <TableHeader>
                 <TableRow className="bg-slate-50/70 hover:bg-slate-50/70">
-                  <TableHead className="w-10 text-slate-500 text-xs font-semibold uppercase tracking-wide pl-5">No</TableHead>
-                  <TableHead className="text-slate-500 text-xs font-semibold uppercase tracking-wide">Wilayah</TableHead>
-                  <TableHead className="text-slate-500 text-xs font-semibold uppercase tracking-wide">Provinsi</TableHead>
-                  <TableHead className="w-36 text-slate-500 text-xs font-semibold uppercase tracking-wide">Status Kelompok Kerja</TableHead>
-                  <TableHead className="w-36 text-slate-500 text-xs font-semibold uppercase tracking-wide text-center">Jumlah Bidang</TableHead>
-                  <TableHead className="w-36 text-slate-500 text-xs font-semibold uppercase tracking-wide">Kontak</TableHead>
-                  <TableHead className="w-36 text-slate-500 text-xs font-semibold uppercase tracking-wide text-center">Skor Terakhir</TableHead>
+                  <TableHead className="w-12 text-slate-500 text-xs font-semibold uppercase tracking-wide pl-5">No</TableHead>
+                  <TableHead className="w-52 text-slate-500 text-xs font-semibold uppercase tracking-wide">Wilayah</TableHead>
+                  <TableHead className="w-40 text-slate-500 text-xs font-semibold uppercase tracking-wide">Provinsi</TableHead>
+                  <TableHead className="text-slate-500 text-xs font-semibold uppercase tracking-wide">Dukungan Bidang Tersedia</TableHead>
+                  <TableHead className="w-40 text-slate-500 text-xs font-semibold uppercase tracking-wide">Status</TableHead>
                   <TableHead className="w-28" />
                 </TableRow>
               </TableHeader>
@@ -344,29 +373,40 @@ export function DataPublikContent({ showBackButton = false, heroTitle, heroSubti
                         <TableCell className="text-slate-600">
                           {row.provinsi.includes(" - ") ? row.provinsi.split(" - ")[0] : "-"}
                         </TableCell>
+                        <TableCell>
+                          {(() => {
+                            const bidangs = getBidangList(row)
+                            if (bidangs.length === 0) return <span className="text-slate-400">-</span>
+                            const visible = bidangs.slice(0, 3)
+                            const hidden = bidangs.slice(3)
+                            return (
+                              <div className="flex flex-wrap gap-1">
+                                {visible.map((b) => (
+                                  <span key={b} className="inline-block px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-xs font-medium">
+                                    {b.replace("Bidang ", "")}
+                                  </span>
+                                ))}
+                                {hidden.length > 0 && (
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <span className="inline-block px-2 py-0.5 rounded-full bg-slate-200 text-slate-500 text-xs font-medium cursor-default">
+                                        dan {hidden.length} lainnya
+                                      </span>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="!bg-white !text-slate-700 border border-slate-200 shadow-md px-3 py-2" arrowClassName="!bg-white !fill-white">
+                                      <ul className="space-y-1">
+                                        {hidden.map((b) => (
+                                          <li key={b} className="text-xs">{b.replace("Bidang ", "")}</li>
+                                        ))}
+                                      </ul>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                )}
+                              </div>
+                            )
+                          })()}
+                        </TableCell>
                         <TableCell>{statusBadge(row.statusPokja)}</TableCell>
-                        <TableCell className="text-center">
-                          {row.bidangTersedia != null ? (
-                            <span className="text-slate-700">{row.bidangTersedia}</span>
-                          ) : (
-                            <span className="text-slate-400">-</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-slate-600 text-sm">
-                          {row.kontak ?? "-"}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          {row.skor != null ? (
-                            <span className={cn(
-                              "font-semibold text-sm",
-                              row.skor >= 75 ? "text-emerald-600" : row.skor >= 50 ? "text-amber-600" : "text-slate-500"
-                            )}>
-                              {row.skor}
-                            </span>
-                          ) : (
-                            <span className="text-slate-400">-</span>
-                          )}
-                        </TableCell>
                         <TableCell>
                           {row.statusPokja === "Aktif" && (
                             <Button
@@ -465,63 +505,79 @@ export function DataPublikContent({ showBackButton = false, heroTitle, heroSubti
               </button>
             </div>
             <div className="flex-1 overflow-hidden">
-              <div className="flex h-full max-h-[400px]">
+              <div className="flex h-full max-h-[420px]">
+                {/* Left: provinces */}
                 <div className="w-1/2 border-r border-gray-100 overflow-y-auto">
-                  <div className="p-2">
+                  <div className="p-2 space-y-0.5">
                     <button
-                      onClick={() => { setSearch(""); setPage(1); setShowWilayahModal(false) }}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium ${!search ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50"}`}
+                      onClick={() => { setModalPending("all"); setModalBrowseProvince(null) }}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${modalPending === "all" ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-gray-700"}`}
                     >
-                      Semua Wilayah
+                      Seluruh Indonesia
                     </button>
-                    {PROVINSI_DATA.map((prov) => {
-                      const isSelected = search === prov.provinsi
+                    <button
+                      onClick={() => { setModalPending("provinsi_only"); setModalBrowseProvince(null) }}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${modalPending === "provinsi_only" ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-gray-700"}`}
+                    >
+                      Hanya Tingkat Provinsi
+                    </button>
+                    <div className="border-t border-gray-100 my-1" />
+                    {PROVINSI_ONLY.map((prov) => {
+                      const isBrowsed = modalBrowseProvince === prov.provinsi
+                      const isSelected = modalPending === prov.provinsi || (modalPending.includes(" - ") && modalPending.startsWith(prov.provinsi + " - "))
                       return (
                         <button
                           key={prov.provinsi}
-                          onClick={() => { setSearch(prov.provinsi); setPage(1); setShowWilayahModal(false) }}
-                          className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between ${
-                            isSelected ? "bg-blue-50 text-blue-700 font-medium" : "hover:bg-gray-50"
+                          onClick={() => { setModalBrowseProvince(prov.provinsi); setModalPending(prov.provinsi) }}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between transition-colors ${
+                            isBrowsed ? "bg-blue-50 text-blue-700 font-medium" : isSelected ? "bg-blue-50/50 text-blue-600" : "hover:bg-gray-50 text-gray-700"
                           }`}
                         >
                           <span className="truncate">{prov.provinsi}</span>
-                          <span className="text-xs text-gray-400">{prov.jumlahKabKota}</span>
+                          {isBrowsed && <svg className="w-3.5 h-3.5 shrink-0 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>}
                         </button>
                       )
                     })}
                   </div>
                 </div>
-                <div className="w-1/2 overflow-y-auto bg-white">
-                  <div className="p-2">
-                    {search ? (
-                      (() => {
-                        const prov = PROVINSI_DATA.find(p => p.provinsi === search)
-                        const kabCount = prov?.jumlahKabKota ?? 0
-                        if (kabCount === 0) {
-                          return <p className="text-sm text-gray-400 p-3">Tidak ada kabupaten/kota</p>
-                        }
-                        return (
-                          <>
-                            <button
-                              onClick={() => { setSearch(search); setPage(1); setShowWilayahModal(false) }}
-                              className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-gray-100"
-                            >
-                              Semua Kabupaten/Kota
-                            </button>
-                            {Array.from({ length: kabCount }, (_, i) => (
+
+                {/* Right: kab/kota */}
+                <div className="w-1/2 overflow-y-auto bg-gray-50/40">
+                  <div className="p-2 space-y-0.5">
+                    {modalBrowseProvince ? (() => {
+                      const kabRows = PROVINSI_DATA.filter(r => r.provinsi.startsWith(modalBrowseProvince + " - "))
+                      const semuaKabValue = `semua_kab:${modalBrowseProvince}`
+                      return (
+                        <>
+                          <p className="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">{modalBrowseProvince}</p>
+                          <button
+                            onClick={() => setModalPending(semuaKabValue)}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                              modalPending === semuaKabValue ? "bg-blue-50 text-blue-700" : "hover:bg-gray-100 text-gray-700"
+                            }`}
+                          >
+                            Semua Kabupaten/Kota
+                          </button>
+                          {kabRows.length > 0 && <div className="border-t border-gray-100 my-1" />}
+                          {kabRows.map((kab) => {
+                            const kabName = kab.provinsi.split(" - ")[1]
+                            const isSelected = modalPending === kab.provinsi
+                            return (
                               <button
-                                key={i}
-                                onClick={() => { setSearch(`${search} - Kab/Kota ${i + 1}`); setPage(1); setShowWilayahModal(false) }}
-                                className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-gray-100"
+                                key={kab.provinsi}
+                                onClick={() => setModalPending(kab.provinsi)}
+                                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                                  isSelected ? "bg-blue-50 text-blue-700 font-medium" : "hover:bg-gray-100 text-gray-700"
+                                }`}
                               >
-                                Kab/Kota {i + 1}
+                                {kabName}
                               </button>
-                            ))}
-                          </>
-                        )
-                      })()
-                    ) : (
-                      <p className="text-sm text-gray-400 p-3">Pilih wilayah di kiri</p>
+                            )
+                          })}
+                        </>
+                      )
+                    })() : (
+                      <p className="text-sm text-gray-400 p-4">Pilih provinsi di kiri untuk melihat kab/kota</p>
                     )}
                   </div>
                 </div>
@@ -535,8 +591,9 @@ export function DataPublikContent({ showBackButton = false, heroTitle, heroSubti
                 Batal
               </button>
               <button
-                onClick={() => setShowWilayahModal(false)}
-                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition"
+                onClick={applyWilayahFilter}
+                disabled={modalBrowseProvince !== null && modalPending === modalBrowseProvince}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Terapkan
               </button>

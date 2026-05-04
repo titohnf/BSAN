@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useMemo } from "react"
-import { Search, Globe, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, X } from "lucide-react"
+import { Search, Globe, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, X, ChevronDown, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   KATEGORI_CONFIG,
@@ -48,7 +48,8 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
   const [filterPenyedia, setFilterPenyedia] = useState<KategoriPenyedia | "semua">("semua")
   const [filterWilayah, setFilterWilayah] = useState<FilterWilayah>(null)
   const [showWilayahModal, setShowWilayahModal] = useState(false)
-  const [modalProvinsi, setModalProvinsi] = useState<string | null>(null)
+  const [modalBrowseProvinsi, setModalBrowseProvinsi] = useState<string | null>(null)
+  const [modalPendingFilter, setModalPendingFilter] = useState<FilterWilayah>(null)
   const [selectedItem, setSelectedItem] = useState<SumberRujukan | null>(null)
 
   const filtered = useMemo(() => {
@@ -80,44 +81,25 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
   }
 
   const openWilayahModal = () => {
-    setModalProvinsi(filterWilayah?.province ?? null)
+    setModalPendingFilter(filterWilayah)
+    setModalBrowseProvinsi(filterWilayah?.province ?? null)
     setShowWilayahModal(true)
   }
 
-  const closeWilayahModal = () => setShowWilayahModal(false)
-
-  const selectSemua = () => {
-    setFilterWilayah(null)
+  const applyWilayahFilter = () => {
+    setFilterWilayah(modalPendingFilter)
     setPage(1)
-    closeWilayahModal()
-  }
-
-  const selectProvinsi = (province: string) => {
-    setModalProvinsi(province)
-    setFilterWilayah({ province, kabupaten: "" })
-    setPage(1)
-  }
-
-  const selectKabupaten = (kabupaten: string) => {
-    setFilterWilayah((prev) => ({ province: prev?.province ?? modalProvinsi ?? "", kabupaten }))
-    setPage(1)
-    closeWilayahModal()
-  }
-
-  const selectSemauKabupaten = () => {
-    setFilterWilayah((prev) => ({ province: prev?.province ?? modalProvinsi ?? "", kabupaten: "" }))
-    setPage(1)
-    closeWilayahModal()
+    setShowWilayahModal(false)
   }
 
   const wilayahLabel = filterWilayah
     ? filterWilayah.kabupaten
       ? `${filterWilayah.province} — ${filterWilayah.kabupaten}`
       : filterWilayah.province
-    : "Semua Wilayah"
+    : "Seluruh Indonesia"
 
-  const kabupatenForModal = modalProvinsi
-    ? Array.from(new Set(VERIFIED_DATA.filter((i) => i.provinsi === modalProvinsi).map((i) => i.kabupatenKota)))
+  const kabupatenForModal = modalBrowseProvinsi
+    ? Array.from(new Set(VERIFIED_DATA.filter((i) => i.provinsi === modalBrowseProvinsi).map((i) => i.kabupatenKota)))
         .filter(Boolean)
         .sort()
     : []
@@ -145,19 +127,16 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-8">
             {/* Filter bar */}
             <div className="px-5 py-4 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <h2 className="font-semibold text-slate-900">
-                    Sumber Dukungan: {wilayahLabel}
-                  </h2>
-                  <Button variant="outline" size="sm" onClick={openWilayahModal} className="w-fit h-7 text-xs gap-1">
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    Ganti
-                  </Button>
-                </div>
-                <p className="text-slate-400 text-xs mt-1">{filtered.length} layanan ditemukan</p>
+              <div className="flex items-center gap-2">
+                <h2 className="font-semibold text-slate-900 shrink-0">Data Sumber Dukungan</h2>
+                <button
+                  onClick={openWilayahModal}
+                  className="h-8 px-3 text-sm border border-slate-400 rounded-lg bg-white text-slate-800 font-medium hover:bg-slate-50 hover:border-slate-500 transition-colors flex items-center gap-2"
+                >
+                  <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                  <span className="max-w-[200px] truncate">{wilayahLabel}</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                </button>
               </div>
               <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
                 <select
@@ -204,7 +183,6 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
                         <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Nama Instansi</th>
                         <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Wilayah</th>
                         <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Kategori Dukungan</th>
-                        <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Kontak</th>
                         <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide" />
                       </tr>
                     </thead>
@@ -227,15 +205,9 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
                               {item.kabupatenKota ? `Kota ${item.kabupatenKota}` : "-"}
                             </td>
                             <td className="px-4 py-3.5">
-                              <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${kategoriCfg.bg} ${kategoriCfg.color}`}>
-                                {kategoriCfg.icon}
+                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
                                 <span className="whitespace-nowrap">{kategoriCfg.label}</span>
                               </div>
-                            </td>
-                            <td className="px-4 py-3.5">
-                              {item.nomorCallCenter || item.nomorPribadi ? (
-                                <span className="text-slate-700">{item.nomorCallCenter || item.nomorPribadi}</span>
-                              ) : <span className="text-gray-400">-</span>}
                             </td>
                             <td className="px-4 py-3.5 text-right">
                               <Button
@@ -325,8 +297,7 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
               <div className="grid grid-cols-2 gap-y-4 gap-x-3 pb-6">
                 <div>
                   <p className="text-xs text-slate-500 mb-1">Kategori Dukungan</p>
-                  <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${KATEGORI_CONFIG[selectedItem.kategoriBentukDukungan]?.bg} ${KATEGORI_CONFIG[selectedItem.kategoriBentukDukungan]?.color}`}>
-                    {KATEGORI_CONFIG[selectedItem.kategoriBentukDukungan]?.icon}
+                  <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
                     <span>{KATEGORI_CONFIG[selectedItem.kategoriBentukDukungan]?.label}</span>
                   </div>
                 </div>
@@ -350,8 +321,8 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
 
               {(selectedItem.namaJalan || selectedItem.nomorJalan) && (
                 <div className="pt-4">
-                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Alamat</p>
-                  <p className="text-sm text-slate-700 mb-3">
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Alamat</p>
+                  <p className="text-sm text-slate-700 mb-4">
                     {[selectedItem.namaJalan, selectedItem.nomorJalan, selectedItem.kelurahan, selectedItem.kecamatan, selectedItem.kabupatenKota, selectedItem.provinsi].filter(Boolean).join(", ")}
                   </p>
                   <div className="rounded-lg border border-slate-200 overflow-hidden h-48">
@@ -369,8 +340,7 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
                 </div>
               )}
 
-              <div className="py-5">
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Kontak</p>
+              <div className="pt-3 pb-1">
                 <div className="space-y-3">
                   {selectedItem.nomorCallCenter && (
                     <a
@@ -382,7 +352,7 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
                       </svg>
-                      Hubungi via WhatsApp - {selectedItem.nomorCallCenter}
+                      Hubungi Layanan Pengaduan ({selectedItem.nomorCallCenter})
                     </a>
                   )}
                   {selectedItem.nomorPribadi && !selectedItem.nomorCallCenter && (
@@ -395,7 +365,7 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
                       </svg>
-                      Hubungi via WhatsApp - {selectedItem.nomorPribadi}
+                      Hubungi Layanan Pengaduan ({selectedItem.nomorPribadi})
                     </a>
                   )}
                   {selectedItem.website && (
@@ -428,43 +398,39 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
       {/* Wilayah Modal */}
       {showWilayahModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50" onClick={closeWilayahModal} />
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowWilayahModal(false)} />
           <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
               <h3 className="text-base font-bold text-gray-900">Filter Wilayah</h3>
-              <button onClick={closeWilayahModal} className="p-1 hover:bg-gray-100 rounded-lg">
+              <button onClick={() => setShowWilayahModal(false)} className="p-1 hover:bg-gray-100 rounded-lg">
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
 
             <div className="flex-1 overflow-hidden">
-              <div className="flex h-full max-h-[400px]">
+              <div className="flex h-full max-h-[420px]">
                 {/* Kolom kiri: Provinsi */}
                 <div className="w-1/2 border-r border-gray-100 overflow-y-auto">
-                  <div className="p-2">
+                  <div className="p-2 space-y-0.5">
                     <button
-                      onClick={selectSemua}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium ${!modalProvinsi && !filterWilayah ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50"}`}
+                      onClick={() => { setModalPendingFilter(null); setModalBrowseProvinsi(null) }}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${!modalBrowseProvinsi && modalPendingFilter === null ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-gray-700"}`}
                     >
-                      Semua Provinsi
+                      Seluruh Indonesia
                     </button>
+                    <div className="border-t border-gray-100 my-1" />
                     {PROVINSI_LIST.map((province) => {
-                      const kabupatens = Array.from(
-                        new Set(VERIFIED_DATA.filter((i) => i.provinsi === province).map((i) => i.kabupatenKota))
-                      ).filter(Boolean)
-                      const isSelected = modalProvinsi === province
+                      const isBrowsed = modalBrowseProvinsi === province
                       return (
                         <button
                           key={province}
-                          onClick={() => selectProvinsi(province)}
-                          className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between ${
-                            isSelected ? "bg-blue-50 text-blue-700 font-medium" : "hover:bg-gray-50"
+                          onClick={() => setModalBrowseProvinsi(province)}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between transition-colors ${
+                            isBrowsed ? "bg-blue-50 text-blue-700 font-medium" : "hover:bg-gray-50 text-gray-700"
                           }`}
                         >
                           <span className="truncate">{province}</span>
-                          {kabupatens.length > 0 && (
-                            <span className="text-xs text-gray-400 ml-1 shrink-0">{kabupatens.length}</span>
-                          )}
+                          {isBrowsed && <svg className="w-3.5 h-3.5 shrink-0 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>}
                         </button>
                       )
                     })}
@@ -472,40 +438,38 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
                 </div>
 
                 {/* Kolom kanan: Kabupaten/Kota */}
-                <div className="w-1/2 overflow-y-auto bg-white">
-                  <div className="p-2">
-                    {modalProvinsi ? (
-                      kabupatenForModal.length === 0 ? (
-                        <p className="text-sm text-gray-400 p-3">Tidak ada data kabupaten/kota</p>
-                      ) : (
-                        <>
+                <div className="w-1/2 overflow-y-auto bg-gray-50/40">
+                  <div className="p-2 space-y-0.5">
+                    {modalBrowseProvinsi ? (
+                      <>
+                        <p className="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">{modalBrowseProvinsi}</p>
+                        <button
+                          onClick={() => setModalPendingFilter({ province: modalBrowseProvinsi, kabupaten: "" })}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            modalPendingFilter?.province === modalBrowseProvinsi && !modalPendingFilter.kabupaten
+                              ? "bg-blue-50 text-blue-700"
+                              : "hover:bg-gray-100 text-gray-700"
+                          }`}
+                        >
+                          Semua Kabupaten/Kota
+                        </button>
+                        {kabupatenForModal.length > 0 && <div className="border-t border-gray-100 my-1" />}
+                        {kabupatenForModal.map((kab) => (
                           <button
-                            onClick={selectSemauKabupaten}
-                            className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
-                              filterWilayah?.province === modalProvinsi && !filterWilayah.kabupaten
+                            key={kab}
+                            onClick={() => setModalPendingFilter({ province: modalBrowseProvinsi, kabupaten: kab })}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                              modalPendingFilter?.kabupaten === kab
                                 ? "bg-blue-50 text-blue-700 font-medium"
-                                : "hover:bg-gray-100"
+                                : "hover:bg-gray-100 text-gray-700"
                             }`}
                           >
-                            Semua Kabupaten/Kota
+                            {kab}
                           </button>
-                          {kabupatenForModal.map((kab) => (
-                            <button
-                              key={kab}
-                              onClick={() => selectKabupaten(kab)}
-                              className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
-                                filterWilayah?.kabupaten === kab
-                                  ? "bg-blue-50 text-blue-700 font-medium"
-                                  : "hover:bg-gray-100"
-                              }`}
-                            >
-                              {kab}
-                            </button>
-                          ))}
-                        </>
-                      )
+                        ))}
+                      </>
                     ) : (
-                      <p className="text-sm text-gray-400 p-3">Pilih provinsi di kiri</p>
+                      <p className="text-sm text-gray-400 p-4">Pilih provinsi di kiri untuk melihat kab/kota</p>
                     )}
                   </div>
                 </div>
@@ -514,14 +478,15 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
 
             <div className="px-5 py-4 border-t border-gray-200 flex justify-end gap-2">
               <button
-                onClick={selectSemua}
+                onClick={() => setShowWilayahModal(false)}
                 className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition"
               >
-                Reset Wilayah
+                Batal
               </button>
               <button
-                onClick={closeWilayahModal}
-                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition"
+                onClick={applyWilayahFilter}
+                disabled={modalBrowseProvinsi !== null && modalPendingFilter?.province !== modalBrowseProvinsi}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Terapkan
               </button>

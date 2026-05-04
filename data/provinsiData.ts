@@ -55,6 +55,20 @@ const ALL_PROVINSI: { name: string; kabKota: number }[] = [
   { name: "Papua Pegunungan", kabKota: 8 },
 ]
 
+const PROVINSI_AKTIF = new Set([
+  "Aceh", "Sumatera Utara", "Sumatera Barat", "Riau", "Jambi",
+  "Sumatera Selatan", "Bengkulu", "Lampung", "Kepulauan Bangka Belitung", "Kepulauan Riau",
+  "DKI Jakarta", "Jawa Barat", "Jawa Tengah", "DI Yogyakarta", "Jawa Timur",
+  "Banten", "Bali", "Nusa Tenggara Barat",
+  "Kalimantan Barat", "Kalimantan Tengah", "Kalimantan Selatan", "Kalimantan Timur",
+  "Sulawesi Utara", "Sulawesi Tengah", "Sulawesi Selatan", "Sulawesi Tenggara",
+  "Maluku", "Papua Barat",
+])
+
+const PROVINSI_PERLU_PERIKSA = new Set([
+  "Nusa Tenggara Timur", "Gorontalo", "Maluku Utara", "Papua",
+])
+
 function getStatus(provinsi: string): {
   status: "Aktif" | "Perlu Diperiksa" | "Belum Terbentuk"
   pokjaId?: string
@@ -65,9 +79,10 @@ function getStatus(provinsi: string): {
     return { status: statuses[idx] }
   }
   const match = MOCK_PENGAJUAN.find((p) => p.provinsi === provinsi)
-  if (!match) return { status: "Belum Terbentuk" }
-  if (match.status === "disetujui") return { status: "Aktif", pokjaId: match.id }
-  return { status: "Perlu Diperiksa", pokjaId: match.id }
+  if (PROVINSI_AKTIF.has(provinsi)) return { status: "Aktif", pokjaId: match?.id }
+  if (match) return { status: "Perlu Diperiksa", pokjaId: match.id }
+  if (PROVINSI_PERLU_PERIKSA.has(provinsi)) return { status: "Perlu Diperiksa" }
+  return { status: "Belum Terbentuk" }
 }
 
 const KAB_TO_INCLUDE: Record<string, string[]> = {

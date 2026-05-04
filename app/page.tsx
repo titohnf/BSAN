@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { LandingNavbar } from "@/components/landing/LandingNavbar"
 import { LandingFooter } from "@/components/landing/LandingFooter"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Users, BookOpen, Calendar, ChevronLeft, ChevronRight } from "lucide-react"
+import { ArrowRight, Users, BookOpen, Calendar, ChevronLeft, ChevronRight, ChevronDown, MapPin, X } from "lucide-react"
 import { PieChart, Pie, Cell, Label } from "recharts"
 import {
   TOTAL_PROVINSI,
@@ -17,6 +17,7 @@ import { MOCK_KEGIATAN } from "@/components/landing/KegiatanContent"
 import { SEED, KATEGORI_CONFIG } from "@/components/dashboard/SumberRujukanView"
 import type { KategoriDukungan } from "@/components/dashboard/SumberRujukanView"
 import { cn } from "@/lib/utils"
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 
 const ALL_VERIFIED = SEED.filter((i) => i.status === "terverifikasi")
 
@@ -46,6 +47,10 @@ export default function LandingPage() {
   const [mounted, setMounted] = useState(false)
   const [selectedProvince, setSelectedProvince] = useState("")
   const [selectedKota, setSelectedKota] = useState("")
+  const [showWilayahModal, setShowWilayahModal] = useState(false)
+  const [modalBrowseProvince, setModalBrowseProvince] = useState<string | null>(null)
+  const [modalPendingProvince, setModalPendingProvince] = useState("")
+  const [modalPendingKota, setModalPendingKota] = useState<string | null>(null)
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
 
   useEffect(() => {
@@ -79,6 +84,9 @@ export default function LandingPage() {
   }
 
   const filteredPokja = useMemo(() => {
+    if (selectedProvince === "__hanya_provinsi__") {
+      return PROVINSI_DATA.filter((p) => !p.provinsi.includes(" - "))
+    }
     if (selectedKota) {
       return PROVINSI_DATA.filter((p) => p.provinsi === `${selectedProvince} - ${selectedKota}`)
     }
@@ -90,7 +98,7 @@ export default function LandingPage() {
     return PROVINSI_DATA
   }, [selectedProvince, selectedKota])
 
-  const pokjaAktif = filteredPokja.filter((p) => p.statusPokja === "Aktif").length
+  const pokjaAktif = filteredPokja.filter((p) => p.statusPokja === "Aktif" && !p.provinsi.includes(" - ")).length
   const totalKabKotaFiltered = filteredPokja.reduce((s, p) => s + p.pokjaKabKota, 0)
   const pokjaTotal = filteredPokja.length
   const kabKotaDenominator = selectedProvince
@@ -99,6 +107,7 @@ export default function LandingPage() {
 
   const filteredSumber = useMemo(() => {
     return ALL_VERIFIED.filter((i) => {
+      if (selectedProvince === "__hanya_provinsi__") return true
       if (selectedKota) return i.provinsi === selectedProvince && i.kabupatenKota === selectedKota
       if (selectedProvince) return i.provinsi === selectedProvince
       return true
@@ -114,13 +123,14 @@ export default function LandingPage() {
   , [filteredSumber])
 
   const filteredKegiatan = useMemo(() => {
+    if (selectedProvince === "__hanya_provinsi__") return MOCK_KEGIATAN
     if (selectedKota) {
       return MOCK_KEGIATAN.filter((k) =>
         k.wilayah.toLowerCase().includes(selectedKota.toLowerCase())
       )
     }
     return MOCK_KEGIATAN
-  }, [selectedKota])
+  }, [selectedProvince, selectedKota])
 
   const selectedDateEvents = useMemo(() => {
     if (!selectedDate) return []
@@ -167,33 +177,24 @@ export default function LandingPage() {
           <div className="max-w-6xl mx-auto px-4 py-12">
 
             {/* Section header + filter */}
-            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
-              <div>
-                <h2 className="text-xl font-bold text-slate-900">Ringkasan Portal BSAN</h2>
-                <p className="text-sm text-slate-500 mt-0.5">
-                  {isFiltered
-                    ? <>Data untuk <span className="font-semibold text-slate-700">{selectedKota ? `${selectedKota}, ${selectedProvince}` : selectedProvince}</span></>
-                    : "Data nasional — pilih provinsi atau kab/kota untuk melihat data wilayah"}
-                </p>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <select
-                  value={selectedProvince}
-                  onChange={(e) => handleProvinceChange(e.target.value)}
-                  className="h-9 px-3 text-sm border border-slate-200 rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+            <div className="flex items-center gap-3 mb-6">
+              <h2 className="text-xl font-bold text-slate-900 shrink-0">Ringkasan Portal BSAN</h2>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    setModalPendingProvince(selectedProvince)
+                    setModalPendingKota(selectedProvince ? selectedKota : null)
+                    setModalBrowseProvince(selectedProvince || null)
+                    setShowWilayahModal(true)
+                  }}
+                  className="h-9 px-3 text-sm border border-slate-400 rounded-lg bg-white text-slate-800 font-medium hover:bg-slate-50 hover:border-slate-500 transition-colors flex items-center gap-2"
                 >
-                  <option value="">Seluruh Indonesia</option>
-                  {PROVINCE_OPTIONS.map((p) => <option key={p} value={p}>{p}</option>)}
-                </select>
-                <select
-                  value={selectedKota}
-                  onChange={(e) => setSelectedKota(e.target.value)}
-                  disabled={!selectedProvince || kotaOptions.length === 0}
-                  className="h-9 px-3 text-sm border border-slate-200 rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  <option value="">Semua Kab/Kota</option>
-                  {kotaOptions.map((k) => <option key={k} value={k}>{k}</option>)}
-                </select>
+                  <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                  <span className="max-w-[200px] truncate">
+                    {selectedProvince === "__hanya_provinsi__" ? "Hanya Tingkat Provinsi" : selectedKota ? `${selectedKota}, ${selectedProvince}` : selectedProvince || "Seluruh Indonesia"}
+                  </span>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                </button>
                 {isFiltered && (
                   <button
                     onClick={() => { setSelectedProvince(""); setSelectedKota("") }}
@@ -265,7 +266,50 @@ export default function LandingPage() {
                           </>)}
                         </div>
                       )
-                    })() : (
+                    })() : selectedProvince === "__hanya_provinsi__" ? (
+                      <div className="flex flex-1 items-start gap-6 overflow-hidden">
+                        <div className="shrink-0">
+                          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Provinsi Terbentuk</p>
+                          <p className="text-3xl font-extrabold text-black tabular-nums leading-none">
+                            {pokjaAktif}
+                            <span className="text-sm font-semibold text-emerald-600 ml-1.5">{Math.round(pokjaAktif / TOTAL_PROVINSI * 100)}%</span>
+                          </p>
+                          <p className="text-sm text-slate-400 mt-1">dari {TOTAL_PROVINSI} Provinsi</p>
+                        </div>
+                        <Divider />
+                        <div className="flex-1 overflow-hidden">
+                          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Provinsi Aktif</p>
+                          {(() => {
+                            const aktifList = filteredPokja.filter(p => p.statusPokja === "Aktif").map(p => p.provinsi)
+                            const visible = aktifList.slice(0, 10)
+                            const hidden = aktifList.slice(10)
+                            return (
+                              <div className="flex flex-wrap gap-1.5">
+                                {visible.map(name => (
+                                  <span key={name} className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                                    {name}
+                                  </span>
+                                ))}
+                                {hidden.length > 0 && (
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-slate-200 text-slate-500 cursor-default">
+                                        dan {hidden.length} provinsi lainnya
+                                      </span>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="!bg-white !text-slate-700 border border-slate-200 shadow-md px-3 py-2" arrowClassName="!bg-white !fill-white">
+                                      <ul className="space-y-1">
+                                        {hidden.map(name => <li key={name} className="text-xs">{name}</li>)}
+                                      </ul>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                )}
+                              </div>
+                            )
+                          })()}
+                        </div>
+                      </div>
+                    ) : (
                     <div className="flex flex-1 gap-6">
 
                       {/* Provinsi Terbentuk */}
@@ -514,6 +558,114 @@ export default function LandingPage() {
         </div>
       </div>
       <LandingFooter />
+
+      {/* Wilayah Modal */}
+      {showWilayahModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowWilayahModal(false)} />
+          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
+              <h3 className="text-base font-bold text-gray-900">Filter Wilayah</h3>
+              <button onClick={() => setShowWilayahModal(false)} className="p-1 hover:bg-gray-100 rounded-lg">
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <div className="flex h-full max-h-[420px]">
+                {/* Kiri: Provinsi */}
+                <div className="w-1/2 border-r border-gray-100 overflow-y-auto">
+                  <div className="p-2 space-y-0.5">
+                    <button
+                      onClick={() => { setModalPendingProvince(""); setModalPendingKota(null); setModalBrowseProvince(null) }}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${!modalBrowseProvince && modalPendingProvince === "" ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-gray-700"}`}
+                    >
+                      Seluruh Indonesia
+                    </button>
+                    <button
+                      onClick={() => { setModalPendingProvince("__hanya_provinsi__"); setModalPendingKota(null); setModalBrowseProvince(null) }}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${modalPendingProvince === "__hanya_provinsi__" ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-gray-700"}`}
+                    >
+                      Hanya Tingkat Provinsi
+                    </button>
+                    <div className="border-t border-gray-100 my-1" />
+                    {PROVINCE_OPTIONS.map((province) => {
+                      const isBrowsed = modalBrowseProvince === province
+                      return (
+                        <button
+                          key={province}
+                          onClick={() => { setModalBrowseProvince(province); setModalPendingProvince(province); setModalPendingKota(null) }}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between transition-colors ${
+                            isBrowsed ? "bg-blue-50 text-blue-700 font-medium" : "hover:bg-gray-50 text-gray-700"
+                          }`}
+                        >
+                          <span className="truncate">{province}</span>
+                          {isBrowsed && <svg className="w-3.5 h-3.5 shrink-0 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+                {/* Kanan: Kab/Kota */}
+                <div className="w-1/2 overflow-y-auto bg-gray-50/40">
+                  <div className="p-2 space-y-0.5">
+                    {modalBrowseProvince ? (() => {
+                      const kotaList = PROVINSI_DATA
+                        .filter(p => p.provinsi.startsWith(modalBrowseProvince + " - "))
+                        .map(p => p.provinsi.split(" - ")[1])
+                      return (
+                        <>
+                          <p className="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">{modalBrowseProvince}</p>
+                          <button
+                            onClick={() => setModalPendingKota("")}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                              modalPendingKota === "" ? "bg-blue-50 text-blue-700" : "hover:bg-gray-100 text-gray-700"
+                            }`}
+                          >
+                            Semua Kabupaten/Kota
+                          </button>
+                          {kotaList.length > 0 && <div className="border-t border-gray-100 my-1" />}
+                          {kotaList.map((kota) => (
+                            <button
+                              key={kota}
+                              onClick={() => setModalPendingKota(kota)}
+                              className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                                modalPendingKota === kota ? "bg-blue-50 text-blue-700 font-medium" : "hover:bg-gray-100 text-gray-700"
+                              }`}
+                            >
+                              {kota}
+                            </button>
+                          ))}
+                        </>
+                      )
+                    })() : (
+                      <p className="text-sm text-gray-400 p-4">Pilih provinsi di kiri untuk melihat kab/kota</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="px-5 py-4 border-t border-gray-200 flex justify-end gap-2">
+              <button
+                onClick={() => setShowWilayahModal(false)}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition"
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => {
+                  setSelectedProvince(modalPendingProvince)
+                  setSelectedKota(modalPendingProvince === "__hanya_provinsi__" ? "" : (modalPendingKota ?? ""))
+                  setShowWilayahModal(false)
+                }}
+                disabled={modalBrowseProvince !== null && modalPendingKota === null}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Terapkan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   )
 }
