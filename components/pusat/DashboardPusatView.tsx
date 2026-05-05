@@ -217,7 +217,7 @@ export function DashboardPusatView({ pokjaList, onValidatePusat, onViewSumberRuj
                     </p>
                   </div>
                   <span className="text-xs text-amber-700 bg-amber-100 px-2 py-1 rounded-full whitespace-nowrap">
-                    Perlu Diperiksa
+                    Dalam Proses Pemeriksaan
                   </span>
                   <ChevronRight className="w-4 h-4 text-amber-400 flex-shrink-0" />
                 </li>
