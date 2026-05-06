@@ -4,15 +4,18 @@ import { useState, useEffect, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import {
   ArrowLeft, MapPin, Phone, Globe, Lock, Users,
-  ChevronDown, Building2, RotateCcw, Plus, Trash2,
+  ChevronDown, Building2, RotateCcw, Plus, Trash2, Flag, Pencil, CheckCircle, XCircle, MessageCircle,
 } from "lucide-react"
 import { SEED, type SumberRujukan } from "@/components/dashboard/SumberRujukanView"
 import { RUJUKAN_LOG, dinasLog, getStatusAfterRestore } from "@/lib/rujukan-logs"
 import { getDinasNamaForLogs, readAuthSession } from "@/lib/auth-session"
+import { KAB_KOTA_ACEH, getKecamatanList, getKelurahanList } from "@/lib/wilayah-aceh"
 
 function getRujukanFormExitHref(): string {
   const auth = readAuthSession()
-  return auth?.role === "pusat" ? "/" : "/?menu=sumber-rujukan"
+  if (auth?.role === "sekolah") return "/dashboard"
+  if (auth?.role === "pusat") return "/dashboard"
+  return "/dashboard?menu=sumber-rujukan"
 }
 
 // ---------------------------------------------------------------------------
@@ -30,7 +33,7 @@ type KategoriDukungan =
 
 type KategoriPenyedia = "Pemerintah Pusat" | "Pemerintah Daerah" | "Swasta" | "OMS" | "Lainnya"
 type AksesInfo = "publik" | "terbatas"
-type StatusRujukan = "terverifikasi" | "menunggu" | "menunggu_review" | "dihapus"
+type StatusRujukan = "terverifikasi" | "menunggu" | "menunggu_review" | "nonaktif" | "butuh_perbaikan"
 
 interface KontakEntry {
   nomor: string
@@ -53,6 +56,8 @@ interface FormState {
   kategoriPenyedia: KategoriPenyedia | ""
   aksesInfo: AksesInfo
   status: StatusRujukan
+  jenisMenunggu?: "pengajuan" | "perbaikan" | "perbaikan_laporan" | "penonaktifan" | "pemulihan"
+  jenisButuhPerbaikan?: "ditolak" | "perbaikan"
 }
 
 // ---------------------------------------------------------------------------
@@ -148,17 +153,38 @@ function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: 
   )
 }
 
-function StatusBadge({ status }: { status: StatusRujukan }) {
+function StatusBadge({ status, jenisMenunggu, jenisButuhPerbaikan }: { status: StatusRujukan; jenisMenunggu?: "pengajuan" | "perbaikan" | "perbaikan_laporan" | "penonaktifan" | "pemulihan"; jenisButuhPerbaikan?: "ditolak" | "perbaikan" }) {
   if (status === "terverifikasi") {
     return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">Terverifikasi</span>
   }
-  if (status === "dihapus") {
-    return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">Dihapus</span>
+  if (status === "nonaktif") {
+    return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">Nonaktif</span>
   }
   if (status === "menunggu_review") {
     return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800">Menunggu Review</span>
   }
-  return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Perlu Diperiksa</span>
+  if (status === "butuh_perbaikan") {
+    if (jenisButuhPerbaikan === "perbaikan") {
+      return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">Butuh Perbaikan</span>
+    }
+    return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">Ditolak</span>
+  }
+  if (status === "menunggu") {
+    if (jenisMenunggu === "perbaikan") {
+      return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">Perlu Diperiksa - Perbaikan</span>
+    }
+    if (jenisMenunggu === "perbaikan_laporan") {
+      return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">Perlu Diperiksa - Laporan Perbaikan</span>
+    }
+    if (jenisMenunggu === "pemulihan") {
+      return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-teal-100 text-teal-700">Perlu Diperiksa - Pemulihan</span>
+    }
+    if (jenisMenunggu === "penonaktifan") {
+      return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">Perlu Diperiksa - Penonaktifan</span>
+    }
+    return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Perlu Diperiksa - Pengajuan</span>
+  }
+  return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Perlu Diperiksa - Pengajuan</span>
 }
 
 const emptyForm = (): FormState => ({
@@ -180,22 +206,22 @@ const emptyForm = (): FormState => ({
 })
 
 // ---------------------------------------------------------------------------
-// Helper: persist status change to sessionStorage and update tabel
+// Helper: persist status change to localStorage and update tabel
 // ---------------------------------------------------------------------------
-function persistStatusChange(id: string, status: StatusRujukan, logTerakhir: string) {
+function persistStatusChange(id: string, status: StatusRujukan, logTerakhir: string, extra?: Record<string, unknown>) {
   try {
-    const stored: Array<Record<string, unknown>> = JSON.parse(sessionStorage.getItem("rujukanList") ?? "[]")
+    const stored: Array<Record<string, unknown>> = JSON.parse(localStorage.getItem("rujukanList") ?? "[]")
     const existing = stored.find((i) => i.id === id)
     if (existing) {
-      sessionStorage.setItem(
+      localStorage.setItem(
         "rujukanList",
-        JSON.stringify(stored.map((i) => (i.id === id ? { ...i, status, logTerakhir } : i)))
+        JSON.stringify(stored.map((i) => (i.id === id ? { ...i, status, logTerakhir, ...extra } : i)))
       )
     } else {
       const seed = SEED.find((d) => d.id === id)
-      sessionStorage.setItem(
+      localStorage.setItem(
         "rujukanList",
-        JSON.stringify([...stored, seed ? { ...seed, status, logTerakhir } : { id, status, logTerakhir }])
+        JSON.stringify([...stored, seed ? { ...seed, status, logTerakhir, ...extra } : { id, status, logTerakhir, ...extra }])
       )
     }
     window.dispatchEvent(new CustomEvent("rujukanUpdated"))
@@ -215,23 +241,74 @@ function RujukanFormInner() {
   const isView = !!viewId
   const isReadOnly = isView
   const isPusat = readAuthSession()?.role === "pusat"
+  const isSekolah = readAuthSession()?.role === "sekolah"
+  const isDinas = readAuthSession()?.role === "dinas"
 
   const [form, setForm] = useState<FormState>(emptyForm)
   const [submitted, setSubmitted] = useState(false)
+  const [showReportModal, setShowReportModal] = useState(false)
+  const [reportAlasan, setReportAlasan] = useState("")
+  const [reportJenis, setReportJenis] = useState<"perbaikan" | "penonaktifan" | null>(null)
+  const [mounted, setMounted] = useState(false)
+  const [viewUsulanDari, setViewUsulanDari] = useState<SumberRujukan["usulanDari"]>(undefined)
+  const [duplicateError, setDuplicateError] = useState<string | null>(null)
+  const [viewCatatanPerbaikan, setViewCatatanPerbaikan] = useState("")
+  const [viewLogTerakhir, setViewLogTerakhir] = useState("")
+  const [wasResubmit, setWasResubmit] = useState(false)
+  const [showPerbaikanModal, setShowPerbaikanModal] = useState(false)
+  const [perbaikanCatatan, setPerbaikanCatatan] = useState("")
+  const [tolakModalMode, setTolakModalMode] = useState<"tolak" | "tolak_penonaktifan" | "tolak_laporan" | "tolak_pemulihan">("tolak")
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deleteAlasan, setDeleteAlasan] = useState("")
+  const [showPulihkanModal, setShowPulihkanModal] = useState(false)
+  const [pulihkanAlasan, setPulihkanAlasan] = useState("")
+  const [showNonaktifModal, setShowNonaktifModal] = useState(false)
+  const [nonaktifAlasan, setNonaktifAlasan] = useState("")
+  const [showHapusModal, setShowHapusModal] = useState(false)
+  const [showAjukanModal, setShowAjukanModal] = useState(false)
+  const [ajukanAlasan, setAjukanAlasan] = useState("")
 
-  // Form lengkap hanya untuk Admin Dinas & Admin Pusat; sekolah memakai Usul Instansi.
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const provParam = searchParams.get("provinsi")
+  const kabParam = searchParams.get("kabupaten")
+
+  // Auto-fill wilayah for sekolah
   useEffect(() => {
     if (editId || viewId) return
     const auth = readAuthSession()
-    if (auth?.role === "sekolah") router.replace("/")
-  }, [editId, viewId, router])
+    if (auth?.role !== "sekolah") return
 
-  // Load data — sessionStorage overrides take priority over SEED
+    // URL params (passed explicitly from SekolahSumberRujukanView) take priority
+    if (provParam || kabParam) {
+      setForm((prev) => ({
+        ...prev,
+        ...(provParam && { provinsi: provParam }),
+        ...(kabParam && { kabupatenKota: kabParam }),
+      }))
+      return
+    }
+
+    // Fallback: auth.wilayah "Provinsi - Kabupaten"
+    const wilayah = auth.wilayah ?? ""
+    if (wilayah.includes(" - ")) {
+      const [prov, kab] = wilayah.split(" - ").map((s) => s.trim())
+      setForm((prev) => ({
+        ...prev,
+        ...(prov && { provinsi: prov }),
+        ...(kab && { kabupatenKota: kab }),
+      }))
+    }
+  }, [editId, viewId, provParam, kabParam])
+
+  // Load data — localStorage overrides take priority over SEED
   useEffect(() => {
     if (!activeId) return
     let storedItems: Array<Record<string, unknown>> = []
     try {
-      storedItems = JSON.parse(sessionStorage.getItem("rujukanList") ?? "[]")
+      storedItems = JSON.parse(localStorage.getItem("rujukanList") ?? "[]")
     } catch {}
     const fromStorage = storedItems.find((d) => d.id === activeId) as Record<string, unknown> | undefined
     const fromSeed = SEED.find((d) => d.id === activeId) as Record<string, unknown> | undefined
@@ -263,14 +340,37 @@ function RujukanFormInner() {
         kategoriPenyedia: (existing.kategoriPenyedia as KategoriPenyedia) ?? "",
         aksesInfo: (existing.aksesInfo as AksesInfo) ?? "publik",
         status: (existing.status as StatusRujukan) ?? "menunggu",
+        jenisMenunggu: (() => {
+          const stored = existing.jenisMenunggu as string | undefined
+          if (stored === "dilaporan") return "perbaikan_laporan"
+          if (stored === "perbaikan" && existing.usulanDari !== "sekolah") return "perbaikan_laporan"
+          if (stored === "perbaikan" || stored === "perbaikan_laporan" || stored === "penonaktifan" || stored === "pemulihan") return stored as "perbaikan" | "perbaikan_laporan" | "penonaktifan" | "pemulihan"
+          if (existing.status === "menunggu" && typeof existing.logTerakhir === "string" && /dilaporkan/i.test(existing.logTerakhir)) return "perbaikan_laporan"
+          if (existing.status === "menunggu") return "pengajuan"
+          return undefined
+        })(),
+        jenisButuhPerbaikan: (existing.jenisButuhPerbaikan as "ditolak" | "perbaikan" | undefined) ?? undefined,
       })
+      setViewUsulanDari((existing.usulanDari as SumberRujukan["usulanDari"]) ?? undefined)
+      setViewCatatanPerbaikan((existing.catatanPerbaikan as string) ?? "")
+      setViewLogTerakhir((existing.logTerakhir as string) ?? "")
     }
   }, [activeId])
 
-  const set = <K extends keyof FormState>(k: K, v: FormState[K]) =>
+  const set = <K extends keyof FormState>(k: K, v: FormState[K]) => {
+    if (k === "namaInstansi" || k === "kabupatenKota" || k === "kategoriBentukDukungan" || k === "kategoriPenyedia") setDuplicateError(null)
+    if (k === "kabupatenKota") {
+      setForm((prev) => ({ ...prev, [k]: v, kecamatan: "", kelurahan: "" }))
+      return
+    }
+    if (k === "kecamatan") {
+      setForm((prev) => ({ ...prev, [k]: v, kelurahan: "" }))
+      return
+    }
     setForm((prev) => ({ ...prev, [k]: v }))
+  }
 
-  // Verify — updates sessionStorage so tabel reflects the change
+  // Verify — updates localStorage so tabel reflects the change
   const handleVerify = () => {
     if (!viewId) return
     const isPusat = readAuthSession()?.role === "pusat"
@@ -283,20 +383,51 @@ function RujukanFormInner() {
     setForm((prev) => ({ ...prev, status: "terverifikasi" }))
   }
 
-  // Delete — marks as "dihapus" in sessionStorage then navigates back
-  const handleDelete = () => {
+  const handleTerimaPenonaktifan = () => {
     if (!viewId) return
     const isPusat = readAuthSession()?.role === "pusat"
     const d = getDinasNamaForLogs()
-    persistStatusChange(viewId, "dihapus", isPusat ? RUJUKAN_LOG.dihapusPusat : dinasLog.dihapus(d))
+    persistStatusChange(viewId, "nonaktif", isPusat ? RUJUKAN_LOG.dinonaktifkanPusat : dinasLog.dinonaktifkan(d), { jenisMenunggu: undefined })
+    setForm((prev) => ({ ...prev, status: "nonaktif", jenisMenunggu: undefined }))
+  }
+
+  const handleTerimaPerbaikanNonSekolah = () => {
+    if (!viewId) return
+    const d = getDinasNamaForLogs()
+    const log = `Laporan perbaikan diterima oleh Admin ${d}`
+    persistStatusChange(viewId, "butuh_perbaikan", log, { jenisMenunggu: undefined, jenisButuhPerbaikan: "ditolak" })
+    setForm((prev) => ({ ...prev, status: "butuh_perbaikan", jenisMenunggu: undefined, jenisButuhPerbaikan: "ditolak" }))
     router.push(getRujukanFormExitHref())
+  }
+
+  const handleSekolahHapus = () => {
+    if (!viewId) return
+    const stored = JSON.parse(localStorage.getItem("rujukanList") ?? "[]") as Array<Record<string, unknown>>
+    const filtered = stored.filter((item: Record<string, unknown>) => item.id !== viewId)
+    localStorage.setItem("rujukanList", JSON.stringify(filtered))
+    window.dispatchEvent(new CustomEvent("rujukanUpdated"))
+    router.push("/sumber-rujukan")
+  }
+
+  // Delete — marks as "nonaktif" in localStorage then navigates back
+  const handleDelete = () => {
+    if (!viewId) return
+    
+    const isPusat = readAuthSession()?.role === "pusat"
+    const d = getDinasNamaForLogs()
+    const alasan = deleteAlasan.trim()
+    const extra = alasan ? { catatanPerbaikan: alasan } : {}
+    persistStatusChange(viewId, "nonaktif", isPusat ? RUJUKAN_LOG.dinonaktifkanPusat : dinasLog.dinonaktifkan(d), extra)
+    setForm((prev) => ({ ...prev, status: "nonaktif", ...extra }))
+    setShowDeleteModal(false)
+    setDeleteAlasan("")
   }
 
   const handleRestore = () => {
     if (!viewId) return
     let usulanDari: SumberRujukan["usulanDari"] = "dinas"
     try {
-      const stored = JSON.parse(sessionStorage.getItem("rujukanList") ?? "[]") as Array<Record<string, unknown>>
+      const stored = JSON.parse(localStorage.getItem("rujukanList") ?? "[]") as Array<Record<string, unknown>>
       const row = stored.find((x) => x.id === viewId)
       const seed = SEED.find((s) => s.id === viewId)
       const merged = { ...seed, ...row } as Partial<SumberRujukan>
@@ -313,6 +444,109 @@ function RujukanFormInner() {
     setForm((prev) => ({ ...prev, status: nextStatus }))
   }
 
+  const handleSubmitReport = () => {
+    if (!viewId || !reportAlasan.trim() || !reportJenis) return
+    const raw = localStorage.getItem("reportList")
+    const reports: Array<{ id: string; sumberId: string; jenis: string; alasan: string; dibuatOleh: string; createdAt: string }> = raw ? JSON.parse(raw) : []
+    reports.unshift({
+      id: `report-${Date.now()}`,
+      sumberId: viewId,
+      jenis: reportJenis,
+      alasan: reportAlasan.trim(),
+      dibuatOleh: readAuthSession()?.role === "sekolah" ? `Admin Sekolah ${readAuthSession()?.namaSekolah ?? ""}`.trim() : readAuthSession()?.role === "dinas" ? `Admin ${getDinasNamaForLogs()}` : "Admin",
+      createdAt: new Date().toISOString(),
+    })
+    localStorage.setItem("reportList", JSON.stringify(reports))
+
+    const auth = readAuthSession()
+    const stored = JSON.parse(localStorage.getItem("rujukanList") ?? "[]") as Array<Record<string, unknown>>
+    const existingIndex = stored.findIndex((item: Record<string, unknown>) => item.id === viewId)
+    const logMsg = reportJenis === "penonaktifan"
+      ? `Usulan penonaktifan oleh Admin Sekolah ${auth?.namaSekolah ?? ""}`.trim()
+      : `Laporan perbaikan oleh Admin Sekolah ${auth?.namaSekolah ?? ""}`.trim()
+    const alasan = reportAlasan.trim()
+
+    const jenisForStorage = reportJenis === "perbaikan" ? "perbaikan_laporan" : (reportJenis ?? "perbaikan_laporan")
+    if (existingIndex >= 0) {
+      stored[existingIndex] = {
+        ...stored[existingIndex],
+        status: "menunggu",
+        jenisMenunggu: jenisForStorage,
+        logTerakhir: logMsg,
+        catatanPerbaikan: `Laporan: ${alasan}`
+      }
+    } else {
+      const seedItem = SEED.find((s) => s.id === viewId)
+      if (seedItem) {
+        stored.push({
+          ...seedItem,
+          status: "menunggu",
+          jenisMenunggu: jenisForStorage,
+          logTerakhir: logMsg,
+          catatanPerbaikan: `Laporan: ${alasan}`,
+        })
+      }
+    }
+
+    localStorage.setItem("rujukanList", JSON.stringify(stored))
+    window.dispatchEvent(new CustomEvent("rujukanUpdated"))
+
+    setShowReportModal(false)
+    setReportAlasan("")
+    setReportJenis(null)
+    setForm((prev) => ({ ...prev, status: "menunggu", jenisMenunggu: jenisForStorage, catatanPerbaikan: `Laporan: ${alasan}` }))
+  }
+
+  const handleSekolahNonaktif = () => {
+    if (!viewId || !nonaktifAlasan.trim()) return
+    const auth = readAuthSession()
+    persistStatusChange(viewId, "menunggu", `Usulan penonaktifan oleh Admin Sekolah ${auth?.namaSekolah ?? ""}`.trim(), { jenisMenunggu: "penonaktifan", catatanPerbaikan: nonaktifAlasan.trim() })
+    setForm((prev) => ({ ...prev, status: "menunggu", jenisMenunggu: "penonaktifan" }))
+    setShowNonaktifModal(false)
+    setNonaktifAlasan("")
+  }
+
+  const handleSubmitPulihkan = () => {
+    if (!viewId || !pulihkanAlasan.trim()) return
+    const patch = { status: "menunggu", jenisMenunggu: "pemulihan", logTerakhir: "Usulan pemulihan oleh Admin Sekolah", catatanPerbaikan: pulihkanAlasan.trim() }
+    const stored = JSON.parse(localStorage.getItem("rujukanList") ?? "[]") as Array<Record<string, unknown>>
+    const idx = stored.findIndex((x) => x.id === viewId)
+    if (idx >= 0) stored[idx] = { ...stored[idx], ...patch }
+    else { const s = SEED.find((s) => s.id === viewId); if (s) stored.push({ ...s, ...patch }) }
+    localStorage.setItem("rujukanList", JSON.stringify(stored))
+    window.dispatchEvent(new CustomEvent("rujukanUpdated"))
+    setForm((prev) => ({ ...prev, status: "menunggu", jenisMenunggu: "pemulihan" }))
+    setShowPulihkanModal(false)
+    setPulihkanAlasan("")
+  }
+
+  const handleSubmitPerbaikan = () => {
+    if (!viewId || !perbaikanCatatan.trim()) return
+    const isPusat = readAuthSession()?.role === "pusat"
+    const d = getDinasNamaForLogs()
+    let log: string
+    if (tolakModalMode === "tolak_penonaktifan" || tolakModalMode === "tolak_laporan") {
+      log = tolakModalMode === "tolak_penonaktifan"
+        ? `Usulan penonaktifan ditolak oleh Admin ${isPusat ? "Pusat" : d}`
+        : `Laporan perbaikan ditolak oleh Admin ${isPusat ? "Pusat" : d}`
+      persistStatusChange(viewId, "terverifikasi", log, { catatanPerbaikan: perbaikanCatatan.trim(), jenisMenunggu: undefined })
+      setForm((prev) => ({ ...prev, status: "terverifikasi", jenisMenunggu: undefined }))
+    } else if (tolakModalMode === "tolak_pemulihan") {
+      log = `Usulan pemulihan ditolak oleh Admin ${isPusat ? "Pusat" : d}`
+      persistStatusChange(viewId, "nonaktif", log, { catatanPerbaikan: perbaikanCatatan.trim(), jenisMenunggu: undefined })
+      setForm((prev) => ({ ...prev, status: "nonaktif", jenisMenunggu: undefined }))
+    } else {
+      log = `Ditolak oleh Admin ${isPusat ? "Pusat" : d}`
+      persistStatusChange(viewId, "butuh_perbaikan", log, { catatanPerbaikan: perbaikanCatatan.trim(), jenisMenunggu: undefined, jenisButuhPerbaikan: "ditolak" })
+      setForm((prev) => ({ ...prev, status: "butuh_perbaikan", jenisMenunggu: undefined, jenisButuhPerbaikan: "ditolak" }))
+    }
+    setViewCatatanPerbaikan(perbaikanCatatan.trim())
+    setViewLogTerakhir(log)
+    setShowPerbaikanModal(false)
+    setPerbaikanCatatan("")
+    router.push(getRujukanFormExitHref())
+  }
+
   const canSubmit =
     form.kategoriBentukDukungan !== "" &&
     form.namaInstansi.trim() !== "" &&
@@ -323,29 +557,71 @@ function RujukanFormInner() {
   const handleSubmit = () => {
     if (!canSubmit) return
     const auth = readAuthSession()
-    if (!auth || auth.role === "sekolah") return
+    if (!auth) return
+    const isSekolah = auth.role === "sekolah"
     const isPusat = auth.role === "pusat"
+    const isResubmit = isSekolah && form.status === "butuh_perbaikan"
+    const isEditTerverifikasi = isSekolah && form.status === "terverifikasi"
+    const needsReverify = isResubmit || isEditTerverifikasi
+    const reverifyJenis = "pengajuan" as const
     const d = getDinasNamaForLogs()
     const logEdit = isPusat ? RUJUKAN_LOG.diperbaharuiPusat : dinasLog.diperbaharui(d)
     try {
-      const stored = JSON.parse(sessionStorage.getItem("rujukanList") ?? "[]") as Array<Record<string, unknown>>
+      const stored = JSON.parse(localStorage.getItem("rujukanList") ?? "[]") as Array<Record<string, unknown>>
+
+      // Duplicate check for new entries only
+      if (!isEdit) {
+        const namaNorm = form.namaInstansi.trim().toLowerCase()
+        const kabNorm = form.kabupatenKota.trim().toLowerCase()
+        const kategoriNorm = form.kategoriBentukDukungan.toLowerCase()
+        const penyediaNorm = form.kategoriPenyedia.toLowerCase()
+        const allItems = [
+          ...SEED.map((s) => {
+            const override = stored.find((x) => x.id === s.id)
+            return override ? { ...s, ...override } : s
+          }),
+          ...stored.filter((x) => !SEED.find((s) => s.id === x.id)),
+        ] as Array<{ namaInstansi?: string; kabupatenKota?: string; kategoriBentukDukungan?: string; kategoriPenyedia?: string; status?: string }>
+        const duplicate = allItems.find(
+          (x) =>
+            x.status !== "nonaktif" &&
+            x.namaInstansi?.trim().toLowerCase() === namaNorm &&
+            x.kabupatenKota?.trim().toLowerCase() === kabNorm &&
+            x.kategoriBentukDukungan?.toLowerCase() === kategoriNorm &&
+            x.kategoriPenyedia?.toLowerCase() === penyediaNorm
+        )
+        if (duplicate) {
+          setDuplicateError(`"${form.namaInstansi}" dengan kategori dan penyedia yang sama sudah terdaftar di ${form.kabupatenKota}.`)
+          return
+        }
+      }
+      setDuplicateError(null)
+
       if (isEdit && editId) {
         const idx = stored.findIndex((item) => item.id === editId)
         if (idx >= 0) {
-          stored[idx] = { ...stored[idx], ...form, logTerakhir: logEdit }
-          sessionStorage.setItem("rujukanList", JSON.stringify(stored))
+          const reverifyAlasan = ajukanAlasan.trim() || undefined
+          stored[idx] = {
+            ...stored[idx],
+            ...form,
+            logTerakhir: isResubmit ? RUJUKAN_LOG.dibuatSekolah(auth.namaSekolah ?? "") : logEdit,
+            ...(needsReverify ? { status: "menunggu", jenisMenunggu: reverifyJenis, catatanPerbaikan: reverifyAlasan } : {})
+          }
+          localStorage.setItem("rujukanList", JSON.stringify(stored))
         } else if (SEED_IDS.includes(editId)) {
           const seed = SEED.find((d) => d.id === editId)
-          sessionStorage.setItem(
+          const reverifyAlasan = ajukanAlasan.trim() || undefined
+          localStorage.setItem(
             "rujukanList",
-            JSON.stringify([...stored, { ...seed, ...form, id: editId, logTerakhir: logEdit }])
+            JSON.stringify([...stored, { ...seed, ...form, id: editId, logTerakhir: isResubmit ? RUJUKAN_LOG.dibuatSekolah(auth.namaSekolah ?? "") : logEdit, ...(needsReverify ? { status: "menunggu", jenisMenunggu: reverifyJenis, catatanPerbaikan: reverifyAlasan } : {}) }])
           )
         } else {
-          sessionStorage.setItem("rujukanList", JSON.stringify([...stored, { id: editId, ...form, logTerakhir: logEdit }]))
+          const reverifyAlasan = ajukanAlasan.trim() || undefined
+          localStorage.setItem("rujukanList", JSON.stringify([...stored, { id: editId, ...form, logTerakhir: isResubmit ? RUJUKAN_LOG.dibuatSekolah(auth.namaSekolah ?? "") : logEdit, ...(needsReverify ? { status: "menunggu", jenisMenunggu: reverifyJenis, catatanPerbaikan: reverifyAlasan } : {}) }]))
         }
       } else {
         const newItem: SumberRujukan = {
-          id: `sr-${Date.now()}`,
+          id: isSekolah ? `usul-${Date.now()}` : `sr-${Date.now()}`,
           namaInstansi: form.namaInstansi,
           kategoriBentukDukungan: form.kategoriBentukDukungan as SumberRujukan["kategoriBentukDukungan"],
           kategoriPenyedia: form.kategoriPenyedia as SumberRujukan["kategoriPenyedia"],
@@ -362,16 +638,19 @@ function RujukanFormInner() {
           kontak: form.kontak,
           website: form.website,
           aksesInfo: form.aksesInfo,
-          status: "terverifikasi",
-          dibuatOleh: isPusat ? "Admin Pusat" : `Admin ${d}`,
-          logTerakhir: isPusat ? RUJUKAN_LOG.dibuatTerverifikasiPusat : dinasLog.dibuatTerverifikasi(d),
-          usulanDari: isPusat ? "pusat" : "dinas",
+          status: isSekolah ? "menunggu" : "terverifikasi",
+          jenisMenunggu: isSekolah ? "pengajuan" : undefined,
+          dibuatOleh: isSekolah ? `Admin Sekolah ${auth.namaSekolah ?? ""}`.trim() : isPusat ? "Admin Pusat" : `Admin ${d}`,
+          namaSekolah: isSekolah ? (auth.namaSekolah ?? "") : undefined,
+          logTerakhir: isSekolah ? RUJUKAN_LOG.dibuatSekolah(auth.namaSekolah ?? "") : isPusat ? RUJUKAN_LOG.dibuatTerverifikasiPusat : dinasLog.dibuatTerverifikasi(d),
+          usulanDari: isSekolah ? "sekolah" : isPusat ? "pusat" : "dinas",
           createdAt: new Date().toISOString(),
         }
-        sessionStorage.setItem("rujukanList", JSON.stringify([...stored, newItem]))
+        localStorage.setItem("rujukanList", JSON.stringify([...stored, newItem]))
       }
       window.dispatchEvent(new CustomEvent("rujukanUpdated"))
     } catch { /* ignore */ }
+    if (isResubmit) setWasResubmit(true)
     setSubmitted(true)
   }
 
@@ -391,12 +670,14 @@ function RujukanFormInner() {
             </svg>
           </div>
           <h2 className="text-lg font-bold text-gray-900">
-            {isEdit ? "Berhasil Diperbarui" : "Berhasil Ditambahkan"}
+            {isEdit ? (wasResubmit ? "Usulan Berhasil Dikirim Ulang" : "Berhasil Diperbarui") : isSekolah ? "Usulan Berhasil Dikirim" : "Berhasil Ditambahkan"}
           </h2>
           <p className="text-sm text-gray-500 mt-1">
             {isEdit
-              ? "Perubahan berhasil disimpan."
-              : "Sumber dukungan berhasil ditambahkan dan langsung terverifikasi."}
+              ? wasResubmit ? "Usulan Anda telah dikirim ulang untuk diperiksa kembali." : "Perubahan berhasil disimpan."
+              : isSekolah
+                ? "Usulan sumber dukungan Anda akan diverifikasi oleh admin."
+                : "Sumber dukungan berhasil ditambahkan dan langsung terverifikasi."}
           </p>
         </div>
       </div>
@@ -422,7 +703,7 @@ function RujukanFormInner() {
             </h1>
             {isView ? (
               <div className="mt-1">
-                <StatusBadge status={form.status} />
+                <StatusBadge status={form.status} jenisMenunggu={form.jenisMenunggu} jenisButuhPerbaikan={form.jenisButuhPerbaikan} />
               </div>
             ) : (
               <p className="text-xs text-gray-500">
@@ -432,6 +713,21 @@ function RujukanFormInner() {
           </div>
         </div>
       </div>
+
+      {/* Catatan banner */}
+      {viewCatatanPerbaikan && (
+        <div className="max-w-2xl mx-auto px-4 pt-4">
+          <div className="rounded-lg px-4 py-3 bg-yellow-50 border border-yellow-200">
+            <div className="flex items-center gap-1.5 mb-1">
+              <MessageCircle className="w-3.5 h-3.5 text-yellow-600 flex-shrink-0" />
+              <p className="text-xs font-semibold text-yellow-700">
+                Catatan dari {viewLogTerakhir?.match(/\boleh\s+(.+)$/i)?.[1] ?? "Admin"}
+              </p>
+            </div>
+            <p className="text-sm text-yellow-900">{viewCatatanPerbaikan}</p>
+          </div>
+        </div>
+      )}
 
       {/* Bulk upload info banner - only show for new creation, and only for non-pusat roles */}
       {isPusat === false && !isEdit && !isView && (
@@ -469,19 +765,48 @@ function RujukanFormInner() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <FieldLabel required={!isReadOnly}>Provinsi</FieldLabel>
-              <SelectInput value={form.provinsi} onChange={(v) => set("provinsi", v)} options={PROVINSI_OPTIONS} disabled={isReadOnly} />
+              <SelectInput value={form.provinsi} onChange={(v) => set("provinsi", v)} options={PROVINSI_OPTIONS} disabled={isReadOnly || (mounted && isSekolah) || (mounted && isDinas)} />
             </div>
             <div className="flex flex-col gap-1.5">
               <FieldLabel required={!isReadOnly}>Kabupaten / Kota</FieldLabel>
-              <TextInput value={form.kabupatenKota} onChange={(v) => set("kabupatenKota", v)} placeholder="Contoh: Kota Banda Aceh" disabled={isReadOnly} />
+              {mounted && isDinas && !isReadOnly ? (
+                <SelectInput
+                  value={form.kabupatenKota}
+                  onChange={(v) => set("kabupatenKota", v)}
+                  options={KAB_KOTA_ACEH}
+                  placeholder="Pilih Kabupaten / Kota"
+                />
+              ) : (
+                <TextInput value={form.kabupatenKota} onChange={(v) => set("kabupatenKota", v)} placeholder={form.kabupatenKota || "Kabupaten / Kota"} disabled={isReadOnly || (mounted && isSekolah)} />
+              )}
             </div>
             <div className="flex flex-col gap-1.5">
               <FieldLabel>Kecamatan</FieldLabel>
-              <TextInput value={form.kecamatan} onChange={(v) => set("kecamatan", v)} placeholder="Contoh: Baiturrahman" disabled={isReadOnly} />
+              {mounted && (isDinas || isSekolah) && !isReadOnly ? (
+                <SelectInput
+                  value={form.kecamatan}
+                  onChange={(v) => set("kecamatan", v)}
+                  options={getKecamatanList(form.kabupatenKota)}
+                  placeholder={form.kabupatenKota ? "Pilih Kecamatan" : "Pilih Kabupaten / Kota dulu"}
+                  disabled={!form.kabupatenKota}
+                />
+              ) : (
+                <TextInput value={form.kecamatan} onChange={(v) => set("kecamatan", v)} placeholder="Contoh: Baiturrahman" disabled={isReadOnly} />
+              )}
             </div>
             <div className="flex flex-col gap-1.5">
               <FieldLabel>Kelurahan</FieldLabel>
-              <TextInput value={form.kelurahan} onChange={(v) => set("kelurahan", v)} placeholder="Contoh: Peunayong" disabled={isReadOnly} />
+              {mounted && (isDinas || isSekolah) && !isReadOnly ? (
+                <SelectInput
+                  value={form.kelurahan}
+                  onChange={(v) => set("kelurahan", v)}
+                  options={getKelurahanList(form.kabupatenKota, form.kecamatan)}
+                  placeholder={form.kecamatan ? "Pilih Kelurahan / Desa" : "Pilih Kecamatan dulu"}
+                  disabled={!form.kecamatan}
+                />
+              ) : (
+                <TextInput value={form.kelurahan} onChange={(v) => set("kelurahan", v)} placeholder="Contoh: Peunayong" disabled={isReadOnly} />
+              )}
             </div>
             <div className="flex flex-col gap-1.5">
               <FieldLabel>Nama Jalan</FieldLabel>
@@ -643,71 +968,546 @@ function RujukanFormInner() {
         {/* Action buttons */}
         {isReadOnly ? (
           <div className="flex flex-col sm:flex-row gap-3 pt-2 pb-8">
-            {form.status === "dihapus" ? (
+            {/* Dinas/Pusat: nonaktif → Pulihkan */}
+            {form.status === "nonaktif" && !isSekolah && (
+              <button
+                type="button"
+                onClick={handleRestore}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition inline-flex items-center justify-center gap-2"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Pulihkan
+              </button>
+            )}
+            {/* Sekolah: own entry + nonaktif → Pulihkan (usulkan pemulihan) */}
+            {mounted && isSekolah && viewUsulanDari === "sekolah" && form.status === "nonaktif" && (
+              <button
+                type="button"
+                onClick={() => setShowPulihkanModal(true)}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 transition inline-flex items-center justify-center gap-2"
+              >
+                <RotateCcw className="w-4 h-4" /> Pulihkan
+              </button>
+            )}
+            {/* Sekolah: own entry + butuh_perbaikan → edit & kirim ulang */}
+            {mounted && isSekolah && viewUsulanDari === "sekolah" && form.status === "butuh_perbaikan" && (
               <>
                 <button
                   type="button"
-                  onClick={handleRestore}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition inline-flex items-center justify-center gap-2"
+                  onClick={() => router.push(`/sumber-rujukan/form?edit=${viewId}`)}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition inline-flex items-center justify-center gap-2"
                 >
-                  <RotateCcw className="w-4 h-4" />
-                  Pulihkan
+                  <Pencil className="w-4 h-4" />
+                  Perbaiki Sumber Dukungan
                 </button>
                 <button
                   type="button"
-                  onClick={() => router.push(getRujukanFormExitHref())}
-                  className="flex-1 py-2.5 rounded-xl border border-gray-300 text-sm font-semibold text-gray-800 bg-white hover:bg-gray-50 transition"
-                >
-                  Tutup
-                </button>
-              </>
-            ) : (
-              <>
-                {(form.status === "menunggu" || form.status === "menunggu_review") && (
-                  <button
-                    type="button"
-                    onClick={handleVerify}
-                    className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-green-600 hover:bg-green-700 transition"
-                  >
-                    Verifikasi
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={handleDelete}
-                  className="flex-1 py-2.5 rounded-xl border border-red-300 text-sm font-semibold text-red-600 bg-white hover:bg-red-50 transition"
+                  onClick={() => setShowHapusModal(true)}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition"
                 >
                   Hapus
                 </button>
-                <button
-                  type="button"
-                  onClick={() => router.push(getRujukanFormExitHref())}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition"
-                >
-                  Tutup
-                </button>
               </>
             )}
+{/* Sekolah: own entry + terverifikasi → edit + nonaktif */}
+                {mounted && isSekolah && viewUsulanDari === "sekolah" && form.status === "terverifikasi" && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/sumber-rujukan/form?edit=${viewId}`)}
+                      className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition inline-flex items-center justify-center gap-2"
+                    >
+                      <Pencil className="w-4 h-4" />
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowNonaktifModal(true)}
+                      className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition"
+                    >
+                      Nonaktif
+                    </button>
+                  </>
+                )}
+                {/* Sekolah: not own entry + terverifikasi → laporkan kesalahan */}
+                {mounted && isSekolah && viewUsulanDari !== "sekolah" && form.status === "terverifikasi" && (
+                  <button
+                    type="button"
+                    onClick={() => setShowReportModal(true)}
+                    className="flex-1 py-2.5 rounded-xl border border-red-300 text-sm font-semibold text-red-600 bg-white hover:bg-red-50 transition"
+                  >
+                    Laporkan Sumber Dukungan
+                  </button>
+                )}
+                {/* Dinas/Pusat: menunggu penonaktifan → Terima Penonaktifan + Tolak */}
+                {mounted && (form.status === "menunggu" || form.status === "menunggu_review") && !isSekolah && form.jenisMenunggu === "penonaktifan" && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleTerimaPenonaktifan}
+                      className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-green-600 hover:bg-green-700 transition inline-flex items-center justify-center gap-2"
+                    >
+                      <CheckCircle className="w-4 h-4" /> Terima Penonaktifan
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setTolakModalMode("tolak_penonaktifan"); setShowPerbaikanModal(true) }}
+                      className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition inline-flex items-center justify-center gap-2"
+                    >
+                      <XCircle className="w-4 h-4" /> Tolak
+                    </button>
+                  </>
+                )}
+                {/* Dinas/Pusat: menunggu pemulihan → Terima Pemulihan + Tolak */}
+                {mounted && (form.status === "menunggu" || form.status === "menunggu_review") && !isSekolah && form.jenisMenunggu === "pemulihan" && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleVerify}
+                      className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 transition inline-flex items-center justify-center gap-2"
+                    >
+                      <CheckCircle className="w-4 h-4" /> Terima Pemulihan
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setTolakModalMode("tolak_pemulihan"); setShowPerbaikanModal(true) }}
+                      className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition inline-flex items-center justify-center gap-2"
+                    >
+                      <XCircle className="w-4 h-4" /> Tolak
+                    </button>
+                  </>
+                )}
+                {/* Dinas/Pusat: menunggu laporan perbaikan (item orang lain) → Terima Laporan + Tolak */}
+                {mounted && (form.status === "menunggu" || form.status === "menunggu_review") && !isSekolah && form.jenisMenunggu === "perbaikan_laporan" && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleTerimaPerbaikanNonSekolah}
+                      className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-green-600 hover:bg-green-700 transition inline-flex items-center justify-center gap-2"
+                    >
+                      <CheckCircle className="w-4 h-4" /> Terima Laporan
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setTolakModalMode("tolak_laporan"); setShowPerbaikanModal(true) }}
+                      className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition inline-flex items-center justify-center gap-2"
+                    >
+                      <XCircle className="w-4 h-4" /> Tolak
+                    </button>
+                  </>
+                )}
+                {/* Dinas/Pusat: menunggu pengajuan atau perbaikan milik sekolah → Terima + Tolak */}
+                {mounted && (form.status === "menunggu" || form.status === "menunggu_review") && !isSekolah && form.jenisMenunggu !== "penonaktifan" && form.jenisMenunggu !== "perbaikan_laporan" && form.jenisMenunggu !== "pemulihan" && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleVerify}
+                      className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-green-600 hover:bg-green-700 transition inline-flex items-center justify-center gap-2"
+                    >
+                      <CheckCircle className="w-4 h-4" /> Terima Pengajuan
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setTolakModalMode("tolak"); setShowPerbaikanModal(true) }}
+                      className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition inline-flex items-center justify-center gap-2"
+                    >
+                      <XCircle className="w-4 h-4" /> Tolak
+                    </button>
+                  </>
+                )}
+                {/* Dinas/Pusat: terverifikasi → Nonaktif */}
+                {mounted && form.status === "terverifikasi" && !isSekolah && (
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition"
+                  >
+                    Nonaktif
+                  </button>
+                )}
           </div>
         ) : (
-          <div className="flex gap-3 pt-2 pb-8">
-            <button
-              type="button"
-              onClick={() => router.push(getRujukanFormExitHref())}
-              className="flex-1 py-2.5 rounded-xl border border-gray-300 text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 transition"
-            >
-              Batal
-            </button>
-            <button
-              onClick={handleSubmit}
-              disabled={!canSubmit}
-              className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-            >
-              {isEdit ? "Simpan Perubahan" : "Simpan Sumber Dukungan"}
-            </button>
+          <div className="flex flex-col gap-2 pt-2 pb-8">
+            {duplicateError && (
+              <div className="flex items-start gap-2 px-3 py-2.5 rounded-lg bg-red-50 border border-red-200">
+                <div className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0 mt-1.5" />
+                <p className="text-xs text-red-600">{duplicateError}</p>
+              </div>
+            )}
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => router.push(getRujukanFormExitHref())}
+                className="flex-1 py-2.5 rounded-xl border border-gray-300 text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 transition"
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => {
+                  if (mounted && isSekolah && isEdit && (form.status === "terverifikasi" || form.status === "butuh_perbaikan")) {
+                    setShowAjukanModal(true)
+                  } else {
+                    handleSubmit()
+                  }
+                }}
+                disabled={!canSubmit}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              >
+                {isEdit && mounted && isSekolah && (form.status === "terverifikasi" || form.status === "butuh_perbaikan") ? "Ajukan Perubahan" : isEdit ? "Simpan Perubahan" : (mounted && isSekolah) ? "Kirim Usulan" : "Simpan Sumber Dukungan"}
+              </button>
+            </div>
           </div>
         )}
       </div>
+
+      {/* Report Modal */}
+      {showAjukanModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/50" onClick={() => { setShowAjukanModal(false); setAjukanAlasan("") }} />
+          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-200">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-100">
+                <Pencil className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-gray-900">Ajukan Perubahan</h3>
+                <p className="text-xs text-gray-500">Jelaskan alasan perubahan data ini.</p>
+              </div>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-1">Instansi</p>
+                <p className="text-sm text-gray-900">{form.namaInstansi}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Alasan Perubahan</label>
+                <textarea
+                  value={ajukanAlasan}
+                  onChange={(e) => setAjukanAlasan(e.target.value)}
+                  placeholder="Jelaskan alasan perubahan data..."
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  rows={4}
+                />
+              </div>
+            </div>
+            <div className="px-5 py-4 border-t border-gray-200 flex justify-end gap-2">
+              <button
+                onClick={() => { setShowAjukanModal(false); setAjukanAlasan("") }}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition"
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => { setShowAjukanModal(false); handleSubmit() }}
+                disabled={!ajukanAlasan.trim()}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Ajukan Perubahan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showHapusModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setShowHapusModal(false)} />
+          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-200">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-red-100">
+                <Trash2 className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-gray-900">Hapus Sumber Dukungan</h3>
+                <p className="text-xs text-gray-500">Tindakan ini tidak dapat dibatalkan.</p>
+              </div>
+            </div>
+            <div className="p-5">
+              <p className="text-sm text-gray-700">Apakah Anda yakin ingin menghapus <span className="font-semibold">{form.namaInstansi}</span>? Data akan dihapus permanen.</p>
+            </div>
+            <div className="px-5 py-4 border-t border-gray-200 flex justify-end gap-2">
+              <button
+                onClick={() => setShowHapusModal(false)}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleSekolahHapus}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition"
+              >
+                Hapus Permanen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showNonaktifModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/50" onClick={() => { setShowNonaktifModal(false); setNonaktifAlasan("") }} />
+          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-200">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-red-100">
+                <XCircle className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-gray-900">Usulkan Penonaktifan</h3>
+                <p className="text-xs text-gray-500">Jelaskan alasan penonaktifan data ini.</p>
+              </div>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-1">Instansi</p>
+                <p className="text-sm text-gray-900">{form.namaInstansi}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Alasan Penonaktifan</label>
+                <textarea
+                  value={nonaktifAlasan}
+                  onChange={(e) => setNonaktifAlasan(e.target.value)}
+                  placeholder="Jelaskan alasan penonaktifan..."
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 bg-white"
+                  rows={4}
+                />
+              </div>
+            </div>
+            <div className="px-5 py-4 border-t border-gray-200 flex justify-end gap-2">
+              <button
+                onClick={() => { setShowNonaktifModal(false); setNonaktifAlasan("") }}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleSekolahNonaktif}
+                disabled={!nonaktifAlasan.trim()}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Kirim Usulan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showPulihkanModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/50" onClick={() => { setShowPulihkanModal(false); setPulihkanAlasan("") }} />
+          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-200">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-teal-100">
+                <RotateCcw className="w-5 h-5 text-teal-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-gray-900">Usulkan Pemulihan</h3>
+                <p className="text-xs text-gray-500">Jelaskan alasan pemulihan data ini.</p>
+              </div>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-1">Instansi</p>
+                <p className="text-sm text-gray-900">{form.namaInstansi}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Alasan Pemulihan</label>
+                <textarea
+                  value={pulihkanAlasan}
+                  onChange={(e) => setPulihkanAlasan(e.target.value)}
+                  placeholder="Jelaskan alasan pemulihan..."
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+                  rows={4}
+                />
+              </div>
+            </div>
+            <div className="px-5 py-4 border-t border-gray-200 flex justify-end gap-2">
+              <button
+                onClick={() => { setShowPulihkanModal(false); setPulihkanAlasan("") }}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleSubmitPulihkan}
+                disabled={!pulihkanAlasan.trim()}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Kirim Usulan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showPerbaikanModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setShowPerbaikanModal(false)} />
+          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-200">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-red-100">
+                <XCircle className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-gray-900">
+                  {tolakModalMode === "tolak_penonaktifan" ? "Tolak Penonaktifan" : tolakModalMode === "tolak_laporan" ? "Tolak Laporan" : tolakModalMode === "tolak_pemulihan" ? "Tolak Pemulihan" : "Tolak"}
+                </h3>
+                <p className="text-xs text-gray-500">Jelaskan alasan penolakan.</p>
+              </div>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-1">Instansi</p>
+                <p className="text-sm text-gray-900">{form.namaInstansi}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Alasan Penolakan</label>
+                <textarea
+                  value={perbaikanCatatan}
+                  onChange={(e) => setPerbaikanCatatan(e.target.value)}
+                  placeholder="Jelaskan alasan penolakan..."
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 bg-white"
+                  rows={4}
+                />
+              </div>
+            </div>
+            <div className="px-5 py-4 border-t border-gray-200 flex justify-end gap-2">
+              <button
+                onClick={() => { setShowPerbaikanModal(false); setPerbaikanCatatan("") }}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleSubmitPerbaikan}
+                disabled={!perbaikanCatatan.trim()}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {tolakModalMode === "tolak_penonaktifan" ? "Tolak Penonaktifan" : tolakModalMode === "tolak_laporan" ? "Tolak Laporan" : tolakModalMode === "tolak_pemulihan" ? "Tolak Pemulihan" : "Tolak"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showReportModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setShowReportModal(false)} />
+          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-200">
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                <Flag className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-gray-900">Laporkan Sumber Dukungan</h3>
+                <p className="text-xs text-gray-500">Laporan Anda akan dikirim ke admin untuk ditindaklanjuti.</p>
+              </div>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-1">Instansi</p>
+                <p className="text-sm text-gray-900">{form.namaInstansi}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-2">Jenis Laporan <span className="text-red-500">*</span></p>
+                <div className="space-y-2">
+                  {([
+                    { value: "perbaikan", label: "Perbaikan data", desc: "Data yang tercantum tidak akurat atau perlu diperbarui" },
+                    { value: "penonaktifan", label: "Usulan Penonaktifan", desc: "Layanan ini sudah tidak aktif atau tidak dapat dihubungi" },
+                  ] as { value: "perbaikan" | "penonaktifan"; label: string; desc: string }[]).map((opt) => (
+                    <label key={opt.value} className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition ${reportJenis === opt.value ? "border-red-400 bg-red-50" : "border-gray-200 hover:bg-gray-50"}`}>
+                      <input
+                        type="radio"
+                        name="reportJenis"
+                        value={opt.value}
+                        checked={reportJenis === opt.value}
+                        onChange={() => setReportJenis(opt.value)}
+                        className="mt-0.5 accent-red-600"
+                      />
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{opt.label}</p>
+                        <p className="text-xs text-gray-500">{opt.desc}</p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Keterangan <span className="text-red-500">*</span></label>
+                <textarea
+                  value={reportAlasan}
+                  onChange={(e) => setReportAlasan(e.target.value)}
+                  placeholder={reportJenis === "penonaktifan" ? "Jelaskan alasan penonaktifan..." : "Jelaskan data yang perlu diperbaiki..."}
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 bg-white"
+                  rows={3}
+                />
+              </div>
+            </div>
+            <div className="px-5 py-4 border-t border-gray-200 flex justify-end gap-2">
+              <button
+                onClick={() => { setShowReportModal(false); setReportJenis(null); setReportAlasan("") }}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleSubmitReport}
+                disabled={!reportAlasan.trim() || !reportJenis}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Kirim Laporan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setShowDeleteModal(false)} />
+          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-200">
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                <Trash2 className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-gray-900">Nonaktifkan Sumber Dukungan</h3>
+                <p className="text-xs text-gray-500">Tuliskan alasan mengapa dinonaktifkan</p>
+              </div>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-1">Instansi</p>
+                <p className="text-sm text-gray-900">{form.namaInstansi}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Alasan Nonaktif</label>
+                <textarea
+                  value={deleteAlasan}
+                  onChange={(e) => setDeleteAlasan(e.target.value)}
+                  placeholder="Contoh: Data tidak valid atau sudah tidak beroperasi..."
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 bg-white"
+                  rows={3}
+                />
+              </div>
+            </div>
+            <div className="px-5 py-4 border-t border-gray-200 flex justify-end gap-2">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={!deleteAlasan.trim()}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Nonaktifkan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

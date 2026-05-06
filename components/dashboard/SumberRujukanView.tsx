@@ -32,7 +32,7 @@ export type KategoriDukungan =
   | "Kepolisian" | "Psikologi" | "Pendidikan" | "Sosial" | "Lainnya"
 
 export type KategoriPenyedia = "Pemerintah Pusat" | "Pemerintah Daerah" | "Swasta" | "OMS" | "Lainnya"
-export type StatusRujukan = "terverifikasi" | "menunggu" | "menunggu_review" | "dihapus"
+export type StatusRujukan = "terverifikasi" | "menunggu" | "menunggu_review" | "nonaktif" | "butuh_perbaikan"
 
 export interface SumberRujukan {
   id: string
@@ -54,11 +54,59 @@ export interface SumberRujukan {
   status: StatusRujukan
   dibuatOleh: string
   logTerakhir?: string
+  catatanPerbaikan?: string
   /** Asal usulan entri menunggu verifikasi (mempengaruhi teks log bila belum ada `logTerakhir`). */
   usulanDari?: "dinas" | "sekolah" | "pusat"
   /** Nama sekolah untuk log "Dibuat oleh Admin Sekolah …". */
   namaSekolah?: string
   createdAt?: string
+  /** Jenis status menunggu: pengajuan = baru, perbaikan = laporan perbaikan data, penonaktifan = usulan nonaktif */
+  jenisMenunggu?: "pengajuan" | "perbaikan" | "perbaikan_laporan" | "penonaktifan" | "pemulihan"
+  /** Jenis butuh_perbaikan: ditolak = dari tolak pengajuan/perbaikan, perbaikan = dari terima laporan perbaikan */
+  jenisButuhPerbaikan?: "ditolak" | "perbaikan"
+  /** Nama sekolah yang pernah melaporkan item ini (untuk filter "pernah dilaporkan"). */
+  dilaporkanOlehSekolah?: string
+}
+
+const KOTA_SET = new Set([
+  "Banda Aceh", "Sabang", "Langsa", "Lhokseumawe", "Subulussalam",
+  "Medan", "Binjai", "Gunungsitoli", "Padangsidempuan", "Pematangsiantar", "Sibolga", "Tanjungbalai", "Tebing Tinggi",
+  "Bukittinggi", "Padang", "Padangpanjang", "Pariaman", "Payakumbuh", "Sawahlunto", "Solok",
+  "Dumai", "Pekanbaru",
+  "Jambi", "Sungaipenuh",
+  "Lubuklinggau", "Pagar Alam", "Palembang", "Prabumulih",
+  "Bengkulu",
+  "Bandar Lampung", "Metro",
+  "Pangkalpinang",
+  "Batam", "Tanjungpinang",
+  "Jakarta Pusat", "Jakarta Utara", "Jakarta Barat", "Jakarta Selatan", "Jakarta Timur",
+  "Bandung", "Banjar", "Bekasi", "Bogor", "Cimahi", "Cirebon", "Depok", "Sukabumi", "Tasikmalaya",
+  "Magelang", "Pekalongan", "Salatiga", "Semarang", "Surakarta", "Tegal",
+  "Yogyakarta",
+  "Batu", "Blitar", "Kediri", "Madiun", "Malang", "Mojokerto", "Pasuruan", "Probolinggo", "Surabaya",
+  "Cilegon", "Serang", "Tangerang", "Tangerang Selatan",
+  "Denpasar",
+  "Bima", "Mataram",
+  "Kupang",
+  "Pontianak", "Singkawang",
+  "Palangkaraya",
+  "Banjarbaru", "Banjarmasin",
+  "Balikpapan", "Bontang", "Samarinda",
+  "Tarakan",
+  "Bitung", "Kotamobagu", "Manado", "Tomohon",
+  "Palu",
+  "Makassar", "Palopo", "Parepare",
+  "Bau-Bau", "Kendari",
+  "Gorontalo",
+  "Mamuju",
+  "Ambon", "Tual",
+  "Ternate", "Tidore Kepulauan",
+  "Sorong",
+  "Jayapura",
+])
+
+function getWilayahType(kabupatenKota: string): "Kota" | "Kabupaten" {
+  return KOTA_SET.has(kabupatenKota) ? "Kota" : "Kabupaten"
 }
 
 // ---------------------------------------------------------------------------
@@ -98,10 +146,10 @@ export const SEED: SumberRujukan[] = [
     nomorJalan: "No. 45",
     nomorCallCenter: "065199988",
     aksesInfo: "publik",
-    status: "menunggu_review",
+    status: "terverifikasi",
     dibuatOleh: actorDinasSeed,
     usulanDari: "dinas",
-    logTerakhir: dinasLog.menungguReview(D_SEED),
+    logTerakhir: dinasLog.dibuatTerverifikasi(D_SEED),
   },
   {
     id: "sr-1", namaInstansi: "RSUD Zainoel Abidin",
@@ -157,9 +205,9 @@ export const SEED: SumberRujukan[] = [
     namaInstansi: "Klinik Pratama Medika",
     kategoriBentukDukungan: "Fasilitas Kesehatan", kategoriPenyedia: "Swasta",
     provinsi: "Aceh", kabupatenKota: "Banda Aceh", namaJalan: "Jl. Prof. Ali Hasyimi No. 20",
-    nomorCallCenter: "065145678", aksesInfo: "publik", status: "dihapus",
+    nomorCallCenter: "065145678", aksesInfo: "publik", status: "nonaktif",
     dibuatOleh: actorDinasSeed, usulanDari: "dinas",
-    logTerakhir: dinasLog.dihapus(D_SEED),
+    logTerakhir: dinasLog.dinonaktifkan(D_SEED),
   },
   // --- Seed lintas wilayah untuk demo fitur "Semua Wilayah" ---
   {
@@ -214,9 +262,21 @@ export const SEED: SumberRujukan[] = [
 ]
 
 // ---------------------------------------------------------------------------
+// Infer jenisMenunggu dari logTerakhir untuk data lama yang belum punya field ini
+// ---------------------------------------------------------------------------
+function resolveJenisMenunggu(item: Pick<SumberRujukan, "jenisMenunggu" | "logTerakhir" | "status" | "usulanDari">): "pengajuan" | "perbaikan" | "perbaikan_laporan" | "penonaktifan" | "pemulihan" | undefined {
+  if (item.status !== "menunggu") return undefined
+  if ((item.jenisMenunggu as string) === "dilaporan") return "perbaikan_laporan"
+  if ((item.jenisMenunggu as string) === "perbaikan" && item.usulanDari !== "sekolah") return "perbaikan_laporan"
+  if (item.jenisMenunggu) return item.jenisMenunggu
+  if (item.logTerakhir && /dilaporkan/i.test(item.logTerakhir)) return "perbaikan_laporan"
+  return "pengajuan"
+}
+
+// ---------------------------------------------------------------------------
 // Status badge (non-clickable)
 // ---------------------------------------------------------------------------
-function StatusBadge({ status }: { status: StatusRujukan }) {
+function StatusBadge({ status, jenisMenunggu, jenisButuhPerbaikan }: { status: StatusRujukan; jenisMenunggu?: "pengajuan" | "perbaikan" | "perbaikan_laporan" | "penonaktifan" | "pemulihan"; jenisButuhPerbaikan?: "ditolak" | "perbaikan" }) {
   if (status === "terverifikasi") {
     return (
       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
@@ -225,9 +285,37 @@ function StatusBadge({ status }: { status: StatusRujukan }) {
     )
   }
   if (status === "menunggu") {
+    if (jenisMenunggu === "perbaikan") {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">
+          <AlertCircle className="w-3 h-3" /> Perlu Diperiksa - Perbaikan
+        </span>
+      )
+    }
+    if (jenisMenunggu === "perbaikan_laporan") {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
+          <AlertCircle className="w-3 h-3" /> Perlu Diperiksa - Laporan Perbaikan
+        </span>
+      )
+    }
+    if (jenisMenunggu === "pemulihan") {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-teal-100 text-teal-700">
+          <RotateCcw className="w-3 h-3" /> Perlu Diperiksa - Pemulihan
+        </span>
+      )
+    }
+    if (jenisMenunggu === "penonaktifan") {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+          <XCircle className="w-3 h-3" /> Perlu Diperiksa - Penonaktifan
+        </span>
+      )
+    }
     return (
       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
-        Perlu Diperiksa
+        <Clock className="w-3 h-3" /> Perlu Diperiksa - Pengajuan
       </span>
     )
   }
@@ -238,9 +326,23 @@ function StatusBadge({ status }: { status: StatusRujukan }) {
       </span>
     )
   }
+  if (status === "butuh_perbaikan") {
+    if (jenisButuhPerbaikan === "perbaikan") {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
+          <Pencil className="w-3 h-3" /> Butuh Perbaikan
+        </span>
+      )
+    }
+    return (
+      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+        <XCircle className="w-3 h-3" /> Ditolak
+      </span>
+    )
+  }
   return (
-    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-600">
-      <XCircle className="w-3 h-3" /> Dihapus
+    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
+      <XCircle className="w-3 h-3" /> Nonaktif
     </span>
   )
 }
@@ -257,6 +359,10 @@ function DetailPanel({
   onEdit,
   onDelete,
   onRestore,
+  onNeedRevision,
+  onTolakPenonaktifan,
+  onTolakLaporan,
+  onTolakPemulihan,
 }: {
   item: SumberRujukan
   dinasNamaForLog: string
@@ -264,25 +370,57 @@ function DetailPanel({
   onVerify: (id: string) => void
   onUnverify: (id: string) => void
   onEdit: (id: string) => void
-  onDelete: (id: string) => void
+  onDelete: (id: string, catatan: string) => void
   onRestore: (id: string) => void
+  onNeedRevision: (id: string, catatan: string, jenis: "ditolak" | "perbaikan") => void
+  onTolakPenonaktifan: (id: string, catatan: string) => void
+  onTolakLaporan: (id: string, catatan: string) => void
+  onTolakPemulihan: (id: string, catatan: string) => void
 }) {
+  const resolvedJenis = resolveJenisMenunggu(item)
+  const [showRevisionModal, setShowRevisionModal] = useState(false)
+  const [revisionModalMode, setRevisionModalMode] = useState<"tolak" | "tolak_penonaktifan" | "tolak_laporan" | "tolak_pemulihan">("tolak")
+  const [revisionNotes, setRevisionNotes] = useState("")
+  const [showNonaktifModal, setShowNonaktifModal] = useState(false)
+  const [nonaktifNotes, setNonaktifNotes] = useState("")
   const kategoriCfg = KATEGORI_CONFIG[item.kategoriBentukDukungan]
   const penyediaCfg = item.kategoriPenyedia ? PENYEDIA_CONFIG[item.kategoriPenyedia] : null
   const alamat = [item.namaJalan, item.nomorJalan, item.kelurahan, item.kecamatan, item.kabupatenKota, item.provinsi, item.kodePos]
     .filter(Boolean).join(", ")
 
-return (
+  const handleSubmitRevision = () => {
+    if (revisionNotes.trim()) {
+      if (revisionModalMode === "tolak_penonaktifan") {
+        onTolakPenonaktifan(item.id, revisionNotes.trim())
+      } else if (revisionModalMode === "tolak_laporan") {
+        onTolakLaporan(item.id, revisionNotes.trim())
+      } else if (revisionModalMode === "tolak_pemulihan") {
+        onTolakPemulihan(item.id, revisionNotes.trim())
+      } else {
+        onNeedRevision(item.id, revisionNotes.trim(), "ditolak")
+      }
+      setShowRevisionModal(false)
+      setRevisionNotes("")
+    }
+  }
+
+  const handleSubmitNonaktif = () => {
+    onDelete(item.id, nonaktifNotes.trim())
+    setShowNonaktifModal(false)
+    setNonaktifNotes("")
+  }
+
+  return (
     <div className="fixed inset-0 z-40 bg-black/40" onClick={onClose}>
       <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white shadow-2xl flex flex-col" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className={`w-9 h-9 rounded-full ${kategoriCfg.bg} ${kategoriCfg.color} flex items-center justify-center flex-shrink-0`}>
+            <div className="w-9 h-9 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center flex-shrink-0">
               {kategoriCfg.icon}
             </div>
             <div>
               <h2 className="text-sm font-bold text-gray-900 leading-tight">{item.namaInstansi}</h2>
-              <StatusBadge status={item.status} />
+              <StatusBadge status={item.status} jenisMenunggu={resolveJenisMenunggu(item)} jenisButuhPerbaikan={item.jenisButuhPerbaikan} />
             </div>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-200 text-gray-500 transition">
@@ -294,14 +432,14 @@ return (
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-gray-50 rounded-lg p-3">
               <p className="text-xs text-gray-500 mb-1">Kategori Dukungan</p>
-              <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold ${kategoriCfg.bg} ${kategoriCfg.color}`}>
-                {kategoriCfg.icon} {kategoriCfg.label}
+              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                {kategoriCfg.label}
               </div>
             </div>
             <div className="bg-gray-50 rounded-lg p-3">
               <p className="text-xs text-gray-500 mb-1">Kategori Penyedia</p>
-              {penyediaCfg && item.kategoriPenyedia ? (
-                <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${penyediaCfg.bg} ${penyediaCfg.color}`}>
+              {item.kategoriPenyedia ? (
+                <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-600">
                   {item.kategoriPenyedia}
                 </span>
               ) : <span className="text-gray-400 text-xs">-</span>}
@@ -353,8 +491,213 @@ return (
               )}
             </div>
           </div>
+
+          {/* Action Buttons */}
+          <div className="border-t border-gray-200 pt-4 mt-4">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Aksi</p>
+            <div className="flex flex-col gap-2 w-full">
+              {item.status === "nonaktif" ? (
+                <button
+                  onClick={() => onRestore(item.id)}
+                  className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 transition w-full"
+                >
+                  <RotateCcw className="w-4 h-4" /> Pulihkan
+                </button>
+              ) : item.status === "butuh_perbaikan" ? (
+                <button
+                  onClick={() => onEdit(item.id)}
+                  className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 transition w-full"
+                >
+                  <Pencil className="w-4 h-4" /> Perbaiki Sumber Dukungan
+                </button>
+              ) : item.status === "menunggu" ? (
+                <>
+                  {resolvedJenis === "penonaktifan" ? (
+                    <>
+                      <button
+                        onClick={() => onDelete(item.id, "")}
+                        className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 transition w-full border border-green-200"
+                      >
+                        <CheckCircle className="w-4 h-4" /> Terima Penonaktifan
+                      </button>
+                      <button
+                        onClick={() => { setRevisionModalMode("tolak_penonaktifan"); setShowRevisionModal(true) }}
+                        className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 transition w-full border border-red-200"
+                      >
+                        <XCircle className="w-4 h-4" /> Tolak
+                      </button>
+                    </>
+                  ) : resolvedJenis === "perbaikan_laporan" ? (
+                    <>
+                      <button
+                        onClick={() => onNeedRevision(item.id, "", "ditolak")}
+                        className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 transition w-full border border-green-200"
+                      >
+                        <CheckCircle className="w-4 h-4" /> Terima Laporan
+                      </button>
+                      <button
+                        onClick={() => { setRevisionModalMode("tolak_laporan"); setShowRevisionModal(true) }}
+                        className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 transition w-full border border-red-200"
+                      >
+                        <XCircle className="w-4 h-4" /> Tolak
+                      </button>
+                    </>
+                  ) : resolvedJenis === "pemulihan" ? (
+                    <>
+                      <button
+                        onClick={() => onRestore(item.id)}
+                        className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-teal-700 bg-teal-50 hover:bg-teal-100 transition w-full border border-teal-200"
+                      >
+                        <CheckCircle className="w-4 h-4" /> Terima Pemulihan
+                      </button>
+                      <button
+                        onClick={() => { setRevisionModalMode("tolak_pemulihan"); setShowRevisionModal(true) }}
+                        className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 transition w-full border border-red-200"
+                      >
+                        <XCircle className="w-4 h-4" /> Tolak
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => onVerify(item.id)}
+                        className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 transition w-full border border-green-200"
+                      >
+                        <CheckCircle className="w-4 h-4" /> {resolvedJenis === "perbaikan" ? "Terima Perbaikan" : "Terima Pengajuan"}
+                      </button>
+                      <button
+                        onClick={() => { setRevisionModalMode("tolak"); setShowRevisionModal(true) }}
+                        className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 transition w-full border border-red-200"
+                      >
+                        <XCircle className="w-4 h-4" /> Tolak
+                      </button>
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => onEdit(item.id)}
+                    className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 transition w-full border border-blue-200"
+                  >
+                    <Pencil className="w-4 h-4" /> Edit
+                  </button>
+                  <button
+                    onClick={() => setShowNonaktifModal(true)}
+                    className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition w-full"
+                  >
+                    <Trash2 className="w-4 h-4" /> Nonaktifkan
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Revision Notes Modal */}
+      {showRevisionModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowRevisionModal(false)} />
+          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-200">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-red-100">
+                <XCircle className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-gray-900">
+                  {revisionModalMode === "tolak_penonaktifan" ? "Tolak Penonaktifan" : revisionModalMode === "tolak_laporan" ? "Tolak Laporan" : revisionModalMode === "tolak_pemulihan" ? "Tolak Pemulihan" : "Tolak"}
+                </h3>
+                <p className="text-xs text-gray-500">
+                  {revisionModalMode === "tolak_penonaktifan"
+                    ? "Tuliskan alasan penolakan usulan penonaktifan"
+                    : revisionModalMode === "tolak_laporan"
+                    ? "Tuliskan alasan penolakan laporan perbaikan"
+                    : revisionModalMode === "tolak_pemulihan"
+                    ? "Tuliskan alasan penolakan usulan pemulihan"
+                    : "Tuliskan alasan penolakan"}
+                </p>
+              </div>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Catatan untuk sekolah
+                </label>
+                <textarea
+                  value={revisionNotes}
+                  onChange={(e) => setRevisionNotes(e.target.value)}
+                  placeholder="Contoh: Mohon lengkapi alamat lengkap dan nomor call center..."
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+                  rows={4}
+                />
+              </div>
+            </div>
+            <div className="px-5 py-4 border-t border-gray-200 flex justify-end gap-2">
+              <button
+                onClick={() => { setShowRevisionModal(false); setRevisionNotes(""); setRevisionModalMode("tolak") }}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleSubmitRevision}
+                disabled={!revisionNotes.trim()}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white transition disabled:opacity-40 disabled:cursor-not-allowed bg-red-600 hover:bg-red-700"
+              >
+                {revisionModalMode === "tolak_penonaktifan" ? "Tolak Penonaktifan" : revisionModalMode === "tolak_laporan" ? "Tolak Laporan" : revisionModalMode === "tolak_pemulihan" ? "Tolak Pemulihan" : "Tolak"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Nonaktif Modal */}
+      {showNonaktifModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowNonaktifModal(false)} />
+          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-200">
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                <Trash2 className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-gray-900">Nonaktifkan Sumber Dukungan</h3>
+                <p className="text-xs text-gray-500">Tuliskan alasan mengapa dinonaktifkan</p>
+              </div>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Alasan nonaktif
+                </label>
+                <textarea
+                  value={nonaktifNotes}
+                  onChange={(e) => setNonaktifNotes(e.target.value)}
+                  placeholder="Contoh: Data tidak valid atau sudah tidak beroperasi..."
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 bg-white"
+                  rows={4}
+                />
+              </div>
+            </div>
+            <div className="px-5 py-4 border-t border-gray-200 flex justify-end gap-2">
+              <button
+                onClick={() => { setShowNonaktifModal(false); setNonaktifNotes("") }}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleSubmitNonaktif}
+                disabled={!nonaktifNotes.trim()}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Nonaktifkan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -402,7 +745,7 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
   useEffect(() => {
     const loadData = () => {
       try {
-        const raw = sessionStorage.getItem("rujukanList")
+        const raw = localStorage.getItem("rujukanList")
         let stored: Array<Partial<SumberRujukan> & { id: string }> = []
         if (raw != null && raw !== "") {
           const parsed = JSON.parse(raw) as unknown
@@ -467,7 +810,7 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
 
   const persistRujukanPatch = (id: string, patch: Partial<SumberRujukan> & { status?: StatusRujukan }) => {
     try {
-      const stored: Array<Record<string, unknown> & { id: string }> = JSON.parse(sessionStorage.getItem("rujukanList") ?? "[]")
+      const stored: Array<Record<string, unknown> & { id: string }> = JSON.parse(localStorage.getItem("rujukanList") ?? "[]")
       const idx = stored.findIndex((row) => row.id === id)
       if (idx >= 0) {
         stored[idx] = { ...stored[idx], ...patch, id }
@@ -475,7 +818,7 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
         const seed = SEED.find((s) => s.id === id)
         stored.push({ ...(seed ?? { id }), ...patch, id } as Record<string, unknown> & { id: string })
       }
-      sessionStorage.setItem("rujukanList", JSON.stringify(stored))
+      localStorage.setItem("rujukanList", JSON.stringify(stored))
       window.dispatchEvent(new CustomEvent("rujukanUpdated"))
     } catch { /* ignore */ }
   }
@@ -483,9 +826,9 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
   const handleVerify = (id: string) => {
     const isPusat = readAuthSession()?.role === "pusat"
     const log = isPusat ? RUJUKAN_LOG.diverifikasiPusat : dinasLog.diverifikasi(dinasNamaLog)
-    persistRujukanPatch(id, { status: "terverifikasi", logTerakhir: log })
+    persistRujukanPatch(id, { status: "terverifikasi", logTerakhir: log, jenisMenunggu: undefined })
     setList((prev) => prev.map((i) =>
-      i.id === id ? { ...i, status: "terverifikasi" as StatusRujukan, logTerakhir: log } : i
+      i.id === id ? { ...i, status: "terverifikasi" as StatusRujukan, logTerakhir: log, jenisMenunggu: undefined } : i
     ))
   }
 
@@ -498,12 +841,12 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
     ))
   }
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id: string, catatan: string) => {
     const isPusat = readAuthSession()?.role === "pusat"
-    const log = isPusat ? RUJUKAN_LOG.dihapusPusat : dinasLog.dihapus(dinasNamaLog)
-    persistRujukanPatch(id, { status: "dihapus", logTerakhir: log })
+    const log = isPusat ? RUJUKAN_LOG.dinonaktifkanPusat : dinasLog.dinonaktifkan(dinasNamaLog)
+    persistRujukanPatch(id, { status: "nonaktif", logTerakhir: log, catatanPerbaikan: catatan })
     setList((prev) => prev.map((i) =>
-      i.id === id ? { ...i, status: "dihapus" as StatusRujukan, logTerakhir: log } : i
+      i.id === id ? { ...i, status: "nonaktif" as StatusRujukan, logTerakhir: log, catatanPerbaikan: catatan } : i
     ))
   }
 
@@ -516,6 +859,50 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
     persistRujukanPatch(id, { status: nextStatus, logTerakhir })
     setList((prev) => prev.map((i) =>
       i.id === id ? { ...i, status: nextStatus, logTerakhir } : i
+    ))
+  }
+
+  const handleNeedRevision = (id: string, catatan: string, jenis: "ditolak" | "perbaikan" = "ditolak") => {
+    const isPusat = readAuthSession()?.role === "pusat"
+    const log = jenis === "perbaikan"
+      ? (isPusat ? "Butuh perbaikan oleh Admin Pusat" : `Butuh perbaikan oleh Admin ${dinasNamaLog}`)
+      : (isPusat ? "Ditolak oleh Admin Pusat" : dinasLog.butuhPerbaikan(dinasNamaLog))
+    persistRujukanPatch(id, {
+      status: "butuh_perbaikan" as StatusRujukan,
+      logTerakhir: log,
+      catatanPerbaikan: catatan,
+      jenisButuhPerbaikan: jenis,
+      jenisMenunggu: undefined,
+    })
+    setList((prev) => prev.map((i) =>
+      i.id === id ? { ...i, status: "butuh_perbaikan" as StatusRujukan, logTerakhir: log, catatanPerbaikan: catatan, jenisButuhPerbaikan: jenis, jenisMenunggu: undefined } : i
+    ))
+  }
+
+  const handleTolakPenonaktifan = (id: string, catatan: string) => {
+    const isPusat = readAuthSession()?.role === "pusat"
+    const log = `Usulan penonaktifan ditolak oleh Admin ${isPusat ? "Pusat" : dinasNamaLog}`
+    persistRujukanPatch(id, { status: "terverifikasi", logTerakhir: log, catatanPerbaikan: catatan, jenisMenunggu: undefined })
+    setList((prev) => prev.map((i) =>
+      i.id === id ? { ...i, status: "terverifikasi" as StatusRujukan, logTerakhir: log, catatanPerbaikan: catatan, jenisMenunggu: undefined } : i
+    ))
+  }
+
+  const handleTolakLaporan = (id: string, catatan: string) => {
+    const isPusat = readAuthSession()?.role === "pusat"
+    const log = `Laporan perbaikan ditolak oleh Admin ${isPusat ? "Pusat" : dinasNamaLog}`
+    persistRujukanPatch(id, { status: "terverifikasi", logTerakhir: log, catatanPerbaikan: catatan, jenisMenunggu: undefined })
+    setList((prev) => prev.map((i) =>
+      i.id === id ? { ...i, status: "terverifikasi" as StatusRujukan, logTerakhir: log, catatanPerbaikan: catatan, jenisMenunggu: undefined } : i
+    ))
+  }
+
+  const handleTolakPemulihan = (id: string, catatan: string) => {
+    const isPusat = readAuthSession()?.role === "pusat"
+    const log = `Usulan pemulihan ditolak oleh Admin ${isPusat ? "Pusat" : dinasNamaLog}`
+    persistRujukanPatch(id, { status: "nonaktif", logTerakhir: log, catatanPerbaikan: catatan, jenisMenunggu: undefined })
+    setList((prev) => prev.map((i) =>
+      i.id === id ? { ...i, status: "nonaktif" as StatusRujukan, logTerakhir: log, catatanPerbaikan: catatan, jenisMenunggu: undefined } : i
     ))
   }
 
@@ -547,8 +934,8 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
     const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
-    const scopeLabel = filterProvinsi !== "semua" || filterKabupaten !== "semua"
-      ? [filterKabupaten !== "semua" ? filterKabupaten : null, filterProvinsi !== "semua" ? filterProvinsi : null].filter(Boolean).join("-").replace(/\s+/g, "-")
+    const scopeLabel = filterWilayah
+      ? [filterWilayah.kabupaten || null, filterWilayah.province].filter(Boolean).join("-").replace(/\s+/g, "-")
       : "Semua"
     a.href = url
     a.download = `Sumber-Dukungan-${scopeLabel}-${new Date().toISOString().slice(0, 10)}.csv`
@@ -739,8 +1126,8 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
 
         if (validItems.length > 0) {
           try {
-            const stored = JSON.parse(sessionStorage.getItem("rujukanList") ?? "[]") as Array<Record<string, unknown>>
-            sessionStorage.setItem("rujukanList", JSON.stringify([...stored, ...validItems]))
+            const stored = JSON.parse(localStorage.getItem("rujukanList") ?? "[]") as Array<Record<string, unknown>>
+            localStorage.setItem("rujukanList", JSON.stringify([...stored, ...validItems]))
             window.dispatchEvent(new CustomEvent("rujukanUpdated"))
           } catch { /* ignore */ }
         }
@@ -858,7 +1245,7 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {statKeys.map((key) => {
           const cfg = KATEGORI_CONFIG[key]
-          const count = filtered.filter((i) => i.kategoriBentukDukungan === key && i.status !== "dihapus").length
+          const count = filtered.filter((i) => i.kategoriBentukDukungan === key && i.status !== "nonaktif").length
           return (
             <div key={key} className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm flex items-center gap-3">
               <div className={`w-9 h-9 rounded-full ${cfg.bg} ${cfg.color} flex items-center justify-center flex-shrink-0`}>
@@ -906,7 +1293,8 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
             <SelectItem value="terverifikasi">Terverifikasi</SelectItem>
             <SelectItem value="menunggu">Perlu Diperiksa</SelectItem>
             <SelectItem value="menunggu_review">Menunggu Review</SelectItem>
-            <SelectItem value="dihapus">Dihapus</SelectItem>
+            <SelectItem value="butuh_perbaikan">Ditolak</SelectItem>
+            <SelectItem value="nonaktif">Nonaktif</SelectItem>
           </SelectContent>
         </Select>
         <Select value={filterPenyedia} onValueChange={(v) => setFilterPenyedia(v as KategoriPenyedia | "semua")}>
@@ -950,8 +1338,6 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
                 <tr className="bg-gray-50 border-b border-gray-200 text-left">
                   <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Nama Instansi</th>
                   <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Wilayah</th>
-                  <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Kategori Dukungan</th>
-                  <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Penyedia</th>
                   <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Log Terakhir</th>
                   <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
                   <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide text-right">Aksi</th>
@@ -962,42 +1348,34 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
                   const kategoriCfg = KATEGORI_CONFIG[item.kategoriBentukDukungan]
                   const penyediaCfg = item.kategoriPenyedia ? PENYEDIA_CONFIG[item.kategoriPenyedia] : null
                   return (
-                    <tr key={item.id} className={`hover:bg-gray-50 transition-colors ${item.status === "dihapus" ? "opacity-50" : ""}`}>
+                    <tr key={item.id} className={`hover:bg-gray-50 transition-colors ${item.status === "nonaktif" ? "opacity-50" : ""}`}>
                       <td className="px-4 py-3.5">
-                        <div className="flex items-start gap-2">
-                          <div>
-                            <p className="font-semibold text-gray-900 whitespace-nowrap">{item.namaInstansi}</p>
-                            {item.website && (
-                              <a href={item.website} target="_blank" rel="noopener noreferrer"
-                                className="flex items-center gap-1 text-xs text-blue-600 hover:underline mt-0.5">
-                                <Globe className="w-3 h-3" /> Website
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <p className="text-sm font-medium text-gray-800">{item.kabupatenKota}</p>
-                        <p className="text-xs text-gray-400">{item.provinsi}</p>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${kategoriCfg.bg} ${kategoriCfg.color}`}>
-                          {kategoriCfg.icon}
-                          <span className="whitespace-nowrap">{kategoriCfg.label}</span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        {penyediaCfg && item.kategoriPenyedia ? (
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${penyediaCfg.bg} ${penyediaCfg.color}`}>
-                            {item.kategoriPenyedia}
+                        <p className="font-semibold text-gray-900 whitespace-nowrap">{item.namaInstansi}</p>
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 whitespace-nowrap">
+                            {kategoriCfg.label}
                           </span>
-                        ) : <span className="text-gray-400 text-xs">-</span>}
+                          {item.kategoriPenyedia && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-600 whitespace-nowrap">
+                              {item.kategoriPenyedia}
+                            </span>
+                          )}
+                          {item.website && (
+                            <a href={item.website} target="_blank" rel="noopener noreferrer"
+                              className="flex items-center gap-1 text-xs text-blue-600 hover:underline whitespace-nowrap">
+                              <Globe className="w-3 h-3" /> Website
+                            </a>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <p className="text-sm text-gray-800 whitespace-nowrap">{getWilayahType(item.kabupatenKota)} {item.kabupatenKota}</p>
                       </td>
                       <td className="px-4 py-3.5">
                         <p className="text-xs text-gray-600 max-w-[220px] leading-relaxed">{formatLogTerakhirDisplay(item, dinasNamaLog)}</p>
                       </td>
                       <td className="px-4 py-3.5">
-                        <StatusBadge status={item.status} />
+                        <StatusBadge status={item.status} jenisMenunggu={resolveJenisMenunggu(item)} jenisButuhPerbaikan={item.jenisButuhPerbaikan} />
                       </td>
                       <td className="px-4 py-3.5 text-right">
                         <a
@@ -1087,6 +1465,10 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
           onEdit={handleEdit}
           onDelete={handleDelete}
           onRestore={handleRestore}
+          onNeedRevision={handleNeedRevision}
+          onTolakPenonaktifan={handleTolakPenonaktifan}
+          onTolakLaporan={handleTolakLaporan}
+          onTolakPemulihan={handleTolakPemulihan}
         />
       )}
 
