@@ -1,8 +1,9 @@
 "use client"
 
 import React, { useState, useMemo } from "react"
-import { Search, Globe, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, X, ChevronDown, MapPin } from "lucide-react"
+import { Search, Globe, ChevronLeft, ChevronRight, X, ChevronDown, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import {
   KATEGORI_CONFIG,
   PENYEDIA_CONFIG,
@@ -12,7 +13,7 @@ import {
   type KategoriPenyedia,
 } from "@/components/dashboard/SumberRujukanView"
 
-const PAGE_SIZE = 10
+const PAGE_SIZE = 20
 
 const VERIFIED_DATA: SumberRujukan[] = SEED.filter((i) => i.status === "terverifikasi")
 
@@ -44,6 +45,7 @@ type SumberDukunganContentProps = {
 export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukunganContentProps) {
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(20)
   const [filterKategori, setFilterKategori] = useState<KategoriDukungan | "semua">("semua")
   const [filterPenyedia, setFilterPenyedia] = useState<KategoriPenyedia | "semua">("semua")
   const [filterWilayah, setFilterWilayah] = useState<FilterWilayah>(null)
@@ -70,10 +72,10 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
     })
   }, [search, filterKategori, filterPenyedia, filterWilayah])
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
   const safePage = Math.min(page, totalPages)
-  const startIndex = (safePage - 1) * PAGE_SIZE
-  const paged = filtered.slice(startIndex, startIndex + PAGE_SIZE)
+  const startIndex = (safePage - 1) * pageSize
+  const paged = filtered.slice(startIndex, startIndex + pageSize)
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value)
@@ -227,46 +229,63 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
                 </div>
 
                 {/* Pagination */}
-                <div className="px-5 py-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-                  <p className="text-slate-400 text-xs">
+                <div className="px-5 py-4 border-t border-slate-100 flex items-center justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                  <p className="text-slate-400 text-sm">
                     Menampilkan {startIndex + 1}–{Math.min(startIndex + PAGE_SIZE, filtered.length)} dari {filtered.length}
                   </p>
                   <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => setPage(1)}
-                      disabled={safePage === 1}
-                      className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
-                      title="Halaman pertama"
+                    <select
+                      value={pageSize}
+                      onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1) }}
+                      className="px-1 py-0.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent"
                     >
-                      <ChevronsLeft className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      disabled={safePage === 1}
-                      className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
-                      title="Halaman sebelumnya"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </button>
-                    <span className="px-3 text-sm text-gray-600">{safePage} / {totalPages}</span>
-                    <button
-                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                      disabled={safePage === totalPages}
-                      className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
-                      title="Halaman berikutnya"
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => setPage(totalPages)}
-                      disabled={safePage === totalPages}
-                      className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
-                      title="Halaman terakhir"
-                    >
-                      <ChevronsRight className="w-4 h-4" />
-                    </button>
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                      <option value={50}>50</option>
+                    </select>
+                    <span className="text-slate-400 text-sm">baris/halaman</span>
                   </div>
                 </div>
+                <div className="flex items-center gap-1.5">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={safePage === 1}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    className="h-8 px-3 text-xs border-slate-200"
+                  >
+                    Sebelumnya
+                  </Button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter((p) => Math.abs(p - safePage) <= 2)
+                    .map((p) => (
+                      <Button
+                        key={p}
+                        variant={p === safePage ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setPage(p)}
+                        className={cn(
+                          "h-8 w-8 p-0 text-xs",
+                          p === safePage
+                            ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
+                            : "border-slate-200"
+                        )}
+                      >
+                        {p}
+                      </Button>
+                    ))}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={safePage === totalPages}
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    className="h-8 px-3 text-xs border-slate-200"
+                  >
+                    Berikutnya
+                  </Button>
+                </div>
+              </div>
               </>
             )}
           </div>
@@ -283,14 +302,9 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
                 <p className="text-xs text-slate-500 mb-0.5">Sumber Dukungan</p>
                 <h3 className="text-base font-bold text-slate-900">{selectedItem.namaInstansi}</h3>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  Terverifikasi
-                </span>
-                <button onClick={() => setSelectedItem(null)} className="p-1 hover:bg-slate-100 rounded-lg">
-                  <X className="w-5 h-5 text-slate-500" />
-                </button>
-              </div>
+              <button onClick={() => setSelectedItem(null)} className="p-1 hover:bg-slate-100 rounded-lg">
+                <X className="w-5 h-5 text-slate-500" />
+              </button>
             </div>
 
             <div className="flex-1 overflow-y-auto divide-y divide-slate-100 px-6 py-5">
