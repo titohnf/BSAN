@@ -18,12 +18,12 @@ type AuthPayload = {
 export function SekolahDashboard() {
   const router = useRouter()
   const [menu, setMenu] = useState<SekolahMenu>("sumber-rujukan")
-  const [wilayah, setWilayah] = useState("Banda Aceh")
+  const [wilayah, setWilayah] = useState("Aceh - Banda Aceh")
   const [displayName, setDisplayName] = useState("Admin Sekolah")
 
   useEffect(() => {
     try {
-      const raw = sessionStorage.getItem("auth")
+      const raw = localStorage.getItem("auth")
       if (!raw) return
       const parsed = JSON.parse(raw) as AuthPayload
       if (parsed.wilayah) setWilayah(parsed.wilayah)

@@ -2,7 +2,8 @@
 
 import { BookOpenCheck, CalendarCheck, GraduationCap, LogOut, Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { readAuthSession } from "@/lib/auth-session"
 
 export type SekolahMenu = "sumber-rujukan" | "kegiatan"
 
@@ -19,6 +20,12 @@ const navItems: { id: SekolahMenu; label: string; icon: typeof BookOpenCheck }[]
 
 export function SekolahSidebar({ activeMenu, onMenuChange, onLogout }: SekolahSidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [namaSekolah, setNamaSekolah] = useState<string | null>(null)
+
+  useEffect(() => {
+    const session = readAuthSession()
+    if (session?.namaSekolah) setNamaSekolah(session.namaSekolah)
+  }, [])
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
@@ -27,8 +34,10 @@ export function SekolahSidebar({ activeMenu, onMenuChange, onLogout }: SekolahSi
           <GraduationCap className="w-5 h-5 text-white" />
         </div>
         <div className="min-w-0">
-          <p className="text-white font-semibold text-sm leading-tight truncate">Admin Sekolah</p>
-          <p className="text-emerald-200 text-xs leading-tight truncate">Sumber Dukungan Wilayah</p>
+          <p className="text-white font-semibold text-sm leading-tight truncate">Admin Sekolah BSAN</p>
+          {namaSekolah && (
+            <p className="text-emerald-200 text-xs leading-tight truncate">{namaSekolah}</p>
+          )}
         </div>
       </div>
 
@@ -80,7 +89,7 @@ export function SekolahSidebar({ activeMenu, onMenuChange, onLogout }: SekolahSi
       <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-emerald-900 flex items-center justify-between px-4 py-3 shadow">
         <div className="flex items-center gap-2">
           <GraduationCap className="w-5 h-5 text-white" />
-          <p className="text-white font-semibold text-sm">Admin Sekolah</p>
+          <p className="text-white font-semibold text-sm">Admin Sekolah BSAN</p>
         </div>
         <button
           type="button"

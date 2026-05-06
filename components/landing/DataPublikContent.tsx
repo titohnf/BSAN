@@ -195,7 +195,7 @@ export function DataPublikContent({ showBackButton = false, heroTitle, heroSubti
   const [page, setPage] = useState(1)
   const [showWilayahModal, setShowWilayahModal] = useState(false)
   const [selectedRow, setSelectedRow] = useState<ProvinsiRow | null>(null)
-  const [statusFilter, setStatusFilter] = useState<ProvinsiRow["statusPokja"] | "Semua">("Semua")
+  const [statusFilter, setStatusFilter] = useState<ProvinsiRow["statusPokja"] | "Semua">("Aktif")
   // "all" | "provinsi_only" | exact r.provinsi value
   const [wilayahFilter, setWilayahFilter] = useState<string>("all")
   // modal-internal state
@@ -203,6 +203,23 @@ export function DataPublikContent({ showBackButton = false, heroTitle, heroSubti
   const [modalBrowseProvince, setModalBrowseProvince] = useState<string | null>(null)
 
   const PROVINSI_ONLY = useMemo(() => PROVINSI_DATA.filter(r => !r.provinsi.includes(" - ")), [])
+
+  const provinceOnlyStats = useMemo(() => {
+    const onlyProvinces = PROVINSI_ONLY
+    const aktif = onlyProvinces.filter(p => p.statusPokja === "Aktif")
+    const belum = onlyProvinces.filter(p => p.statusPokja === "Belum Dibentuk")
+    const percentage = onlyProvinces.length > 0 
+      ? Math.round((aktif.length / onlyProvinces.length) * 100) 
+      : 0
+    return {
+      total: onlyProvinces.length,
+      aktifCount: aktif.length,
+      belumCount: belum.length,
+      percentage,
+      aktifList: aktif,
+      belumList: belum,
+    }
+  }, [PROVINSI_ONLY])
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase()
@@ -302,6 +319,75 @@ export function DataPublikContent({ showBackButton = false, heroTitle, heroSubti
           </div>
         </div>
 
+        {wilayahFilter === "provinsi_only" && (
+          <div className="max-w-6xl mx-auto px-4 pb-8">
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-8">
+              <div className="px-6 py-5 border-b border-slate-100">
+                <h3 className="text-lg font-bold text-slate-900">Ringkasan Tingkat Provinsi</h3>
+                <p className="text-sm text-slate-500 mt-1">Statistik pembentukan kelompok kerja BSAN tingkat provinsi</p>
+              </div>
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="text-center">
+                    <p className="text-4xl font-bold text-blue-600">{provinceOnlyStats.percentage}%</p>
+                    <p className="text-sm text-slate-500 mt-1">Provinsi Terbentuk</p>
+                  </div>
+                  <div className="h-16 w-px bg-slate-200" />
+                  <div className="text-center">
+                    <p className="text-4xl font-bold text-emerald-600">{provinceOnlyStats.aktifCount}</p>
+                    <p className="text-sm text-slate-500 mt-1">Sudah Terbentuk</p>
+                  </div>
+                  <div className="h-16 w-px bg-slate-200" />
+                  <div className="text-center">
+                    <p className="text-4xl font-bold text-slate-400">{provinceOnlyStats.belumCount}</p>
+                    <p className="text-sm text-slate-500 mt-1">Belum Terbentuk</p>
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                      <p className="text-sm font-semibold text-slate-700">Provinsi Sudah Terbentuk ({provinceOnlyStats.aktifCount})</p>
+                    </div>
+                    <div className="bg-emerald-50 rounded-lg p-3 max-h-48 overflow-y-auto">
+                      {provinceOnlyStats.aktifList.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                          {provinceOnlyStats.aktifList.map((p) => (
+                            <span key={p.no} className="inline-flex items-center px-2.5 py-1 rounded-full bg-white border border-emerald-200 text-xs font-medium text-emerald-700">
+                              {p.provinsi}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-slate-500">Belum ada provinsi terbentuk</p>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-2 h-2 rounded-full bg-slate-400" />
+                      <p className="text-sm font-semibold text-slate-700">Provinsi Belum Terbentuk ({provinceOnlyStats.belumCount})</p>
+                    </div>
+                    <div className="bg-slate-50 rounded-lg p-3 max-h-48 overflow-y-auto">
+                      {provinceOnlyStats.belumList.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                          {provinceOnlyStats.belumList.map((p) => (
+                            <span key={p.no} className="inline-flex items-center px-2.5 py-1 rounded-full bg-white border border-slate-200 text-xs font-medium text-slate-600">
+                              {p.provinsi}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-slate-500">Semua provinsi sudah terbentuk</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="max-w-6xl mx-auto px-4 pb-0 mb-16">
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-16">
               <div className="px-5 py-4 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -324,8 +410,6 @@ export function DataPublikContent({ showBackButton = false, heroTitle, heroSubti
                 >
                   <option value="Semua">Semua Status</option>
                   <option value="Aktif">Aktif</option>
-                  <option value="Perlu Diperiksa">Perlu Diperiksa</option>
-                  <option value="Perlu Perbaikan">Perlu Perbaikan</option>
                   <option value="Belum Dibentuk">Belum Dibentuk</option>
                 </select>
                 <div className="relative flex-1 sm:flex-none sm:w-56">
@@ -354,8 +438,8 @@ export function DataPublikContent({ showBackButton = false, heroTitle, heroSubti
               <TableHeader>
                 <TableRow className="bg-slate-50/70 hover:bg-slate-50/70">
                   <TableHead className="w-12 text-slate-500 text-xs font-semibold uppercase tracking-wide pl-5">No</TableHead>
-                  <TableHead className="w-52 text-slate-500 text-xs font-semibold uppercase tracking-wide">Wilayah</TableHead>
-                  <TableHead className="w-40 text-slate-500 text-xs font-semibold uppercase tracking-wide">Provinsi</TableHead>
+<TableHead className="w-64 text-slate-500 text-xs font-semibold uppercase tracking-wide">Wilayah</TableHead>
+                      <TableHead className="w-56 text-slate-500 text-xs font-semibold uppercase tracking-wide">Provinsi</TableHead>
                   <TableHead className="text-slate-500 text-xs font-semibold uppercase tracking-wide">Dukungan Bidang Tersedia</TableHead>
                   <TableHead className="w-40 text-slate-500 text-xs font-semibold uppercase tracking-wide">Status</TableHead>
                   <TableHead className="w-28" />
@@ -371,14 +455,14 @@ export function DataPublikContent({ showBackButton = false, heroTitle, heroSubti
                           {row.provinsi.includes(" - ") ? `Kota ${row.provinsi.split(" - ")[1]}` : `Provinsi ${row.provinsi}`}
                         </TableCell>
                         <TableCell className="text-slate-600">
-                          {row.provinsi.includes(" - ") ? row.provinsi.split(" - ")[0] : "-"}
+                          {row.provinsi.includes(" - ") ? row.provinsi.split(" - ")[0] : row.provinsi}
                         </TableCell>
                         <TableCell>
                           {(() => {
                             const bidangs = getBidangList(row)
                             if (bidangs.length === 0) return <span className="text-slate-400">-</span>
-                            const visible = bidangs.slice(0, 3)
-                            const hidden = bidangs.slice(3)
+                            const visible = bidangs.slice(0, 2)
+                            const hidden = bidangs.slice(2)
                             return (
                               <div className="flex flex-wrap gap-1">
                                 {visible.map((b) => (

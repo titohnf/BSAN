@@ -1,9 +1,10 @@
 "use client"
 import { LayoutDashboard, Users, LogOut, GraduationCap, Menu, X, BookOpenCheck, CalendarDays } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { clearAuthAndRedirectToLogin } from "@/lib/logout"
+import { readAuthSession } from "@/lib/auth-session"
 
 type ActiveMenu = "dashboard" | "data-pokja" | "sumber-rujukan" | "kegiatan"
 
@@ -38,7 +39,16 @@ const navItems = [
 export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [namaDinas, setNamaDinas] = useState<string | null>(null)
   const logout = () => clearAuthAndRedirectToLogin(router)
+
+  useEffect(() => {
+    const session = readAuthSession()
+    if (session?.namaDinas) {
+      const stripped = session.namaDinas.replace(/^dinas\s+pendidikan\s+/i, "").trim()
+      setNamaDinas(stripped || session.namaDinas)
+    }
+  }, [])
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
@@ -49,7 +59,9 @@ export function Sidebar({ activeMenu, onMenuChange }: SidebarProps) {
         </div>
         <div className="min-w-0">
           <p className="text-white font-semibold text-sm leading-tight truncate">Dinas Pendidikan</p>
-          <p className="text-blue-200 text-xs leading-tight truncate">Kelompok Kerja Budaya Sekolah</p>
+          {namaDinas && (
+            <p className="text-blue-200 text-xs leading-tight truncate">{namaDinas}</p>
+          )}
         </div>
       </div>
 

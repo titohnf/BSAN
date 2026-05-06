@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import {
   ArrowLeft, Wand2, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight,
-  User, Upload, X, AlertCircle, Phone, Building2, Download, Eye, FileText, Plus,
+  User, Upload, X, AlertCircle, Phone, Building2, Download, Eye, FileText, Plus, Trash2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
@@ -24,12 +24,20 @@ function formatDateForDraftName(date: Date): string {
 // ---------------------------------------------------------------------------
 const REGION = "Provinsi Aceh"
 
-const STEPS = [
-  { number: 1, label: "Informasi Dasar" },
-  { number: 2, label: "Susunan Pengurus" },
-  { number: 3, label: "Dokumen SK" },
-  { number: 4, label: "Tinjau Data" },
-]
+const FLOW_STEPS: 3 | 4 = 3
+
+const STEPS = FLOW_STEPS === 3
+  ? [
+      { number: 1, label: "Informasi & Dokumen SK" },
+      { number: 2, label: "Susunan Pengurus" },
+      { number: 3, label: "Tinjau Data" },
+    ]
+  : [
+      { number: 1, label: "Informasi Dasar" },
+      { number: 2, label: "Susunan Pengurus" },
+      { number: 3, label: "Dokumen SK" },
+      { number: 4, label: "Tinjau Data" },
+    ]
 
 // ---------------------------------------------------------------------------
 // Dummy data generator
@@ -61,10 +69,10 @@ const DUMMY_SK = {
 // Sub-components
 // ---------------------------------------------------------------------------
 function InputField({
-  label, required = false, type = "text", placeholder, value, onChange,
+  label, required = false, type = "text", placeholder, value, onChange, hasError = false,
 }: {
   label: string; required?: boolean; type?: string; placeholder?: string
-  value: string; onChange: (v: string) => void
+  value: string; onChange: (v: string) => void; hasError?: boolean
 }) {
   return (
     <div className="flex flex-col gap-1.5">
@@ -76,22 +84,26 @@ function InputField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+        className={cn(
+          "h-9 px-3 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition",
+          hasError ? "border-red-400 bg-red-50" : "border-gray-300"
+        )}
       />
     </div>
   )
 }
 
-function MemberSection({ label, value, onChange, isCollapsed, onToggleCollapse }: {
+function MemberSection({ label, value, onChange, isCollapsed, onToggleCollapse, showErrors = false }: {
   label: string; value: MemberField
   onChange: (field: keyof MemberField, val: string) => void
   isCollapsed?: boolean
   onToggleCollapse?: () => void
+  showErrors?: boolean
 }) {
-  const isComplete = !!(value.nama && value.email && value.noWhatsapp && value.jenisKelamin && value.instansi)
+  const hasErr = showErrors && !(value.nama && value.email && value.noWhatsapp && value.jenisKelamin && value.instansi)
   return (
-    <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-      <div 
+    <div className={cn("rounded-xl border bg-white overflow-hidden", hasErr ? "border-red-300" : "border-gray-200")}>
+      <div
         className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition"
         onClick={onToggleCollapse}
       >
@@ -100,28 +112,29 @@ function MemberSection({ label, value, onChange, isCollapsed, onToggleCollapse }
             <User className="w-3.5 h-3.5 text-blue-700" />
           </div>
           <span className="text-sm font-semibold text-gray-800">{label}</span>
+          {hasErr && isCollapsed && (
+            <span className="text-xs font-medium text-red-500">Ada field yang belum diisi</span>
+          )}
         </div>
         {onToggleCollapse && (
-          <div className="flex items-center gap-2">
-            <span className={cn("text-xs font-medium", isComplete ? "text-green-600" : "text-amber-600")}>
-              {isComplete ? "Seluruh kolom wajib diisi" : "Field wajib belum terisi"}
-            </span>
-            <div className="p-1 rounded-lg text-gray-400 hover:text-gray-600 transition">
-              {isCollapsed ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
-            </div>
+          <div className="p-1 rounded-lg text-gray-400 hover:text-gray-600 transition">
+            {isCollapsed ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
           </div>
         )}
       </div>
       {!isCollapsed && (
       <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <InputField label="Nama" required placeholder="Nama lengkap" value={value.nama} onChange={(v) => onChange("nama", v)} />
+        <InputField label="Nama" required placeholder="Nama lengkap" value={value.nama} onChange={(v) => onChange("nama", v)} hasError={showErrors && !value.nama} />
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-gray-600">Jenis Kelamin <span className="text-red-500">*</span></label>
           <div className="relative">
             <select
               value={value.jenisKelamin}
               onChange={(e) => onChange("jenisKelamin", e.target.value)}
-              className="w-full h-9 pl-3 pr-8 text-sm border border-gray-300 rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-gray-700"
+              className={cn(
+                "w-full h-9 pl-3 pr-8 text-sm border rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-gray-700",
+                showErrors && !value.jenisKelamin ? "border-red-400 bg-red-50" : "border-gray-300"
+              )}
             >
               <option value="" disabled>Pilih jenis kelamin</option>
               <option value="Laki-Laki">Laki-Laki</option>
@@ -130,9 +143,9 @@ function MemberSection({ label, value, onChange, isCollapsed, onToggleCollapse }
             <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
           </div>
         </div>
-        <InputField label="Instansi" required placeholder="Nama instansi" value={value.instansi} onChange={(v) => onChange("instansi", v)} />
+        <InputField label="Instansi" required placeholder="Nama instansi" value={value.instansi} onChange={(v) => onChange("instansi", v)} hasError={showErrors && !value.instansi} />
         <InputField label="Jabatan pada Instansi" placeholder="Contoh: Kepala Bidang, Staff, dll" value={value.jabatan ?? ""} onChange={(v) => onChange("jabatan", v)} />
-        <InputField label="Email" required type="email" placeholder="nama@dinas.go.id" value={value.email} onChange={(v) => onChange("email", v)} />
+        <InputField label="Email" required type="email" placeholder="nama@dinas.go.id" value={value.email} onChange={(v) => onChange("email", v)} hasError={showErrors && !value.email} />
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-gray-600">Nomor HP <span className="text-red-500">*</span></label>
           <div className="relative">
@@ -141,7 +154,10 @@ function MemberSection({ label, value, onChange, isCollapsed, onToggleCollapse }
               type="tel" inputMode="numeric" value={value.noWhatsapp}
               onChange={(e) => onChange("noWhatsapp", e.target.value.replace(/\D/g, ""))}
               placeholder="08xxxxxxxxxx"
-              className="w-full h-9 pl-9 pr-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              className={cn(
+                "w-full h-9 pl-9 pr-3 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition",
+                showErrors && !value.noWhatsapp ? "border-red-400 bg-red-50" : "border-gray-300"
+              )}
             />
           </div>
         </div>
@@ -152,17 +168,18 @@ function MemberSection({ label, value, onChange, isCollapsed, onToggleCollapse }
 }
 
 // MemberSection with disabled bidang field for mandatory members
-function MandatoryMemberSection({ label, value, onChange, bidangValue, isCollapsed, onToggleCollapse }: {
+function MandatoryMemberSection({ label, value, onChange, bidangValue, isCollapsed, onToggleCollapse, showErrors = false }: {
   label: string; value: MemberField
   onChange: (field: keyof MemberField, val: string) => void
   bidangValue: string
   isCollapsed?: boolean
   onToggleCollapse?: () => void
+  showErrors?: boolean
 }) {
-  const isComplete = !!(value.nama && value.email && value.noWhatsapp && value.jenisKelamin && value.instansi)
+  const hasErr = showErrors && !(value.nama && value.email && value.noWhatsapp && value.jenisKelamin && value.instansi)
   return (
-    <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-      <div 
+    <div className={cn("rounded-xl border bg-white overflow-hidden", hasErr ? "border-red-300" : "border-gray-200")}>
+      <div
         className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition"
         onClick={onToggleCollapse}
       >
@@ -171,28 +188,29 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue, isCollaps
             <User className="w-3.5 h-3.5 text-blue-700" />
           </div>
           <span className="text-sm font-semibold text-gray-800">{label}</span>
+          {hasErr && isCollapsed && (
+            <span className="text-xs font-medium text-red-500">Ada field yang belum diisi</span>
+          )}
         </div>
         {onToggleCollapse && (
-          <div className="flex items-center gap-2">
-            <span className={cn("text-xs font-medium", isComplete ? "text-green-600" : "text-amber-600")}>
-              {isComplete ? "Seluruh kolom wajib diisi" : "Field wajib belum terisi"}
-            </span>
-            <div className="p-1 rounded-lg text-gray-400 hover:text-gray-600 transition">
-              {isCollapsed ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
-            </div>
+          <div className="p-1 rounded-lg text-gray-400 hover:text-gray-600 transition">
+            {isCollapsed ? <ChevronDown className="w-4 h-4 rotate-180" /> : <ChevronDown className="w-4 h-4" />}
           </div>
         )}
       </div>
       {!isCollapsed && (
       <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <InputField label="Nama" required placeholder="Nama lengkap" value={value.nama} onChange={(v) => onChange("nama", v)} />
+        <InputField label="Nama" required placeholder="Nama lengkap" value={value.nama} onChange={(v) => onChange("nama", v)} hasError={showErrors && !value.nama} />
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-gray-600">Jenis Kelamin <span className="text-red-500">*</span></label>
           <div className="relative">
             <select
               value={value.jenisKelamin}
               onChange={(e) => onChange("jenisKelamin", e.target.value)}
-              className="w-full h-9 pl-3 pr-8 text-sm border border-gray-300 rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-gray-700"
+              className={cn(
+                "w-full h-9 pl-3 pr-8 text-sm border rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-gray-700",
+                showErrors && !value.jenisKelamin ? "border-red-400 bg-red-50" : "border-gray-300"
+              )}
             >
               <option value="" disabled>Pilih jenis kelamin</option>
               <option value="Laki-Laki">Laki-Laki</option>
@@ -201,9 +219,9 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue, isCollaps
             <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
           </div>
         </div>
-        <InputField label="Instansi" required placeholder="Nama instansi" value={value.instansi} onChange={(v) => onChange("instansi", v)} />
+        <InputField label="Instansi" required placeholder="Nama instansi" value={value.instansi} onChange={(v) => onChange("instansi", v)} hasError={showErrors && !value.instansi} />
         <InputField label="Jabatan pada Instansi" placeholder="Contoh: Kepala Bidang, Staff, dll" value={value.jabatan ?? ""} onChange={(v) => onChange("jabatan", v)} />
-        <InputField label="Email" required type="email" placeholder="nama@dinas.go.id" value={value.email} onChange={(v) => onChange("email", v)} />
+        <InputField label="Email" required type="email" placeholder="nama@dinas.go.id" value={value.email} onChange={(v) => onChange("email", v)} hasError={showErrors && !value.email} />
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-gray-600">Nomor HP <span className="text-red-500">*</span></label>
           <div className="relative">
@@ -212,7 +230,10 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue, isCollaps
               type="tel" inputMode="numeric" value={value.noWhatsapp}
               onChange={(e) => onChange("noWhatsapp", e.target.value.replace(/\D/g, ""))}
               placeholder="08xxxxxxxxxx"
-              className="w-full h-9 pl-9 pr-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              className={cn(
+                "w-full h-9 pl-9 pr-3 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition",
+                showErrors && !value.noWhatsapp ? "border-red-400 bg-red-50" : "border-gray-300"
+              )}
             />
           </div>
         </div>
@@ -494,6 +515,127 @@ function ReviewTable({ members, anggotaList, onEdit, onDelete, onResetMember }: 
   )
 }
 
+function ReviewAccordion({ members, anggotaList }: { members: Members; anggotaList: AnggotaItem[] }) {
+  const [openKeys, setOpenKeys] = useState<Set<string>>(new Set())
+  const toggle = (key: string) => setOpenKeys((prev) => {
+    const next = new Set(prev)
+    next.has(key) ? next.delete(key) : next.add(key)
+    return next
+  })
+
+  const MemberRow = ({ rowKey, label, m, purple = false }: { rowKey: string; label: string; m: MemberField; purple?: boolean }) => {
+    const isOpen = openKeys.has(rowKey)
+    return (
+      <div>
+        <button type="button" className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition text-left" onClick={() => toggle(rowKey)}>
+          <div className="flex items-center gap-3">
+            <div className={cn("w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0", purple ? "bg-purple-100" : "bg-blue-100")}>
+              <User className={cn("w-3 h-3", purple ? "text-purple-700" : "text-blue-700")} />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-gray-500">{label}</p>
+              <p className="text-sm font-medium text-gray-800">{m.nama || <span className="text-gray-400 italic">Belum diisi</span>}</p>
+            </div>
+          </div>
+          <ChevronDown className={cn("w-4 h-4 text-gray-400 flex-shrink-0 transition", isOpen && "rotate-180")} />
+        </button>
+        {isOpen && (
+          <div className="pl-[52px] pr-4 pb-4 pt-1 grid grid-cols-2 gap-3 bg-white">
+            <ReviewRow label="Jenis Kelamin" value={m.jenisKelamin} />
+            <ReviewRow label="Instansi" value={m.instansi} />
+            {m.jabatan && <ReviewRow label="Jabatan pada Instansi" value={m.jabatan} />}
+            <ReviewRow label="Email" value={m.email} />
+            <ReviewRow label="No. HP" value={m.noWhatsapp} />
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  const AnggotaRow = ({ a, rowKey, label }: { a: AnggotaItem; rowKey: string; label: string }) => {
+    const isOpen = openKeys.has(rowKey)
+    return (
+      <div>
+        <button type="button" className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition text-left" onClick={() => toggle(rowKey)}>
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+              <User className="w-3 h-3 text-purple-700" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-gray-500">{label}</p>
+              <p className="text-sm font-medium text-gray-800">{a.nama || <span className="text-gray-400 italic">Belum diisi</span>}</p>
+            </div>
+          </div>
+          <ChevronDown className={cn("w-4 h-4 text-gray-400 flex-shrink-0 transition", isOpen && "rotate-180")} />
+        </button>
+        {isOpen && (
+          <div className="pl-[52px] pr-4 pb-4 pt-1 grid grid-cols-2 gap-3 bg-white">
+            <ReviewRow label="Jenis Kelamin" value={a.jenisKelamin} />
+            <ReviewRow label="Instansi" value={a.instansi || ""} />
+            {a.jabatan && <ReviewRow label="Jabatan pada Instansi" value={a.jabatan} />}
+            <ReviewRow label="Email" value={a.email} />
+            <ReviewRow label="No. HP" value={a.noWhatsapp} />
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  const SectionHeader = ({ title }: { title: string }) => (
+    <div className="px-4 py-2 bg-gray-100 border-b border-gray-200">
+      <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest">{title}</p>
+    </div>
+  )
+
+  const SubHeader = ({ title }: { title: string }) => (
+    <div className="px-4 py-1.5 bg-gray-50 border-t border-b border-gray-100">
+      <p className="text-[11px] font-medium text-gray-400 uppercase tracking-widest">{title}</p>
+    </div>
+  )
+
+  const lainnyaAnggota = anggotaList.filter(a => !BIDANG_ROLES.some(r => r.label === a.bidang))
+  let counter = 0
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="rounded-xl border border-gray-200 overflow-hidden">
+        <SectionHeader title="Pimpinan" />
+        <div className="divide-y divide-gray-200">
+          {PIMPINAN_ROLES.map(r => <MemberRow key={r.key} rowKey={r.key} label={r.label} m={members[r.key]} />)}
+        </div>
+      </div>
+
+      {BIDANG_ROLES.map(r => {
+        const extras = anggotaList.filter(a => a.bidang === r.label)
+        return (
+          <div key={r.key} className="rounded-xl border border-gray-200 overflow-hidden">
+            <SectionHeader title={r.label} />
+            <div className="divide-y divide-gray-200">
+              <MemberRow rowKey={r.key} label="Koordinator Bidang" m={members[r.key]} />
+              {extras.map((a, bidangIdx) => {
+                counter++
+                return <AnggotaRow key={anggotaList.indexOf(a)} a={a} rowKey={`anggota-${anggotaList.indexOf(a)}`} label={`Anggota Bidang ${bidangIdx + 1}`} />
+              })}
+            </div>
+          </div>
+        )
+      })}
+
+      {lainnyaAnggota.length > 0 && (
+        <div className="rounded-xl border border-gray-200 overflow-hidden">
+          <SectionHeader title="Lainnya" />
+          <div className="divide-y divide-gray-200">
+            {lainnyaAnggota.map(a => {
+              counter++
+              return <AnggotaRow key={anggotaList.indexOf(a)} a={a} rowKey={`anggota-${anggotaList.indexOf(a)}`} label={`Anggota Lainnya ${counter} · ${a.bidang || "-"}`} />
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function FileUploadField({ value, onChange, error }: { value: File | null; onChange: (f: File | null) => void; error?: string }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const handleFile = (f: File) => {
@@ -635,13 +777,8 @@ export default function BuatPokjaPage() {
     }
   }
 
-  // Count complete members
-  const isMemberComplete = (m: MemberField) => !!(m.nama && m.email && m.noWhatsapp && m.jenisKelamin && m.instansi)
-  const isBidangSelected = (a: AnggotaItem) => !!a.bidang
-  const completeCount = PIMPINAN_ROLES.filter(r => isMemberComplete(members[r.key])).length
-    + ["pendidikan", "pppa", "sosial", "kesehatan", "dukbangga", "kominfo"].filter(k => isMemberComplete(members[k as keyof Members])).length
-    + anggotaList.filter(a => isBidangSelected(a) && isMemberComplete({ nama: a.nama, email: a.email, noWhatsapp: a.noWhatsapp, jenisKelamin: a.jenisKelamin as "Laki-Laki" | "Perempuan", instansi: a.instansi || "" })).length
-  const totalCount = 9 + anggotaList.length
+  const [step2Errors, setStep2Errors] = useState(false)
+  const isRoleComplete = (m: MemberField) => !!(m.nama && m.email && m.noWhatsapp && m.jenisKelamin && m.instansi)
 
   // Fungsi untuk navigasi ke Step 2 dengan target segmen tertentu
   const goToStep2WithSegment = (segment: string) => {
@@ -760,17 +897,45 @@ export default function BuatPokjaPage() {
   }
 
   const canGoNext = () => {
+    if (FLOW_STEPS === 3) {
+      if (step === 1) return kanalPengaduan.trim().length > 0 && skFile !== null && !!skDetail.nomorSK && !!skDetail.tanggalSK && !!skDetail.periodeMulai && !!skDetail.periodeSelesai
+      return true
+    }
     if (step === 1) return kanalPengaduan.trim().length > 0
-    if (step === 3) return skFile !== null && skDetail.nomorSK && skDetail.tanggalSK && skDetail.periodeMulai && skDetail.periodeSelesai
+    if (step === 3) return skFile !== null && !!skDetail.nomorSK && !!skDetail.tanggalSK && !!skDetail.periodeMulai && !!skDetail.periodeSelesai
     return true
   }
 
   const handleNext = () => {
-    if (step === 3 && !skFile) { setFileError("Dokumen SK wajib diunggah."); return }
+    if (FLOW_STEPS === 3) {
+      if (step === 1 && !skFile) { setFileError("Dokumen SK wajib diunggah."); return }
+    } else {
+      if (step === 3 && !skFile) { setFileError("Dokumen SK wajib diunggah."); return }
+    }
+
+    if (step === 2) {
+      const bidangKeys = ["pendidikan", "pppa", "sosial", "kesehatan", "dukbangga", "kominfo"] as const
+      const isAnggotaComplete = (a: AnggotaItem) => !!(a.bidang && a.nama && a.jenisKelamin && a.email && a.noWhatsapp && a.instansi)
+      const incompletePimpinan = PIMPINAN_ROLES.filter(r => !isRoleComplete(members[r.key])).map(r => r.key)
+      const incompleteBidang = bidangKeys.filter(k => !isRoleComplete(members[k]))
+      const incompleteAnggotaIdx = anggotaList.map((a, i) => i).filter(i => !isAnggotaComplete(anggotaList[i]))
+      if (incompletePimpinan.length > 0 || incompleteBidang.length > 0 || incompleteAnggotaIdx.length > 0) {
+        setStep2Errors(true)
+        if (incompletePimpinan.length > 0)
+          setCollapsedPimpinan(prev => { const s = new Set(prev); incompletePimpinan.forEach(k => s.delete(k)); return s })
+        if (incompleteBidang.length > 0)
+          setCollapsedBidang(prev => { const s = new Set(prev); incompleteBidang.forEach(k => s.delete(k)); return s })
+        if (incompleteAnggotaIdx.length > 0)
+          setCollapsedAnggota(prev => { const s = new Set(prev); incompleteAnggotaIdx.forEach(i => s.delete(i)); return s })
+        return
+      }
+      setStep2Errors(false)
+    }
+
     setFileError("")
-    setStep((s) => Math.min(s + 1, 4))
+    setStep((s) => Math.min(s + 1, FLOW_STEPS))
   }
-  const handleBack = () => setStep((s) => Math.max(s - 1, 1))
+  const handleBack = () => { setStep2Errors(false); setStep((s) => Math.max(s - 1, 1)) }
 
   const handleSubmit = () => {
     const payload: PokjaData = {
@@ -1003,18 +1168,13 @@ export default function BuatPokjaPage() {
               <h2 className="text-lg font-bold text-gray-900 mt-0.5">{STEPS[step - 1].label}</h2>
             </div>
             {step === 2 && (
-              <div className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-gray-600">
-                <span className={cn("font-semibold", completeCount === totalCount ? "text-green-600" : "text-amber-600")}>
-                  {completeCount}/{totalCount} pengurus lengkap
-                </span>
-                <ChevronDown className={cn("w-4 h-4 transition", collapseAllStep2 && "rotate-180")} />
-              </div>
+              <ChevronDown className={cn("w-4 h-4 text-gray-400 transition", collapseAllStep2 && "rotate-180")} />
             )}
           </div>
 
           <div className="px-6 py-6">
-            {/* ---- Step 1: Informasi Dasar ---- */}
-            {step === 1 && (
+            {/* ---- Step 1: Informasi Dasar (4-step) ---- */}
+            {FLOW_STEPS === 4 && step === 1 && (
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-semibold text-gray-600">Wilayah</label>
@@ -1044,6 +1204,70 @@ export default function BuatPokjaPage() {
               </div>
             )}
 
+            {/* ---- Step 1: Informasi Dasar + Dokumen SK (3-step) ---- */}
+            {FLOW_STEPS === 3 && step === 1 && (
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-gray-600">Wilayah</label>
+                  <div className="flex items-center gap-2 h-9 px-3 border border-gray-200 rounded-lg bg-gray-50">
+                    <Building2 className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                    <span className="text-sm text-gray-500">{REGION}</span>
+                  </div>
+                  <p className="text-xs text-gray-400">Wilayah tidak dapat diubah</p>
+                </div>
+
+                <hr className="border-gray-100" />
+
+                <div className="flex flex-col gap-5">
+                  <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Dokumen SK</p>
+                  <FileUploadField value={skFile} onChange={setSkFile} error={fileError} />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-gray-600">Nomor SK <span className="text-red-500">*</span></label>
+                      <input type="text" value={skDetail.nomorSK} onChange={(e) => setSkDetail((p) => ({ ...p, nomorSK: e.target.value }))}
+                        placeholder="Contoh: 421/001/SK/2025"
+                        className="h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-gray-600">Tanggal SK <span className="text-red-500">*</span></label>
+                      <input type="date" value={skDetail.tanggalSK} onChange={(e) => setSkDetail((p) => ({ ...p, tanggalSK: e.target.value }))}
+                        className="h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-gray-600">Tanggal Mulai <span className="text-red-500">*</span></label>
+                      <input type="date" value={skDetail.periodeMulai} onChange={(e) => setSkDetail((p) => ({ ...p, periodeMulai: e.target.value }))}
+                        className="h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-gray-600">Tanggal Selesai <span className="text-red-500">*</span></label>
+                      <input type="date" value={skDetail.periodeSelesai} onChange={(e) => setSkDetail((p) => ({ ...p, periodeSelesai: e.target.value }))}
+                        className="h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+                    </div>
+                  </div>
+                </div>
+
+                <hr className="border-gray-100" />
+
+                <div className="flex flex-col gap-2">
+                  <InputField
+                    label="Nomor Kanal Pengaduan dan Aspirasi"
+                    required
+                    placeholder="Contoh: 081234567890"
+                    value={kanalPengaduan}
+                    onChange={setKanalPengaduan}
+                  />
+                  <div className="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2.5 flex flex-col gap-1">
+                    <p className="text-xs font-semibold text-amber-900">Nomor di atas akan menjadi kontak utama Kelompok Kerja</p>
+                    <ul className="text-xs text-amber-800 space-y-0.5 list-disc list-inside">
+                      <li>Nomor akan dipublikasikan sebagai saluran pengaduan</li>
+                      <li>Gunakan nomor resmi atas nama institusi dan bukan nomor pribadi</li>
+                      <li>Pastikan nomor aktif dan dapat dihubungi masyarakat</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* ---- Step 2: Susunan Pengurus ---- */}
             {step === 2 && (
               <div className="flex flex-col gap-6">
@@ -1051,13 +1275,14 @@ export default function BuatPokjaPage() {
                 <div className="flex flex-col gap-4">
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Pimpinan</p>
                   {PIMPINAN_ROLES.map((r) => (
-                    <MemberSection 
-                      key={r.key} 
-                      label={r.label} 
-                      value={members[r.key]} 
+                    <MemberSection
+                      key={r.key}
+                      label={r.label}
+                      value={members[r.key]}
                       onChange={(f, v) => updateMember(r.key, f, v)}
                       isCollapsed={collapsedPimpinan.has(r.key)}
                       onToggleCollapse={() => toggleCollapsePimpinan(r.key)}
+                      showErrors={step2Errors}
                     />
                   ))}
                 </div>
@@ -1073,56 +1298,62 @@ export default function BuatPokjaPage() {
                     bidangValue="Bidang Pendidikan"
                     isCollapsed={collapsedBidang.has("pendidikan")}
                     onToggleCollapse={() => toggleCollapseBidang("pendidikan")}
+                    showErrors={step2Errors}
                   />
 
                   {/* Anggota Wajib 2: PPPA */}
-                  <MandatoryMemberSection 
-                    label="Anggota Wajib (Bidang PPPA)" 
-                    value={members.pppa} 
+                  <MandatoryMemberSection
+                    label="Anggota Wajib (Bidang PPPA)"
+                    value={members.pppa}
                     onChange={(f, v) => updateMember("pppa", f, v)}
                     bidangValue="Bidang PPPA"
                     isCollapsed={collapsedBidang.has("pppa")}
                     onToggleCollapse={() => toggleCollapseBidang("pppa")}
+                    showErrors={step2Errors}
                   />
 
                   {/* Anggota Wajib 3: Sosial */}
-                  <MandatoryMemberSection 
-                    label="Anggota Wajib (Bidang Sosial)" 
-                    value={members.sosial} 
+                  <MandatoryMemberSection
+                    label="Anggota Wajib (Bidang Sosial)"
+                    value={members.sosial}
                     onChange={(f, v) => updateMember("sosial", f, v)}
                     bidangValue="Bidang Sosial"
                     isCollapsed={collapsedBidang.has("sosial")}
                     onToggleCollapse={() => toggleCollapseBidang("sosial")}
+                    showErrors={step2Errors}
                   />
 
                   {/* Anggota Wajib 4: Kesehatan */}
-                  <MandatoryMemberSection 
-                    label="Anggota Wajib (Bidang Kesehatan)" 
-                    value={members.kesehatan} 
+                  <MandatoryMemberSection
+                    label="Anggota Wajib (Bidang Kesehatan)"
+                    value={members.kesehatan}
                     onChange={(f, v) => updateMember("kesehatan", f, v)}
                     bidangValue="Bidang Kesehatan"
                     isCollapsed={collapsedBidang.has("kesehatan")}
                     onToggleCollapse={() => toggleCollapseBidang("kesehatan")}
+                    showErrors={step2Errors}
                   />
 
                   {/* Anggota Wajib 5: Dukbangga */}
-                  <MandatoryMemberSection 
-                    label="Anggota Wajib (Bidang Dukbangga)" 
-                    value={members.dukbangga} 
+                  <MandatoryMemberSection
+                    label="Anggota Wajib (Bidang Dukbangga)"
+                    value={members.dukbangga}
                     onChange={(f, v) => updateMember("dukbangga", f, v)}
                     bidangValue="Bidang Dukbangga"
                     isCollapsed={collapsedBidang.has("dukbangga")}
                     onToggleCollapse={() => toggleCollapseBidang("dukbangga")}
+                    showErrors={step2Errors}
                   />
 
                   {/* Anggota Wajib 6: Kominfo */}
-                  <MandatoryMemberSection 
-                    label="Anggota Wajib (Bidang Kominfo)" 
-                    value={members.kominfo} 
+                  <MandatoryMemberSection
+                    label="Anggota Wajib (Bidang Kominfo)"
+                    value={members.kominfo}
                     onChange={(f, v) => updateMember("kominfo", f, v)}
                     bidangValue="Bidang Kominfo"
                     isCollapsed={collapsedBidang.has("kominfo")}
                     onToggleCollapse={() => toggleCollapseBidang("kominfo")}
+                    showErrors={step2Errors}
                   />
                 </div>
 
@@ -1135,10 +1366,10 @@ export default function BuatPokjaPage() {
                   {anggotaList.map((anggota, index) => {
                     const isBidangSelected = !!anggota.bidang
                     const isCollapsed = collapsedAnggota.has(index)
-                    const isComplete = isBidangSelected && !!(anggota.nama && anggota.email && anggota.noWhatsapp && anggota.jenisKelamin && anggota.instansi)
+                    const anggotaHasErr = step2Errors && !(anggota.bidang && anggota.nama && anggota.jenisKelamin && anggota.email && anggota.noWhatsapp && anggota.instansi)
                     return (
-                    <div key={index} className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-                      <div 
+                    <div key={index} className={cn("rounded-xl border bg-white overflow-hidden", anggotaHasErr ? "border-red-300" : "border-gray-200")}>
+                      <div
                         className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition"
                         onClick={() => toggleCollapse(index)}
                       >
@@ -1147,13 +1378,17 @@ export default function BuatPokjaPage() {
                             <User className="w-3.5 h-3.5 text-blue-700" />
                           </div>
                           <span className="text-sm font-semibold text-gray-800">Anggota Lainnya {index + 1}</span>
+                          {anggotaHasErr && isCollapsed && (
+                            <span className="text-xs font-medium text-red-500">Ada field yang belum diisi</span>
+                          )}
                           <div className="flex flex-col gap-1 flex-1 max-w-xs" onClick={(e) => e.stopPropagation()}>
                             <div className="relative">
                               <select
                                 value={anggota.bidang}
                                 onChange={(e) => updateAnggota(index, "bidang", e.target.value)}
                                 className={cn(
-                                  "w-full h-8 pl-3 pr-8 text-xs border rounded-lg appearance-none transition text-gray-700 bg-white border-gray-300"
+                                  "w-full h-8 pl-3 pr-8 text-xs border rounded-lg appearance-none transition text-gray-700 bg-white",
+                                  step2Errors && !anggota.bidang ? "border-red-400 bg-red-50" : "border-gray-300"
                                 )}
                               >
                                 <option value="">Pilih bidang</option>
@@ -1170,11 +1405,6 @@ export default function BuatPokjaPage() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          {isBidangSelected && (
-                            <span className={cn("text-xs font-medium", isComplete ? "text-green-600" : "text-amber-600")}>
-                              {isComplete ? "Seluruh kolom wajib diisi" : "Field wajib belum terisi"}
-                            </span>
-                          )}
                           <div
                             className="p-1 rounded-lg text-gray-400 hover:text-gray-600 transition"
                           >
@@ -1184,7 +1414,7 @@ export default function BuatPokjaPage() {
                             onClick={(e) => { e.stopPropagation(); removeAnggota(index) }}
                             className="p-1 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
                           >
-                            <X className="w-4 h-4" />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </div>
@@ -1196,53 +1426,56 @@ export default function BuatPokjaPage() {
                             </div>
                           )}
                           <div className={cn("p-4 grid grid-cols-1 sm:grid-cols-2 gap-4", !isBidangSelected && "opacity-40 pointer-events-none")}>
-                          <InputField 
-                            label="Nama" 
-                            required 
-                            placeholder="Nama lengkap" 
-                            value={anggota.nama} 
-                            onChange={(v) => updateAnggota(index, "nama", v)} 
+                          <InputField
+                            label="Nama"
+                            required
+                            placeholder="Nama lengkap"
+                            value={anggota.nama}
+                            onChange={(v) => updateAnggota(index, "nama", v)}
+                            hasError={step2Errors && !anggota.nama}
                           />
                           <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-gray-600">
                               Jenis Kelamin <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
-<select
-              value={anggota.jenisKelamin}
-              onChange={(e) => updateAnggota(index, "jenisKelamin", e.target.value)}
-              className={cn(
-                "w-full h-9 pl-3 pr-8 text-sm border border-gray-300 rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition",
-               anggota.jenisKelamin ? "text-gray-700" : "text-gray-400"
-              )}
-            >
-              <option value="" disabled>Pilih jenis kelamin</option>
-              <option value="Laki-Laki">Laki-Laki</option>
-              <option value="Perempuan">Perempuan</option>
-            </select>
+                              <select
+                                value={anggota.jenisKelamin}
+                                onChange={(e) => updateAnggota(index, "jenisKelamin", e.target.value)}
+                                className={cn(
+                                  "w-full h-9 pl-3 pr-8 text-sm border rounded-lg appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition",
+                                  step2Errors && !anggota.jenisKelamin ? "border-red-400 bg-red-50 text-gray-400" : anggota.jenisKelamin ? "border-gray-300 text-gray-700" : "border-gray-300 text-gray-400"
+                                )}
+                              >
+                                <option value="" disabled>Pilih jenis kelamin</option>
+                                <option value="Laki-Laki">Laki-Laki</option>
+                                <option value="Perempuan">Perempuan</option>
+                              </select>
                               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
                             </div>
                           </div>
-                          <InputField 
-                            label="Instansi" 
-                            required 
-                            placeholder="Nama instansi / lembaga" 
-                            value={anggota.instansi || ""} 
-                            onChange={(v) => updateAnggota(index, "instansi", v)} 
+                          <InputField
+                            label="Instansi"
+                            required
+                            placeholder="Nama instansi / lembaga"
+                            value={anggota.instansi || ""}
+                            onChange={(v) => updateAnggota(index, "instansi", v)}
+                            hasError={step2Errors && !anggota.instansi}
                           />
-                          <InputField 
-                            label="Jabatan pada Instansi" 
-                            placeholder="Contoh: Kepala Bidang, Staff, dll" 
-                            value={anggota.jabatan || ""} 
-                            onChange={(v) => updateAnggota(index, "jabatan", v)} 
+                          <InputField
+                            label="Jabatan pada Instansi"
+                            placeholder="Contoh: Kepala Bidang, Staff, dll"
+                            value={anggota.jabatan || ""}
+                            onChange={(v) => updateAnggota(index, "jabatan", v)}
                           />
-                          <InputField 
-                            label="Email" 
-                            required 
-                            type="email" 
-                            placeholder="nama@instansi.go.id" 
-                            value={anggota.email} 
-                            onChange={(v) => updateAnggota(index, "email", v)} 
+                          <InputField
+                            label="Email"
+                            required
+                            type="email"
+                            placeholder="nama@instansi.go.id"
+                            value={anggota.email}
+                            onChange={(v) => updateAnggota(index, "email", v)}
+                            hasError={step2Errors && !anggota.email}
                           />
                           <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-gray-600">
@@ -1256,7 +1489,10 @@ export default function BuatPokjaPage() {
                                 value={anggota.noWhatsapp}
                                 onChange={(e) => updateAnggota(index, "noWhatsapp", e.target.value.replace(/\D/g, ""))}
                                 placeholder="08xxxxxxxxxx"
-                                className="w-full h-9 pl-9 pr-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                className={cn(
+                                  "w-full h-9 pl-9 pr-3 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition",
+                                  step2Errors && !anggota.noWhatsapp ? "border-red-400 bg-red-50" : "border-gray-300"
+                                )}
                               />
                             </div>
                           </div>
@@ -1277,8 +1513,8 @@ export default function BuatPokjaPage() {
               </div>
             )}
 
-            {/* ---- Step 3: Dokumen SK ---- */}
-            {step === 3 && (
+            {/* ---- Step 3: Dokumen SK (4-step only) ---- */}
+            {FLOW_STEPS === 4 && step === 3 && (
               <div className="flex flex-col gap-5">
                 <FileUploadField value={skFile} onChange={setSkFile} error={fileError} />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1307,18 +1543,28 @@ export default function BuatPokjaPage() {
               </div>
             )}
 
-            {/* ---- Step 4: Review ---- */}
-            {step === 4 && (
+            {/* ---- Review (step 3 in 3-step mode, step 4 in 4-step mode) ---- */}
+            {((FLOW_STEPS === 3 && step === 3) || (FLOW_STEPS === 4 && step === 4)) && (
               <div className="flex flex-col gap-6">
                 {/* Info Dasar */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Informasi Dasar</p>
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">
+                      {FLOW_STEPS === 3 ? "Informasi & Dokumen SK" : "Informasi Dasar"}
+                    </p>
                     <button onClick={() => setStep(1)} className="text-xs text-blue-600 hover:underline flex items-center gap-1"><Eye className="w-3 h-3" /> Ubah</button>
                   </div>
                   <div className="rounded-xl border border-gray-200 p-4 grid grid-cols-2 gap-4">
                     <ReviewRow label="Wilayah" value={REGION} />
                     <ReviewRow label="Nomor Kanal Pengaduan" value={kanalPengaduan} />
+                    {FLOW_STEPS === 3 && (
+                      <>
+                        <ReviewRow label="File SK" value={skFile?.name ?? "-"} />
+                        <ReviewRow label="Nomor SK" value={skDetail.nomorSK} />
+                        <ReviewRow label="Tanggal SK" value={skDetail.tanggalSK} />
+                        <ReviewRow label="Periode" value={skDetail.periodeMulai && skDetail.periodeSelesai ? `${skDetail.periodeMulai} s/d ${skDetail.periodeSelesai}` : "-"} />
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -1328,28 +1574,34 @@ export default function BuatPokjaPage() {
                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Susunan Pengurus</p>
                     <button onClick={() => setStep(2)} className="text-xs text-blue-600 hover:underline flex items-center gap-1"><Eye className="w-3 h-3" /> Ubah</button>
                   </div>
-                  <ReviewTable 
-                    members={members} 
-                    anggotaList={anggotaList} 
-                    onEdit={(segment) => goToStep2WithSegment(segment)} 
-                    onDelete={(idx) => setAnggotaList(prev => prev.filter((_, i) => i !== idx))}
-                    onResetMember={(roleKey) => setMembers(prev => ({ ...prev, [roleKey]: emptyMember() }))}
-                  />
+                  {FLOW_STEPS === 3 ? (
+                    <ReviewAccordion members={members} anggotaList={anggotaList} />
+                  ) : (
+                    <ReviewTable
+                      members={members}
+                      anggotaList={anggotaList}
+                      onEdit={(segment) => goToStep2WithSegment(segment)}
+                      onDelete={(idx) => setAnggotaList(prev => prev.filter((_, i) => i !== idx))}
+                      onResetMember={(roleKey) => setMembers(prev => ({ ...prev, [roleKey]: emptyMember() }))}
+                    />
+                  )}
                 </div>
 
-                {/* SK */}
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Dokumen SK</p>
-                    <button onClick={() => setStep(3)} className="text-xs text-blue-600 hover:underline flex items-center gap-1"><Eye className="w-3 h-3" /> Ubah</button>
+                {/* SK — only shown separately in 4-step mode */}
+                {FLOW_STEPS === 4 && (
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Dokumen SK</p>
+                      <button onClick={() => setStep(3)} className="text-xs text-blue-600 hover:underline flex items-center gap-1"><Eye className="w-3 h-3" /> Ubah</button>
+                    </div>
+                    <div className="rounded-xl border border-gray-200 p-4 grid grid-cols-2 gap-4">
+                      <ReviewRow label="File SK" value={skFile?.name ?? "-"} />
+                      <ReviewRow label="Nomor SK" value={skDetail.nomorSK} />
+                      <ReviewRow label="Tanggal SK" value={skDetail.tanggalSK} />
+                      <ReviewRow label="Periode" value={skDetail.periodeMulai && skDetail.periodeSelesai ? `${skDetail.periodeMulai} s/d ${skDetail.periodeSelesai}` : "-"} />
+                    </div>
                   </div>
-                  <div className="rounded-xl border border-gray-200 p-4 grid grid-cols-2 gap-4">
-                    <ReviewRow label="File SK" value={skFile?.name ?? "-"} />
-                    <ReviewRow label="Nomor SK" value={skDetail.nomorSK} />
-                    <ReviewRow label="Tanggal SK" value={skDetail.tanggalSK} />
-                    <ReviewRow label="Periode" value={skDetail.periodeMulai && skDetail.periodeSelesai ? `${skDetail.periodeMulai} s/d ${skDetail.periodeSelesai}` : "-"} />
-                  </div>
-                </div>
+                )}
 
                 {/* Deskripsi perubahan — hanya mode perbaikan/edit */}
                 {isPerbaikanMode && (
@@ -1380,7 +1632,7 @@ export default function BuatPokjaPage() {
             </button>
           ) : <div />}
 
-          {step < 4 ? (
+          {step < FLOW_STEPS ? (
             <button
               onClick={handleNext}
               disabled={!canGoNext()}

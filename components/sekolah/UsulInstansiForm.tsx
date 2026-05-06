@@ -55,9 +55,9 @@ export function UsulInstansiForm({ wilayah }: UsulInstansiFormProps) {
       createdAt: new Date().toISOString(),
     }
     try {
-      const raw = sessionStorage.getItem("usulInstansiList")
+      const raw = localStorage.getItem("usulInstansiList")
       const prev: UsulInstansiPayload[] = raw ? JSON.parse(raw) : []
-      sessionStorage.setItem("usulInstansiList", JSON.stringify([payload, ...prev]))
+      localStorage.setItem("usulInstansiList", JSON.stringify([payload, ...prev]))
 
       const auth = readAuthSession()
       const namaSekolah = auth?.namaSekolah?.trim() || "Sekolah"
@@ -78,15 +78,16 @@ export function UsulInstansiForm({ wilayah }: UsulInstansiFormProps) {
         website: "",
         aksesInfo: "publik",
         status: "menunggu",
+        jenisMenunggu: "pengajuan",
         dibuatOleh: `Admin Sekolah ${namaSekolah}`,
         logTerakhir: RUJUKAN_LOG.dibuatSekolah(namaSekolah),
         usulanDari: "sekolah",
         namaSekolah,
         createdAt: payload.createdAt,
       }
-      const rujukanRaw = sessionStorage.getItem("rujukanList")
+      const rujukanRaw = localStorage.getItem("rujukanList")
       const rujukanStored: SumberRujukan[] = rujukanRaw ? JSON.parse(rujukanRaw) : []
-      sessionStorage.setItem("rujukanList", JSON.stringify([...rujukanStored, newRujukan]))
+      localStorage.setItem("rujukanList", JSON.stringify([...rujukanStored, newRujukan]))
       window.dispatchEvent(new CustomEvent("rujukanUpdated"))
     } catch {
       /* ignore */

@@ -3,7 +3,7 @@ import { MOCK_PENGAJUAN } from "./mockPokja"
 export interface ProvinsiRow {
   no: number
   provinsi: string
-  statusPokja: "Aktif" | "Perlu Diperiksa" | "Perlu Perbaikan" | "Belum Dibentuk" | "Belum Terbentuk"
+  statusPokja: "Aktif" | "Belum Dibentuk"
   jumlahKabKota: number
   pokjaKabKota: number
   persentase: number
@@ -70,19 +70,19 @@ const PROVINSI_PERLU_PERIKSA = new Set([
 ])
 
 function getStatus(provinsi: string): {
-  status: "Aktif" | "Perlu Diperiksa" | "Belum Terbentuk"
+  status: "Aktif" | "Belum Dibentuk"
   pokjaId?: string
 } {
   if (provinsi.includes(" - ")) {
-    const statuses: Array<"Aktif" | "Perlu Diperiksa" | "Belum Terbentuk"> = ["Aktif", "Aktif", "Perlu Diperiksa", "Perlu Diperiksa", "Belum Terbentuk"]
+    const statuses: Array<"Aktif" | "Belum Dibentuk"> = ["Aktif", "Aktif", "Belum Dibentuk", "Belum Dibentuk", "Belum Dibentuk"]
     const idx = Math.abs(provinsi.charCodeAt(provinsi.length - 1)) % 5
     return { status: statuses[idx] }
   }
   const match = MOCK_PENGAJUAN.find((p) => p.provinsi === provinsi)
   if (PROVINSI_AKTIF.has(provinsi)) return { status: "Aktif", pokjaId: match?.id }
-  if (match) return { status: "Perlu Diperiksa", pokjaId: match.id }
-  if (PROVINSI_PERLU_PERIKSA.has(provinsi)) return { status: "Perlu Diperiksa" }
-  return { status: "Belum Terbentuk" }
+  if (match) return { status: "Belum Dibentuk", pokjaId: match.id }
+  if (PROVINSI_PERLU_PERIKSA.has(provinsi)) return { status: "Belum Dibentuk" }
+  return { status: "Belum Dibentuk" }
 }
 
 const KAB_TO_INCLUDE: Record<string, string[]> = {
@@ -189,27 +189,27 @@ const PLACEHOLDER_ROWS: ProvinsiRow[] = [
     skor: 92, skorDelta: 8, bidangTersedia: 5, kontak: "081234560003",
   },
   {
-    no: 9004, provinsi: "Bengkulu - Kota Bengkulu", statusPokja: "Perlu Diperiksa",
+    no: 9004, provinsi: "Bengkulu - Kota Bengkulu", statusPokja: "Belum Dibentuk",
     jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
   },
   {
-    no: 9005, provinsi: "Jambi - Kota Jambi", statusPokja: "Perlu Diperiksa",
+    no: 9005, provinsi: "Jambi - Kota Jambi", statusPokja: "Belum Dibentuk",
     jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
   },
   {
-    no: 9006, provinsi: "Lampung - Bandar Lampung", statusPokja: "Perlu Diperiksa",
+    no: 9006, provinsi: "Lampung - Bandar Lampung", statusPokja: "Belum Dibentuk",
     jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
   },
   {
-    no: 9007, provinsi: "Maluku - Ambon", statusPokja: "Perlu Perbaikan",
+    no: 9007, provinsi: "Maluku - Ambon", statusPokja: "Belum Dibentuk",
     jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
   },
   {
-    no: 9008, provinsi: "Papua Barat - Manokwari", statusPokja: "Perlu Perbaikan",
+    no: 9008, provinsi: "Papua Barat - Manokwari", statusPokja: "Belum Dibentuk",
     jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
   },
   {
-    no: 9009, provinsi: "Gorontalo - Kota Gorontalo", statusPokja: "Perlu Perbaikan",
+    no: 9009, provinsi: "Gorontalo - Kota Gorontalo", statusPokja: "Belum Dibentuk",
     jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
   },
   {

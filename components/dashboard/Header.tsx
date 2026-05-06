@@ -28,6 +28,8 @@ export function Header({ userName = "Admin Dinas" }: HeaderProps) {
 
   const reset = () => {
     localStorage.removeItem("pokjaList")
+    localStorage.removeItem("rujukanList")
+    localStorage.removeItem("reportList")
     clearDraft()
     setOpen(false)
     window.location.reload()

@@ -36,8 +36,8 @@ export default function LoginPage() {
           user.role === "sekolah"
             ? {
                 ...base,
-                wilayah: "Banda Aceh",
-                namaSekolah: "SMAN 1 Banda Aceh",
+                wilayah: "Aceh - Banda Aceh",
+                namaSekolah: "SDN 1 Banda Aceh",
               }
             : user.role === "dinas"
               ? {
