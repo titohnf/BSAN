@@ -24,20 +24,6 @@ function formatDateForDraftName(date: Date): string {
 // ---------------------------------------------------------------------------
 const REGION = "Provinsi Aceh"
 
-const FLOW_STEPS: 3 | 4 = 3
-
-const STEPS = FLOW_STEPS === 3
-  ? [
-      { number: 1, label: "Informasi & Dokumen SK" },
-      { number: 2, label: "Susunan Pengurus" },
-      { number: 3, label: "Tinjau Data" },
-    ]
-  : [
-      { number: 1, label: "Informasi Dasar" },
-      { number: 2, label: "Susunan Pengurus" },
-      { number: 3, label: "Dokumen SK" },
-      { number: 4, label: "Tinjau Data" },
-    ]
 
 // ---------------------------------------------------------------------------
 // Dummy data generator
@@ -703,6 +689,19 @@ export default function BuatPokjaPage() {
   const router = useRouter()
 
   const [step, setStep] = useState(1)
+  const [flowSteps, setFlowSteps] = useState<3 | 4>(3)
+  const STEPS = flowSteps === 3
+    ? [
+        { number: 1, label: "Informasi & Dokumen SK" },
+        { number: 2, label: "Susunan Pengurus" },
+        { number: 3, label: "Tinjau Data" },
+      ]
+    : [
+        { number: 1, label: "Informasi Dasar" },
+        { number: 2, label: "Susunan Pengurus" },
+        { number: 3, label: "Dokumen SK" },
+        { number: 4, label: "Tinjau Data" },
+      ]
   const [submitted, setSubmitted] = useState(false)
   const [isPerbaikanMode, setIsPerbaikanMode] = useState(false)
   const [deskripsiPerbaikan, setDeskripsiPerbaikan] = useState("")
@@ -897,7 +896,7 @@ export default function BuatPokjaPage() {
   }
 
   const canGoNext = () => {
-    if (FLOW_STEPS === 3) {
+    if (flowSteps === 3) {
       if (step === 1) return kanalPengaduan.trim().length > 0 && skFile !== null && !!skDetail.nomorSK && !!skDetail.tanggalSK && !!skDetail.periodeMulai && !!skDetail.periodeSelesai
       return true
     }
@@ -907,7 +906,7 @@ export default function BuatPokjaPage() {
   }
 
   const handleNext = () => {
-    if (FLOW_STEPS === 3) {
+    if (flowSteps === 3) {
       if (step === 1 && !skFile) { setFileError("Dokumen SK wajib diunggah."); return }
     } else {
       if (step === 3 && !skFile) { setFileError("Dokumen SK wajib diunggah."); return }
@@ -933,7 +932,7 @@ export default function BuatPokjaPage() {
     }
 
     setFileError("")
-    setStep((s) => Math.min(s + 1, FLOW_STEPS))
+    setStep((s) => Math.min(s + 1, flowSteps))
   }
   const handleBack = () => { setStep2Errors(false); setStep((s) => Math.max(s - 1, 1)) }
 
@@ -1110,6 +1109,22 @@ export default function BuatPokjaPage() {
             Isi Otomatis (Demo)
           </button>
 
+          {/* Flow steps toggle */}
+          <div className="flex items-center rounded-lg border border-gray-200 overflow-hidden text-xs font-semibold">
+            <button
+              onClick={() => { setFlowSteps(3); setStep(1) }}
+              className={cn("px-2.5 py-1.5 transition", flowSteps === 3 ? "bg-blue-600 text-white" : "text-gray-500 hover:bg-gray-100")}
+            >
+              3 Langkah
+            </button>
+            <button
+              onClick={() => { setFlowSteps(4); setStep(1) }}
+              className={cn("px-2.5 py-1.5 transition border-l border-gray-200", flowSteps === 4 ? "bg-blue-600 text-white" : "text-gray-500 hover:bg-gray-100")}
+            >
+              4 Langkah
+            </button>
+          </div>
+
           {/* Save Draft button - always visible in header */}
           <button
             onClick={handleSaveDraft}
@@ -1174,7 +1189,7 @@ export default function BuatPokjaPage() {
 
           <div className="px-6 py-6">
             {/* ---- Step 1: Informasi Dasar (4-step) ---- */}
-            {FLOW_STEPS === 4 && step === 1 && (
+            {flowSteps === 4 && step === 1 && (
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-semibold text-gray-600">Wilayah</label>
@@ -1205,7 +1220,7 @@ export default function BuatPokjaPage() {
             )}
 
             {/* ---- Step 1: Informasi Dasar + Dokumen SK (3-step) ---- */}
-            {FLOW_STEPS === 3 && step === 1 && (
+            {flowSteps === 3 && step === 1 && (
               <div className="flex flex-col gap-6">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-semibold text-gray-600">Wilayah</label>
@@ -1514,7 +1529,7 @@ export default function BuatPokjaPage() {
             )}
 
             {/* ---- Step 3: Dokumen SK (4-step only) ---- */}
-            {FLOW_STEPS === 4 && step === 3 && (
+            {flowSteps === 4 && step === 3 && (
               <div className="flex flex-col gap-5">
                 <FileUploadField value={skFile} onChange={setSkFile} error={fileError} />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1544,20 +1559,20 @@ export default function BuatPokjaPage() {
             )}
 
             {/* ---- Review (step 3 in 3-step mode, step 4 in 4-step mode) ---- */}
-            {((FLOW_STEPS === 3 && step === 3) || (FLOW_STEPS === 4 && step === 4)) && (
+            {((flowSteps === 3 && step === 3) || (flowSteps === 4 && step === 4)) && (
               <div className="flex flex-col gap-6">
                 {/* Info Dasar */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">
-                      {FLOW_STEPS === 3 ? "Informasi & Dokumen SK" : "Informasi Dasar"}
+                      {flowSteps === 3 ? "Informasi & Dokumen SK" : "Informasi Dasar"}
                     </p>
                     <button onClick={() => setStep(1)} className="text-xs text-blue-600 hover:underline flex items-center gap-1"><Eye className="w-3 h-3" /> Ubah</button>
                   </div>
                   <div className="rounded-xl border border-gray-200 p-4 grid grid-cols-2 gap-4">
                     <ReviewRow label="Wilayah" value={REGION} />
                     <ReviewRow label="Nomor Kanal Pengaduan" value={kanalPengaduan} />
-                    {FLOW_STEPS === 3 && (
+                    {flowSteps === 3 && (
                       <>
                         <ReviewRow label="File SK" value={skFile?.name ?? "-"} />
                         <ReviewRow label="Nomor SK" value={skDetail.nomorSK} />
@@ -1574,7 +1589,7 @@ export default function BuatPokjaPage() {
                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Susunan Pengurus</p>
                     <button onClick={() => setStep(2)} className="text-xs text-blue-600 hover:underline flex items-center gap-1"><Eye className="w-3 h-3" /> Ubah</button>
                   </div>
-                  {FLOW_STEPS === 3 ? (
+                  {flowSteps === 3 ? (
                     <ReviewAccordion members={members} anggotaList={anggotaList} />
                   ) : (
                     <ReviewTable
@@ -1588,7 +1603,7 @@ export default function BuatPokjaPage() {
                 </div>
 
                 {/* SK — only shown separately in 4-step mode */}
-                {FLOW_STEPS === 4 && (
+                {flowSteps === 4 && (
                   <div>
                     <div className="flex items-center justify-between mb-3">
                       <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Dokumen SK</p>
@@ -1632,7 +1647,7 @@ export default function BuatPokjaPage() {
             </button>
           ) : <div />}
 
-          {step < FLOW_STEPS ? (
+          {step < flowSteps ? (
             <button
               onClick={handleNext}
               disabled={!canGoNext()}
