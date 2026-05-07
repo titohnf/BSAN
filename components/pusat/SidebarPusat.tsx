@@ -27,8 +27,8 @@ export function SidebarPusat({ activeMenu, onMenuChange }: SidebarPusatProps) {
           <GraduationCap className="w-5 h-5 text-white" />
         </div>
         <div className="min-w-0">
-          <p className="text-white font-semibold text-sm leading-tight truncate">Pemerintah Pusat</p>
-          <p className="text-slate-200 text-xs leading-tight truncate">Admin Kelompok Kerja Nasional</p>
+          <p className="text-white font-semibold text-sm leading-tight truncate">Admin Pusat</p>
+          <p className="text-slate-200 text-xs leading-tight truncate">Puspeka</p>
         </div>
       </div>
 
