@@ -171,11 +171,7 @@ function DetailModal({ row, onClose }: { row: ProvinsiRow; onClose: () => void }
               Hubungi Layanan Pengaduan ({`0${waNumber.slice(2)}`})
             </a>
           )}
-          <div className="flex justify-end">
-            <Button onClick={onClose} variant="outline" className="border-slate-200 text-sm">
-              Tutup
-            </Button>
-          </div>
+          
         </div>
       </div>
     </div>

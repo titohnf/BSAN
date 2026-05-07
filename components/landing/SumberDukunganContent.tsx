@@ -400,11 +400,7 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
               </div>
             </div>
 
-            <div className="px-6 py-4 border-t border-slate-100 flex justify-end">
-              <Button onClick={() => setSelectedItem(null)} variant="outline" className="border-slate-200 text-sm">
-                Tutup
-              </Button>
-            </div>
+            
           </div>
         </div>
       )}

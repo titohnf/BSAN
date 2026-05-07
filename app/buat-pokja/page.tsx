@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import {
-  ArrowLeft, Wand2, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight,
+  ArrowLeft, Wand2, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, ToggleLeft, ToggleRight,
   User, Upload, X, AlertCircle, Phone, Building2, Download, Eye, FileText, Plus, Trash2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -1089,40 +1089,6 @@ export default function BuatPokjaPage() {
             <h1 className="text-sm font-semibold text-gray-900">
               {isPerbaikanMode ? "Perbaikan Kelompok Kerja" : "Pembentukan Kelompok Kerja"} {REGION}
             </h1>
-            {(isPerbaikanMode || isDraftMode) && (
-              <span className="text-xs font-medium px-2 py-0.5 rounded-full">
-                {isPerbaikanMode ? (
-                  <span className="text-red-600 bg-red-50 border border-red-200">Mode Perbaikan</span>
-                ) : (
-                  <span className="text-gray-600 bg-gray-100 border border-gray-300">Mode Draf</span>
-                )}
-              </span>
-            )}
-          </div>
-
-          {/* Auto-fill button */}
-          <button
-            onClick={fillDummyData}
-            className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition"
-          >
-            <Wand2 className="w-3.5 h-3.5" />
-            Isi Otomatis (Demo)
-          </button>
-
-          {/* Flow steps toggle */}
-          <div className="flex items-center rounded-lg border border-gray-200 overflow-hidden text-xs font-semibold">
-            <button
-              onClick={() => { setFlowSteps(3); setStep(1) }}
-              className={cn("px-2.5 py-1.5 transition", flowSteps === 3 ? "bg-blue-600 text-white" : "text-gray-500 hover:bg-gray-100")}
-            >
-              3 Langkah
-            </button>
-            <button
-              onClick={() => { setFlowSteps(4); setStep(1) }}
-              className={cn("px-2.5 py-1.5 transition border-l border-gray-200", flowSteps === 4 ? "bg-blue-600 text-white" : "text-gray-500 hover:bg-gray-100")}
-            >
-              4 Langkah
-            </button>
           </div>
 
           {/* Save Draft button - always visible in header */}
@@ -1135,6 +1101,24 @@ export default function BuatPokjaPage() {
           </button>
         </div>
       </header>
+
+      {/* Floating buttons - bottom right (demo only) */}
+      <div className="fixed bottom-6 right-6 z-40 flex items-center gap-1">
+        <button
+          onClick={fillDummyData}
+          className="p-2 text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition shadow-sm"
+          title="Isi Otomatis (Demo)"
+        >
+          <Wand2 className="w-4 h-4" />
+        </button>
+        <button
+          onClick={() => setFlowSteps(flowSteps === 3 ? 4 : 3)}
+          className={cn("p-2 border rounded-lg transition shadow-sm", flowSteps === 4 ? "bg-blue-600 text-white border-blue-600" : "text-gray-500 bg-white border-gray-200 hover:bg-gray-100")}
+          title={flowSteps === 3 ? "3 Langkah (klik untuk 4)" : "4 Langkah (klik untuk 3)"}
+        >
+          {flowSteps === 3 ? <ToggleLeft className="w-4 h-4" /> : <ToggleRight className="w-4 h-4" />}
+        </button>
+      </div>
 
       {/* Toast notification for draft saved */}
       {showSavedToast && (
