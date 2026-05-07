@@ -71,7 +71,7 @@ export function SekolahHeader({ userName, onLogout }: SekolahHeaderProps) {
                 className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
               >
                 <LogOut className="w-4 h-4 text-gray-500" />
-                Log out
+                Keluar
               </button>
             </div>
           )}

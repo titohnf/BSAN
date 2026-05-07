@@ -382,7 +382,7 @@ export function DashboardView({
                       <div className="flex items-start gap-2 p-3 bg-green-100/50 rounded-lg border border-green-300">
                         <CheckCircle2 className="w-4 h-4 text-green-700 flex-shrink-0 mt-0.5" />
                         <p className="text-xs text-green-800">
-                          <strong>Kelompok Kerja Aktif:</strong> Kelompok Kerja Anda telah diverifikasi dan aktif. Anda dapat mengelola kegiatan dan sumber rujukan.
+                          <strong>Kelompok Kerja Aktif:</strong> Kelompok Kerja Anda telah diverifikasi dan aktif. Anda dapat mengelola kegiatan dan Sumber Dukungan.
                         </p>
                       </div>
                       <button
@@ -390,7 +390,7 @@ export function DashboardView({
                         onClick={() => onPerbaikiPokja?.(pokja)}
                         className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                       >
-                        Edit Kelompok Kerja
+                        Ubah Kelompok Kerja
                       </button>
                     </div>
                   )}
@@ -531,8 +531,8 @@ export function DashboardView({
             <tbody className="divide-y divide-gray-100">
               {[
                 { waktu: "12:45", user: "Admin Dinas", aksi: "Verifikasi Sumber Dukungan" },
-                { waktu: "11:30", user: "Admin Sekolah", aksi: "Upload Dokumen Kelompok Kerja" },
-                { waktu: "10:15", user: "Admin Dinas", aksi: "Menolak Pengajuan Kelompok Kerja" },
+                { waktu: "11:30", user: "Admin Sekolah", aksi: "Unggah Dokumen Kelompok Kerja" },
+                { waktu: "10:15", user: "Admin Dinas", aksi: "Memverifikasi Sumber Dukungan" },
               ].map((log, i) => (
                 <tr key={i} className="hover:bg-gray-50">
                   <td className="px-3 py-2.5 text-gray-700">{log.waktu}</td>
