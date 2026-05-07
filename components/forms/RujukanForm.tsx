@@ -707,7 +707,7 @@ function RujukanFormInner() {
               </div>
             ) : (
               <p className="text-xs text-gray-500">
-                {isEdit ? "Perbarui informasi sumber rujukan" : "Lengkapi semua informasi yang diperlukan"}
+                {isEdit ? "Perbarui informasi Sumber Dukungan" : "Lengkapi semua informasi yang diperlukan"}
               </p>
             )}
           </div>
