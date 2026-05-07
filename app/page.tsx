@@ -201,10 +201,9 @@ export default function LandingPage() {
                             )
                           })()}
                         </div>
+                        <div className="flex-1" />
                         <Divider />
-                        <div className="shrink-0 flex items-center h-[168px]">
-                          <Button onClick={() => router.push("/kelompok-kerja")} size="sm" className="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 gap-1 shrink-0">Lihat Detail <ArrowRight className="w-3.5 h-3.5" /></Button>
-                        </div>
+                        <Button onClick={() => router.push("/kelompok-kerja")} size="sm" className="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 gap-1">Lihat Detail <ArrowRight className="w-3.5 h-3.5" /></Button>
                       </div>
                     ) : (
                       <div className="flex flex-1 gap-6 min-w-0">
@@ -342,10 +341,6 @@ export default function LandingPage() {
                             )
                           })()}
                         </div>
-                        <Divider />
-                        <div className="shrink-0 flex items-center h-[168px]">
-                          <Button onClick={() => router.push("/kelompok-kerja")} size="sm" className="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 gap-1 shrink-0">Lihat Detail <ArrowRight className="w-3.5 h-3.5" /></Button>
-                        </div>
                       </div>
                     ) : (
                       <div className="flex flex-1 gap-6">
@@ -367,13 +362,25 @@ export default function LandingPage() {
                         </div>
                       </div>
                     )}
-                    {selectedProvince !== "__hanya_provinsi__" && (
-                      <>
-                        <Divider />
-                        <Button onClick={() => router.push("/kelompok-kerja")} size="sm" className="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 gap-1 shrink-0">Lihat Detail <ArrowRight className="w-3.5 h-3.5" /></Button>
-                      </>
-                    )}
-                  </div>
+                      {selectedProvince === "__hanya_provinsi__" && !selectedKota && (
+                        <>
+                          <Divider />
+                          <Button onClick={() => router.push("/kelompok-kerja")} size="sm" className="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 gap-1 shrink-0">Lihat Detail <ArrowRight className="w-3.5 h-3.5" /></Button>
+                        </>
+                      )}
+                      {!selectedProvince && !selectedKota && (
+                        <>
+                          <Divider />
+                          <Button onClick={() => router.push("/kelompok-kerja")} size="sm" className="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 gap-1 shrink-0">Lihat Detail <ArrowRight className="w-3.5 h-3.5" /></Button>
+                        </>
+                      )}
+                      {selectedProvince && selectedProvince !== "__hanya_provinsi__" && !selectedKota && (
+                        <>
+                          <Divider />
+                          <Button onClick={() => router.push("/kelompok-kerja")} size="sm" className="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 gap-1 shrink-0">Lihat Detail <ArrowRight className="w-3.5 h-3.5" /></Button>
+                        </>
+                      )}
+                    </div>
                 </div>
               </div>
 
