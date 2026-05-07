@@ -40,6 +40,8 @@ export const MOCK_KEGIATAN: Kegiatan[] = [
   { no: 15, nama: "Pelatihan Guru Anti Bullying", penyelengara: "Dinas Pendidikan Jawa Barat", wilayah: "Bandung", tanggal: "2026-05-06", status: "Berlangsung", peserta: 150, deskripsi: "Pelatihan untuk guru-guru mengenai pencegahan dan penanganan bullying di sekolah." },
   { no: 16, nama: "Workshop Pemetaan Zona Aman Sekolah", penyelengara: "Kemendikdasmen", wilayah: "Jakarta", tanggal: "2026-05-06", status: "Akan Datang", peserta: 60, deskripsi: "Workshop pemetaan zona aman di setiap sekolah untuk keselamatan peserta didik." },
   { no: 17, nama: "Forum Koordinasi Orang Tua - Sekolah", penyelengara: "Dinas Pendidikan Banten", wilayah: "Serang", tanggal: "2026-05-06", status: "Akan Datang", peserta: 100, deskripsi: "Forum koordinasi antara orang tua dan sekolah untuk mendukung program BSAN." },
+  { no: 18, nama: "Pelatihan Pengembangan Kurikulum BSAN", penyelengara: "Kemendikdasmen", wilayah: "Bandung", tanggal: "2026-05-07", status: "Berlangsung", peserta: 120, deskripsi: "Pelatihan pengembangan kurikulum terintegrasi BSAN untuk guru-guru di wilayah Jawa Barat." },
+  { no: 19, nama: "Sosialisasi Pencegahan Perundungan di Sekolah", penyelengara: "Dinas Pendidikan Jawa Timur", wilayah: "Surabaya", tanggal: "2026-05-07", status: "Berlangsung", peserta: 180, deskripsi: "Sosialisasi dan pelatihan pencegahan perundungan di lingkungan sekolah." },
 ]
 
 const STATUS_OPTIONS = ["Semua", "Berlangsung", "Selesai", "Akan Datang"] as const

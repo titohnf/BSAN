@@ -44,6 +44,7 @@ export default function LandingPage() {
   const [modalPendingKota, setModalPendingKota] = useState<string | null>(null)
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [activityPage, setActivityPage] = useState(0)
+  const [activityStatusFilter, setActivityStatusFilter] = useState<string>("Berlangsung")
   const [showProvinsiList, setShowProvinsiList] = useState(false)
   const [expandAllProvinsi, setExpandAllProvinsi] = useState(false)
   const [showKabKotaList, setShowKabKotaList] = useState(false)
@@ -107,26 +108,20 @@ export default function LandingPage() {
     return MOCK_KEGIATAN
   }, [selectedProvince, selectedKota])
 
-  const todayActivities = useMemo(() => {
+  const monthActivities = useMemo(() => {
     setActivityPage(0)
     if (!selectedDate) return []
-    return filteredActivities.filter(k => new Date(k.tanggal).toDateString() === selectedDate.toDateString())
-  }, [filteredActivities, selectedDate])
+    return filteredActivities.filter(k => {
+      const actDate = new Date(k.tanggal)
+      const sameMonthYear = actDate.getMonth() === selectedDate.getMonth() && actDate.getFullYear() === selectedDate.getFullYear()
+      const matchStatus = activityStatusFilter === "Semua" || k.status === activityStatusFilter
+      return sameMonthYear && matchStatus
+    })
+  }, [filteredActivities, selectedDate, activityStatusFilter])
 
   const ACTIVITY_PAGE_SIZE = 3
-  const totalActivityPages = Math.max(1, Math.ceil(todayActivities.length / ACTIVITY_PAGE_SIZE))
-  const pagedActivities = todayActivities.slice(activityPage * ACTIVITY_PAGE_SIZE, (activityPage + 1) * ACTIVITY_PAGE_SIZE)
-
-  const weekDays = useMemo(() => {
-    if (!selectedDate) return []
-    const d = new Date(selectedDate)
-    const day = d.getDay()
-    const diff = day === 0 ? -6 : 1 - day
-    const monday = new Date(d)
-    monday.setDate(d.getDate() + diff)
-    monday.setHours(0, 0, 0, 0)
-    return Array.from({ length: 4 }, (_, i) => { const dd = new Date(monday); dd.setDate(monday.getDate() + i); return dd })
-  }, [selectedDate])
+  const totalActivityPages = Math.max(1, Math.ceil(monthActivities.length / ACTIVITY_PAGE_SIZE))
+  const pagedActivities = monthActivities.slice(activityPage * ACTIVITY_PAGE_SIZE, (activityPage + 1) * ACTIVITY_PAGE_SIZE)
 
   const isFiltered = selectedProvince !== ""
 
@@ -359,6 +354,7 @@ export default function LandingPage() {
                         <div className="shrink-0">
                           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">{isFiltered ? "Capaian Provinsi" : "Capaian Nasional"}</p>
                           <p className="text-3xl font-extrabold text-slate-700 tabular-nums">{Math.round(((selectedProvince && selectedProvince !== "__hanya_provinsi__" ? 1 : pokjaAktif) + totalKabKotaFiltered) / (selectedProvince && selectedProvince !== "__hanya_provinsi__" ? 1 + kabKotaDenominator : 38 + 514) * 100)}%</p>
+                          {!isFiltered && <p className="text-sm text-slate-400 mt-1">{pokjaAktif + totalKabKotaFiltered} dari 552 Provinsi dan Kab/Kota</p>}
                         </div>
                       </div>
                     )}
@@ -456,45 +452,51 @@ export default function LandingPage() {
                         <p className="text-xs text-slate-400">untuk wilayah yang dipilih</p>
                       </div>
                     ) : (
-                      <div className="flex-1 grid grid-cols-[144px_1px_1fr] gap-5 items-start">
-                        {/* Kalender 2×4 */}
-                        <div className="w-[144px] shrink-0 flex flex-col gap-1.5">
-                          <div className="flex items-center justify-between">
-                            <button onClick={() => shiftWeek(-1)} className="p-0.5 rounded hover:bg-slate-100 text-slate-400 transition-colors"><ChevronLeft className="w-3.5 h-3.5" /></button>
-                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
+                      <div className="flex-1 grid grid-cols-[164px_1fr] gap-5 items-stretch">
+                        {/* Stat Table 1x3 */}
+                        <div className="w-[164px] shrink-0 flex flex-col gap-2 self-stretch">
+                          <div className="flex items-center justify-between h-8">
+                            <button onClick={() => shiftMonth(-1)} className="p-0.5 rounded hover:bg-slate-100 text-slate-400 transition-colors"><ChevronLeft className="w-3.5 h-3.5" /></button>
+                            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
                               {selectedDate ? selectedDate.toLocaleDateString("id-ID", { month: "short", year: "numeric" }) : ""}
                             </span>
-                            <button onClick={() => shiftWeek(1)} className="p-0.5 rounded hover:bg-slate-100 text-slate-400 transition-colors"><ChevronRight className="w-3.5 h-3.5" /></button>
+                            <button onClick={() => shiftMonth(1)} className="p-0.5 rounded hover:bg-slate-100 text-slate-400 transition-colors"><ChevronRight className="w-3.5 h-3.5" /></button>
                           </div>
                           <div className="border border-slate-200 rounded-lg overflow-hidden">
-                            {[weekDays.slice(0, 2), weekDays.slice(2, 4)].map((row, rowIdx) => (
-                              <div key={rowIdx} className={`grid grid-cols-2 divide-x divide-slate-200 ${rowIdx === 0 ? "border-b border-slate-200" : ""}`}>
-                                {row.map((day) => {
-                                  const isSelected = selectedDate?.toDateString() === day.toDateString()
-                                  const isToday = new Date().toDateString() === day.toDateString()
-                                  const hasActivity = filteredActivities.some(k => new Date(k.tanggal).toDateString() === day.toDateString())
-                                  const DAY_NAMES = ["Min","Sen","Sel","Rab","Kam","Jum","Sab"]
-                                  return (
-                                    <button key={day.toISOString()} onClick={() => setSelectedDate(day)}
-                                      className={`flex flex-col items-center gap-0.5 py-2.5 transition-colors ${isSelected ? "bg-emerald-600" : isToday ? "bg-emerald-50" : "hover:bg-slate-50"}`}>
-                                      <span className={`text-[9px] font-semibold leading-none ${isSelected ? "text-emerald-200" : "text-slate-400"}`}>{DAY_NAMES[day.getDay()]}</span>
-                                      <span className={`text-sm font-bold leading-none ${isSelected ? "text-white" : isToday ? "text-emerald-700" : "text-slate-700"}`}>{day.getDate()}</span>
-                                      <span className={`w-1 h-1 rounded-full ${hasActivity ? (isSelected ? "bg-white" : "bg-emerald-500") : "bg-transparent"}`} />
-                                    </button>
-                                  )
-                                })}
-                              </div>
-                            ))}
+                            {(() => {
+                              const rows = [
+                                { label: "Berlangsung", count: filteredActivities.filter(k => { if (!selectedDate) return false; const d = new Date(k.tanggal); return d.getMonth() === selectedDate.getMonth() && d.getFullYear() === selectedDate.getFullYear() && k.status === "Berlangsung" }).length, status: "Berlangsung", color: "bg-blue-500" },
+                                { label: "Akan Datang", count: filteredActivities.filter(k => { if (!selectedDate) return false; const d = new Date(k.tanggal); return d.getMonth() === selectedDate.getMonth() && d.getFullYear() === selectedDate.getFullYear() && k.status === "Akan Datang" }).length, status: "Akan Datang", color: "bg-amber-500" },
+                                { label: "Selesai", count: filteredActivities.filter(k => { if (!selectedDate) return false; const d = new Date(k.tanggal); return d.getMonth() === selectedDate.getMonth() && d.getFullYear() === selectedDate.getFullYear() && k.status === "Selesai" }).length, status: "Selesai", color: "bg-emerald-500" },
+                              ]
+                              return (
+                                <table className="w-full text-sm">
+                                  <tbody>
+                                    {rows.map((row, idx) => (
+                                      <tr
+                                        key={row.label}
+                                        onClick={() => setActivityStatusFilter(row.status)}
+                                        className={cn("cursor-pointer transition-colors", idx < rows.length - 1 ? "border-b border-slate-200" : "", activityStatusFilter === row.status ? "bg-blue-50" : "hover:bg-slate-50")}
+                                      >
+                                        <td className="flex items-center justify-between gap-2 px-3 py-2">
+                                          <div className="flex items-center gap-2">
+                                            <span className={`w-1.5 h-1.5 rounded-full ${row.color} shrink-0`} />
+                                            <span className={cn("text-slate-600 truncate", activityStatusFilter === row.status && "font-semibold text-blue-700")}>{row.label}</span>
+                                          </div>
+                                          <span className="font-bold text-slate-700 tabular-nums">{row.count}</span>
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              )
+                            })()}
                           </div>
                         </div>
                         {/* Divider vertikal */}
-                        <div className="self-stretch bg-slate-100" />
-                        {/* Daftar kegiatan */}
-                        <div className="flex flex-col gap-2">
-                          <div className="flex items-center justify-between">
-                            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                              {selectedDate ? selectedDate.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long" }) : ""}
-                            </p>
+                        <div className="flex flex-col gap-2 self-stretch">
+                          <div className="flex items-center justify-between h-8 shrink-0">
+                            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Kegiatan</p>
                             {totalActivityPages > 1 && (
                               <div className="flex items-center gap-0.5">
                                 <button onClick={() => setActivityPage(p => Math.max(0, p - 1))} disabled={activityPage === 0} className="p-1 rounded hover:bg-slate-100 text-slate-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"><ChevronLeft className="w-3.5 h-3.5" /></button>
@@ -507,7 +509,7 @@ export default function LandingPage() {
                             {pagedActivities.length > 0 ? pagedActivities.map(k => (
                               <div key={k.no} className="grid grid-cols-[1fr_auto] border-b border-slate-100 last:border-b-0">
                                 <p className="text-sm font-semibold text-slate-800 leading-snug line-clamp-1 px-3 py-2">{k.nama}</p>
-                                <p className="text-xs text-slate-400 whitespace-nowrap px-3 py-2">{k.wilayah}</p>
+                                <p className="text-xs text-slate-400 whitespace-nowrap px-3 py-2">{k.wilayah} · {new Date(k.tanggal).toLocaleDateString("id-ID", { day: "2-digit", month: "short" })}</p>
                               </div>
                             )) : (
                               <p className="text-xs text-slate-400 px-3 py-2.5">Tidak ada kegiatan</p>
@@ -582,11 +584,11 @@ export default function LandingPage() {
     </main>
   )
 
-  function shiftWeek(delta: number) {
+  function shiftMonth(delta: number) {
     setSelectedDate(d => {
       if (!d) return d
       const next = new Date(d)
-      next.setDate(d.getDate() + delta * 4)
+      next.setMonth(d.getMonth() + delta)
       return next
     })
   }
