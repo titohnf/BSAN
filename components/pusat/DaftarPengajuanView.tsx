@@ -66,7 +66,7 @@ export function DaftarPengajuanView({ pokjaList, onSelect }: DaftarPengajuanView
     .filter((p) => {
       const matchSearch = p.nama.toLowerCase().includes(search.toLowerCase()) ||
                           p.data?.region?.toLowerCase().includes(search.toLowerCase())
-      const matchStatus = filterStatus === "semua" || p.effectiveStatus === filterStatus
+      const matchStatus = (filterStatus === "semua" || p.effectiveStatus === filterStatus) && p.effectiveStatus !== "draf"
       return matchSearch && matchStatus
     })
     .sort((a, b) => {
