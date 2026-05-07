@@ -69,11 +69,17 @@ const PROVINSI_PERLU_PERIKSA = new Set([
   "Nusa Tenggara Timur", "Gorontalo", "Maluku Utara", "Papua",
 ])
 
-function getStatus(provinsi: string): {
+function getStatus(provinsi: string, kabIdx?: number): {
   status: "Aktif" | "Belum Dibentuk"
   pokjaId?: string
 } {
   if (provinsi.includes(" - ")) {
+    if (provinsi.startsWith("Aceh - ")) {
+      const acehKabList = KAB_TO_INCLUDE["Aceh"] || []
+      const formedCount = acehKabList.length
+      const idx = kabIdx ?? 0
+      return { status: idx < formedCount ? "Aktif" : "Belum Dibentuk" }
+    }
     const statuses: Array<"Aktif" | "Belum Dibentuk"> = ["Aktif", "Aktif", "Belum Dibentuk", "Belum Dibentuk", "Belum Dibentuk"]
     const idx = Math.abs(provinsi.charCodeAt(provinsi.length - 1)) % 5
     return { status: statuses[idx] }
@@ -86,7 +92,7 @@ function getStatus(provinsi: string): {
 }
 
 const KAB_TO_INCLUDE: Record<string, string[]> = {
-  "Aceh": ["Banda Aceh", "Aceh Besar", "Pidie", "Aceh Utara", "Aceh Timur", "Aceh Barat"],
+  "Aceh": ["Banda Aceh", "Aceh Besar", "Pidie", "Aceh Utara", "Aceh Timur", "Aceh Barat", "Aceh Tengah", "Pidie Jaya", "Bireuen", "Lhokseumawe"],
   "Sumatera Utara": ["Medan", "Deli Serdang", "Simalungun", "Toba Samosir", "Labuhanbatu", "Padang Sidempuan"],
   "DKI Jakarta": ["Jakarta Pusat", "Jakarta Utara", "Jakarta Barat", "Jakarta Selatan", "Jakarta Timur", "Kepulauan Seribu"],
   "Jawa Barat": ["Bandung", "Bekasi", "Bogor", "Depok", "Cirebon", "Sukabumi", "Garut", "Karawang"],
@@ -119,7 +125,8 @@ function generateRows(): ProvinsiRow[] {
 
   for (const p of ALL_PROVINSI) {
     const { status, pokjaId } = getStatus(p.name)
-    const pokjaKabKota = status === "Aktif" ? Math.floor(p.kabKota * 0.3) : 0
+    const includedKab = KAB_TO_INCLUDE[p.name] || []
+    const pokjaKabKota = status === "Aktif" ? includedKab.length : 0
     no++
     const skor = status === "Aktif" ? seedScore(no, 60, 100) : undefined
     const bidangTersedia = status === "Aktif" ? 3 + (no % 3) : undefined
@@ -143,9 +150,10 @@ function generateRows(): ProvinsiRow[] {
     })
 
     if (KAB_TO_INCLUDE[p.name]) {
-      for (const kabName of KAB_TO_INCLUDE[p.name]) {
+      for (let kabIdx = 0; kabIdx < KAB_TO_INCLUDE[p.name].length; kabIdx++) {
+        const kabName = KAB_TO_INCLUDE[p.name][kabIdx]
         const fullName = `${p.name} - ${kabName}`
-        const { status: kabStatus, pokjaId: kabPokjaId } = getStatus(fullName)
+        const { status: kabStatus, pokjaId: kabPokjaId } = getStatus(fullName, kabIdx)
         const isAktif = kabStatus === "Aktif"
         const kabNo = ++no
         const kabSkor = isAktif ? seedScore(kabNo, 60, 100) : undefined
@@ -173,57 +181,19 @@ function generateRows(): ProvinsiRow[] {
 }
 
 const PLACEHOLDER_ROWS: ProvinsiRow[] = [
-  {
-    no: 9001, provinsi: "Kalimantan Barat - Pontianak", statusPokja: "Aktif",
-    jumlahKabKota: 1, pokjaKabKota: 1, persentase: 100,
-    skor: 88, skorDelta: 5, bidangTersedia: 4, kontak: "081234560001",
-  },
-  {
-    no: 9002, provinsi: "Sulawesi Tengah - Palu", statusPokja: "Aktif",
-    jumlahKabKota: 1, pokjaKabKota: 1, persentase: 100,
-    skor: 76, skorDelta: -2, bidangTersedia: 3, kontak: "081234560002",
-  },
-  {
-    no: 9003, provinsi: "Nusa Tenggara Barat - Mataram", statusPokja: "Aktif",
-    jumlahKabKota: 1, pokjaKabKota: 1, persentase: 100,
-    skor: 92, skorDelta: 8, bidangTersedia: 5, kontak: "081234560003",
-  },
-  {
-    no: 9004, provinsi: "Bengkulu - Kota Bengkulu", statusPokja: "Belum Dibentuk",
-    jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
-  },
-  {
-    no: 9005, provinsi: "Jambi - Kota Jambi", statusPokja: "Belum Dibentuk",
-    jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
-  },
-  {
-    no: 9006, provinsi: "Lampung - Bandar Lampung", statusPokja: "Belum Dibentuk",
-    jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
-  },
-  {
-    no: 9007, provinsi: "Maluku - Ambon", statusPokja: "Belum Dibentuk",
-    jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
-  },
-  {
-    no: 9008, provinsi: "Papua Barat - Manokwari", statusPokja: "Belum Dibentuk",
-    jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
-  },
-  {
-    no: 9009, provinsi: "Gorontalo - Kota Gorontalo", statusPokja: "Belum Dibentuk",
-    jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
-  },
-  {
-    no: 9010, provinsi: "Papua Tengah - Nabire", statusPokja: "Belum Dibentuk",
-    jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
-  },
-  {
-    no: 9011, provinsi: "Papua Pegunungan - Wamena", statusPokja: "Belum Dibentuk",
-    jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
-  },
-  {
-    no: 9012, provinsi: "Sulawesi Barat - Mamuju", statusPokja: "Belum Dibentuk",
-    jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0,
-  },
+  { no: 9001, provinsi: "Aceh - Sabang", statusPokja: "Belum Dibentuk", jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0 },
+  { no: 9002, provinsi: "Aceh - Subulussalam", statusPokja: "Belum Dibentuk", jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0 },
+  { no: 9003, provinsi: "Aceh - Simeulue", statusPokja: "Belum Dibentuk", jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0 },
+  { no: 9004, provinsi: "Aceh - Aceh Tenggara", statusPokja: "Belum Dibentuk", jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0 },
+  { no: 9005, provinsi: "Aceh - Gayo Lues", statusPokja: "Belum Dibentuk", jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0 },
+  { no: 9006, provinsi: "Aceh - Aceh Selatan", statusPokja: "Belum Dibentuk", jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0 },
+  { no: 9007, provinsi: "Aceh - Aceh Barat Daya", statusPokja: "Belum Dibentuk", jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0 },
+  { no: 9008, provinsi: "Aceh - Nagan Raya", statusPokja: "Belum Dibentuk", jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0 },
+  { no: 9009, provinsi: "Aceh - Aceh Singkil", statusPokja: "Belum Dibentuk", jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0 },
+  { no: 9010, provinsi: "Aceh - Bener Meriah", statusPokja: "Belum Dibentuk", jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0 },
+  { no: 9011, provinsi: "Aceh - Aceh Tamiang", statusPokja: "Belum Dibentuk", jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0 },
+  { no: 9012, provinsi: "Aceh - Langsa", statusPokja: "Belum Dibentuk", jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0 },
+  { no: 9013, provinsi: "Aceh - Aceh Jaya", statusPokja: "Belum Dibentuk", jumlahKabKota: 1, pokjaKabKota: 0, persentase: 0 },
 ]
 
 export const PROVINSI_DATA: ProvinsiRow[] = [...generateRows(), ...PLACEHOLDER_ROWS]

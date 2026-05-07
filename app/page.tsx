@@ -202,20 +202,20 @@ export default function LandingPage() {
                         <Divider />
                         <div className="flex-1 min-w-0 py-2">
                           {(() => {
-                            const row = filteredPokja[0]
-                            const totalKabKota = row.pokjaKabKota || 0
                             const kabKotaDenominator = KAB_KOTA_PER_PROVINSI[selectedProvince] || 0
                             const activeList = filteredPokja.filter(p => p.statusPokja === "Aktif" && p.provinsi.includes(" - ")).map(p => p.provinsi.split(" - ")[1])
-                            const inactiveCount = kabKotaDenominator - activeList.length
-                            const hasMore = activeList.length > 3 || inactiveCount > 3
+                            const totalKabKotaTerbentuk = activeList.length
+                            const percentage = kabKotaDenominator > 0 ? Math.round((totalKabKotaTerbentuk / kabKotaDenominator) * 100) : 0
+                            const belumList = PROVINSI_DATA.filter(p => p.provinsi.startsWith(selectedProvince + " - ") && p.statusPokja !== "Aktif").map(p => p.provinsi.split(" - ")[1])
+                            const hasMore = activeList.length > 3 || belumList.length > 3
                             const displayActive = expandAllKabKota ? activeList : activeList.slice(0, 3)
                             return (
                               <div className={cn("flex flex-col border border-slate-200 rounded-lg overflow-hidden", expandAllKabKota ? "justify-start" : "justify-center", "h-full")}>
                                 <div className="flex items-center justify-between px-3 py-2 border-b border-slate-200">
                                   <div>
                                     <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Persentase Kab/Kota Terbentuk</p>
-                                    <p className="text-2xl font-extrabold text-slate-700 tabular-nums leading-none mt-1">{Math.round(totalKabKota / kabKotaDenominator * 100)}%</p>
-                                    <p className="text-xs text-slate-400 mt-0.5">{totalKabKota} dari {kabKotaDenominator} Kab/Kota</p>
+                                    <p className="text-2xl font-extrabold text-slate-700 tabular-nums leading-none mt-1">{percentage}%</p>
+                                    <p className="text-xs text-slate-400 mt-0.5">{totalKabKotaTerbentuk} dari {kabKotaDenominator} Kab/Kota</p>
                                   </div>
                                   <button onClick={() => setShowKabKotaList(v => !v)} className="p-1 hover:bg-slate-100 rounded transition-colors">
                                     <ChevronDown className={cn("w-4 h-4 text-slate-400 transition-transform", showKabKotaList && "rotate-180")} />
@@ -226,7 +226,7 @@ export default function LandingPage() {
                                     <div className="flex bg-slate-50 border-b border-slate-200">
                                       <div className="flex-1 px-3 py-2"><p className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Terbentuk ({activeList.length})</p></div>
                                       <div className="w-px bg-slate-200 shrink-0" />
-                                      <div className="flex-1 px-3 py-2 border-l border-slate-200"><p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Belum Terbentuk ({inactiveCount})</p></div>
+                                      <div className="flex-1 px-3 py-2 border-l border-slate-200"><p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Belum Terbentuk ({belumList.length})</p></div>
                                     </div>
                                     <div className="flex">
                                       <div className="flex-1 flex flex-col gap-1 px-3 py-2">
@@ -236,7 +236,10 @@ export default function LandingPage() {
                                       </div>
                                       <div className="w-px bg-slate-100 shrink-0" />
                                       <div className="flex-1 flex flex-col gap-1 px-3 py-2 border-l border-slate-100">
-                                        {inactiveCount > 0 && <div className="text-sm text-slate-500">Dan {inactiveCount} lainnya</div>}
+                                        {(expandAllKabKota ? belumList : belumList.slice(0, 3)).map(kota => (
+                                          <div key={kota} className="flex items-center gap-1.5 min-w-0"><span className="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0" /><span className="text-sm text-slate-700">{kota}</span></div>
+                                        ))}
+                                        {belumList.length > 3 && !expandAllKabKota && <div className="text-xs text-slate-500">Dan {belumList.length - 3} lainnya</div>}
                                       </div>
                                     </div>
                                     {hasMore && (
@@ -249,6 +252,12 @@ export default function LandingPage() {
                               </div>
                             )
                           })()}
+                        </div>
+                        <Divider />
+                        <div className="shrink-0 flex flex-col justify-center h-[168px] w-32">
+                          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Capaian Provinsi</p>
+                          <p className="text-3xl font-extrabold text-slate-700 tabular-nums leading-none">100%</p>
+                          <p className="text-xs text-slate-400 mt-1">1 dari 1 Provinsi</p>
                         </div>
                         <Divider />
                         <div className="shrink-0 flex items-center h-[168px]">
@@ -257,68 +266,67 @@ export default function LandingPage() {
                       </div>
                     ) : (
                       <div className="flex flex-1 gap-6 min-w-0">
-                        <div className="shrink-0 flex flex-col justify-center h-[168px] w-36">
-                          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Status Pokja Provinsi</p>
-                          <span className={cn("inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold w-fit", pokjaAktif > 0 ? "bg-emerald-100 text-emerald-700 border border-emerald-200" : "bg-slate-100 text-slate-500 border border-slate-200")}>
-                            {pokjaAktif > 0 ? "Terbentuk" : "Belum Terbentuk"}
-                          </span>
-                        </div>
-                        <Divider />
-                        <div className="flex-1 min-w-0 py-2">
+                          <div className="shrink-0 flex flex-col justify-center h-[168px] w-36">
+                            {(() => {
+                              const kabKotaDenominator = KAB_KOTA_PER_PROVINSI[selectedProvince] || 0
+                              const provinceRow = filteredPokja.find(p => p.provinsi === selectedProvince)
+                              const provinceActive = provinceRow?.statusPokja === "Aktif" ? 1 : 0
+                              const activeList = filteredPokja.filter(p => p.statusPokja === "Aktif" && p.provinsi.includes(" - "))
+                              const totalKabKotaTerbentuk = activeList.length
+                              const percentage = kabKotaDenominator > 0 ? Math.round((totalKabKotaTerbentuk / kabKotaDenominator) * 100) : 0
+                              return (
+                                <>
+                                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Kelompok Kerja Terbentuk</p>
+                                  <p className="text-3xl font-extrabold text-slate-700 tabular-nums leading-none">{percentage}%</p>
+                                  <p className="text-xs text-slate-400 mt-1">{provinceActive} dari 1 Provinsi dan {totalKabKotaTerbentuk} dari {kabKotaDenominator} kab/kota</p>
+                                </>
+                              )
+                            })()}
+                          </div>
+                          <Divider />
+<div className="flex-1 min-w-0 py-2">
                           {(() => {
                             const kabKotaDenominator = KAB_KOTA_PER_PROVINSI[selectedProvince] || 0
-                            const totalKabKotaTerbentuk = filteredPokja.reduce((s, p) => s + p.pokjaKabKota, 0)
-                            const aktifList = filteredPokja.filter(p => p.statusPokja === "Aktif").map(p => p.provinsi.includes(" - ") ? p.provinsi.split(" - ")[1] : p.provinsi)
-                            const belumList = Array.from({ length: Math.max(0, kabKotaDenominator - totalKabKotaTerbentuk) }, (_, i) => `Kab/Kota ${i + 1}`)
-                            const hasMore = aktifList.length > 3 || belumList.length > 3
-                            const displayAktif = expandAllKabKota ? aktifList : aktifList.slice(0, 3)
+                            const provinceRow = filteredPokja.find(p => p.provinsi === selectedProvince)
+                            const provinceActive = provinceRow?.statusPokja === "Aktif" ? [selectedProvince] : []
+                            const activeList = filteredPokja.filter(p => p.statusPokja === "Aktif" && p.provinsi.includes(" - ")).map(p => p.provinsi.split(" - ")[1])
+                            const allActiveList = [...provinceActive, ...activeList]
+                            const totalKabKotaTerbentuk = activeList.length
+                            const percentage = kabKotaDenominator > 0 ? Math.round((totalKabKotaTerbentuk / kabKotaDenominator) * 100) : 0
+                            const provinceBelum = provinceRow && provinceRow.statusPokja !== "Aktif" ? [selectedProvince] : []
+                            const kabBelumList = PROVINSI_DATA.filter(p => p.provinsi.startsWith(selectedProvince + " - ") && p.statusPokja !== "Aktif").map(p => p.provinsi.split(" - ")[1])
+                            const belumList = [...provinceBelum, ...kabBelumList]
+                            const displayActive = expandAllKabKota ? allActiveList : allActiveList.slice(0, 3)
                             const displayBelum = expandAllKabKota ? belumList : belumList.slice(0, 3)
+                            const hasMore = allActiveList.length > 3 || belumList.length > 3
                             return (
                               <div className={cn("flex flex-col border border-slate-200 rounded-lg overflow-hidden", expandAllKabKota ? "justify-start" : "justify-center", "h-full")}>
-                                <div className="flex items-center justify-between px-3 py-2 border-b border-slate-200">
-                                  <div>
-                                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Persentase Kab/Kota Terbentuk</p>
-                                    <p className="text-2xl font-extrabold text-slate-700 tabular-nums leading-none mt-1">{Math.round(totalKabKotaTerbentuk / kabKotaDenominator * 100)}%</p>
-                                    <p className="text-xs text-slate-400 mt-0.5">{totalKabKotaTerbentuk} dari {kabKotaDenominator} Kab/Kota</p>
-                                  </div>
-                                  <button onClick={() => setShowKabKotaList(v => !v)} className="p-1 hover:bg-slate-100 rounded transition-colors">
-                                    <ChevronDown className={cn("w-4 h-4 text-slate-400 transition-transform", showKabKotaList && "rotate-180")} />
-                                  </button>
+                                <div className="flex bg-slate-50 border-b border-slate-200">
+                                  <div className="flex-1 px-3 py-2"><p className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Terbentuk ({allActiveList.length})</p></div>
+                                  <div className="w-px bg-slate-200 shrink-0" />
+                                  <div className="flex-1 px-3 py-2 border-l border-slate-200"><p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Belum Terbentuk ({belumList.length})</p></div>
                                 </div>
-                                {showKabKotaList && (
-                                  <>
-                                    <div className="flex bg-slate-50 border-b border-slate-200">
-                                      <div className="flex-1 px-3 py-2"><p className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Terbentuk ({aktifList.length})</p></div>
-                                      <div className="w-px bg-slate-200 shrink-0" />
-                                      <div className="flex-1 px-3 py-2 border-l border-slate-200"><p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Belum Terbentuk ({belumList.length})</p></div>
-                                    </div>
-                                    <div className="flex">
-                                      <div className="flex-1 flex flex-col gap-1 px-3 py-2">
-                                        {displayAktif.map(kota => (
-                                          <div key={kota} className="flex items-center gap-1.5 min-w-0"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" /><span className="text-sm text-slate-700">{kota}</span></div>
-                                        ))}
-                                      </div>
-                                      <div className="w-px bg-slate-100 shrink-0" />
-                                      <div className="flex-1 flex flex-col gap-1 px-3 py-2 border-l border-slate-100">
-                                        {displayBelum.map(kota => (
-                                          <div key={kota} className="flex items-center gap-1.5 min-w-0"><span className="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0" /><span className="text-sm text-slate-700">{kota}</span></div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                    {hasMore && (
-                                      <div className="border-t border-slate-200 px-3 py-2 text-center">
-                                        <button onClick={() => setExpandAllKabKota(v => !v)} className="text-xs text-blue-600 hover:text-blue-700 font-medium">{expandAllKabKota ? "Sembunyikan" : "Tampilkan seluruhnya"}</button>
-                                      </div>
-                                    )}
-                                  </>
+                                <div className="flex">
+                                  <div className="flex-1 flex flex-col gap-1 px-3 py-2">
+                                    {displayActive.map(kota => (
+                                      <div key={kota} className="flex items-center gap-1.5 min-w-0"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" /><span className="text-sm text-slate-700">{kota}</span></div>
+                                    ))}
+                                  </div>
+                                  <div className="w-px bg-slate-100 shrink-0" />
+                                  <div className="flex-1 flex flex-col gap-1 px-3 py-2 border-l border-slate-100">
+                                    {displayBelum.map(kota => (
+                                      <div key={kota} className="flex items-center gap-1.5 min-w-0"><span className="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0" /><span className="text-sm text-slate-700">{kota}</span></div>
+                                    ))}
+                                  </div>
+                                </div>
+                                {hasMore && (
+                                  <div className="border-t border-slate-200 px-3 py-2 text-center">
+                                    <button onClick={() => setExpandAllKabKota(v => !v)} className="text-xs text-blue-600 hover:text-blue-700 font-medium">{expandAllKabKota ? "Sembunyikan" : "Tampilkan seluruhnya"}</button>
+                                  </div>
                                 )}
                               </div>
                             )
                           })()}
-                        </div>
-                        <Divider />
-                        <div className="shrink-0 flex items-center h-[168px]">
-                          <Button onClick={() => router.push("/kelompok-kerja")} size="sm" className="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 gap-1 shrink-0">Lihat Detail <ArrowRight className="w-3.5 h-3.5" /></Button>
                         </div>
                       </div>
                     ) : selectedProvince === "__hanya_provinsi__" ? (
