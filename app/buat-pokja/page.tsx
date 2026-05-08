@@ -93,7 +93,7 @@ function MemberSection({ label, value, onChange, isCollapsed, onToggleCollapse, 
         className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition"
         onClick={onToggleCollapse}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gapx-4 mt-2 mb-4">
           <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
             <User className="w-3.5 h-3.5 text-blue-700" />
           </div>
@@ -109,7 +109,7 @@ function MemberSection({ label, value, onChange, isCollapsed, onToggleCollapse, 
         )}
       </div>
       {!isCollapsed && (
-      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
         <InputField label="Nama" required placeholder="Nama lengkap" value={value.nama} onChange={(v) => onChange("nama", v)} hasError={showErrors && !value.nama} />
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-gray-600">Jenis Kelamin <span className="text-red-500">*</span></label>
@@ -169,7 +169,7 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue, isCollaps
         className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition"
         onClick={onToggleCollapse}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gapx-4 mt-2 mb-4">
           <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
             <User className="w-3.5 h-3.5 text-blue-700" />
           </div>
@@ -185,7 +185,7 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue, isCollaps
         )}
       </div>
       {!isCollapsed && (
-      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
         <InputField label="Nama" required placeholder="Nama lengkap" value={value.nama} onChange={(v) => onChange("nama", v)} hasError={showErrors && !value.nama} />
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-gray-600">Jenis Kelamin <span className="text-red-500">*</span></label>
@@ -231,7 +231,7 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue, isCollaps
 
 function ReviewRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-0.5">
+    <div className="flex flex-col gapx-4 mt-2 mb-4.5">
       <span className="text-xs text-gray-500">{label}</span>
       <span className="text-sm font-medium text-gray-800">{value || "-"}</span>
     </div>
@@ -242,11 +242,11 @@ function ReviewMemberCard({ label, member }: { label: string; member: MemberFiel
   const isEmpty = !member.nama && !member.email && !member.noWhatsapp
   return (
     <div className="rounded-lg border border-gray-200 overflow-hidden">
-      <div className="px-3 py-2 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
+      <div className="px-3 py-2 bg-gray-50 border-b border-gray-200 flex items-center gapx-4 mt-2 mb-4">
         <User className="w-3.5 h-3.5 text-blue-600" />
         <span className="text-xs font-semibold text-gray-700">{label}</span>
         {isEmpty && (
-          <span className="ml-auto text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Belum diisi</span>
+          <span className="ml-auto text-xs text-amber-600 bg-amber-50 px-2 mt-2 mb-4.5 rounded-full">Belum diisi</span>
         )}
       </div>
       {!isEmpty && (
@@ -461,7 +461,7 @@ function ReviewTable({ members, anggotaList, onEdit, onDelete, onResetMember }: 
                   )}
                 </td>
                 <td className={cn("px-4 py-3 whitespace-nowrap border-b border-gray-100", (row.status === "Belum diisi" || row.status === "Tidak Lengkap") ? "bg-red-50" : "bg-white")}>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gapx-4 mt-2 mb-4">
                     {!row.isCategory && (
                       <button 
                         onClick={() => {
@@ -513,7 +513,7 @@ function ReviewAccordion({ members, anggotaList }: { members: Members; anggotaLi
     const isOpen = openKeys.has(rowKey)
     return (
       <div>
-        <button type="button" className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition text-left" onClick={() => toggle(rowKey)}>
+<button type="button" className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition text-left" onClick={() => toggle(rowKey)}>
           <div className="flex items-center gap-3">
             <div className={cn("w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0", purple ? "bg-purple-100" : "bg-blue-100")}>
               <User className={cn("w-3 h-3", purple ? "text-purple-700" : "text-blue-700")} />
@@ -526,8 +526,8 @@ function ReviewAccordion({ members, anggotaList }: { members: Members; anggotaLi
           <ChevronDown className={cn("w-4 h-4 text-gray-400 flex-shrink-0 transition", isOpen && "rotate-180")} />
         </button>
         {isOpen && (
-          <div className="px-4 pb-3 pt-1 bg-white -mt-1">
-            <div className="grid grid-cols-3 gap-x-6 gap-y-2 pl-[44px]">
+          <div className="pl-[52px] pr-4 bg-white -mt-1">
+            <div className="grid grid-cols-3 gap-x-6 gap-y-2 px-4 mt-2 mb-4 border-l-2 border-blue-300">
               <div>
                 <p className="text-xs text-gray-400">Jenis Kelamin</p>
                 <p className="text-sm font-medium text-gray-800">{m.jenisKelamin}</p>
@@ -555,11 +555,11 @@ function ReviewAccordion({ members, anggotaList }: { members: Members; anggotaLi
     )
   }
 
-  const AnggotaRow = ({ a, rowKey, label }: { a: AnggotaItem; rowKey: string; label: string }) => {
+const AnggotaRow = ({ a, rowKey, label }: { a: AnggotaItem; rowKey: string; label: string }) => {
     const isOpen = openKeys.has(rowKey)
     return (
       <div>
-        <button type="button" className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition text-left" onClick={() => toggle(rowKey)}>
+<button type="button" className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition text-left" onClick={() => toggle(rowKey)}>
           <div className="flex items-center gap-3">
             <div className="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
               <User className="w-3 h-3 text-purple-700" />
@@ -572,8 +572,8 @@ function ReviewAccordion({ members, anggotaList }: { members: Members; anggotaLi
           <ChevronDown className={cn("w-4 h-4 text-gray-400 flex-shrink-0 transition", isOpen && "rotate-180")} />
         </button>
         {isOpen && (
-          <div className="px-4 pb-3 pt-1 bg-white -mt-1">
-            <div className="grid grid-cols-3 gap-x-6 gap-y-2 pl-[44px]">
+          <div className="pl-[52px] pr-4 bg-white -mt-1">
+            <div className="grid grid-cols-3 gap-x-6 gap-y-2 px-4 mt-2 mb-4 border-l-2 border-purple-300">
               <div>
                 <p className="text-xs text-gray-400">Jenis Kelamin</p>
                 <p className="text-sm font-medium text-gray-800">{a.jenisKelamin}</p>
@@ -617,7 +617,7 @@ function ReviewAccordion({ members, anggotaList }: { members: Members; anggotaLi
   let counter = 0
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4 mt-2 mb-4">
       <div className="rounded-xl border border-gray-200 overflow-hidden">
         <SectionHeader title="Pimpinan" />
         <div className="divide-y divide-gray-200">
@@ -674,13 +674,13 @@ function FileUploadField({ value, onChange, error }: { value: File | null; onCha
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f) }}
         className={cn(
-          "flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-xl p-8 cursor-pointer transition",
+          "flex flex-col items-center justify-center gapx-4 mt-2 mb-4 border-2 border-dashed rounded-xl p-8 cursor-pointer transition",
           error ? "border-red-400 bg-red-50" : "border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50"
         )}
       >
         <Upload className={cn("w-6 h-6", error ? "text-red-400" : "text-gray-400")} />
         {value ? (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gapx-4 mt-2 mb-4">
             <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
             <span className="text-sm font-medium text-gray-800 break-all">{value.name}</span>
             <button type="button" onClick={(e) => { e.stopPropagation(); onChange(null) }} className="ml-1 text-gray-400 hover:text-red-500 transition" aria-label="Hapus file">
@@ -1078,7 +1078,7 @@ export default function BuatPokjaPage() {
 
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-        <div className="bg-white rounded-2xl p-10 flex flex-col items-center gap-4 shadow-xl max-w-sm w-full text-center">
+        <div className="bg-white rounded-2xl p-10 flex flex-col items-center gap-3 shadow-xl max-w-sm w-full text-center">
           <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
             <CheckCircle2 className="w-8 h-8 text-green-600" />
           </div>
@@ -1109,9 +1109,9 @@ export default function BuatPokjaPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Top bar */}
-      <header className="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+      <header className="sticky topx-4 mt-2 mb-4 z-10 bg-white border-b border-gray-200 shadow-sm">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gapx-4 mt-2 mb-4">
             <button
               onClick={() => router.back()}
               className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition"
@@ -1129,7 +1129,7 @@ export default function BuatPokjaPage() {
           <button
             onClick={handleSaveDraft}
             disabled={isSavingDraft}
-            className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition"
+            className="flex items-center gapx-4 mt-2 mb-4 px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition"
           >
             {isSavingDraft ? "Menyimpan..." : "Simpan Draf"}
           </button>
@@ -1140,14 +1140,14 @@ export default function BuatPokjaPage() {
       <div className="fixed bottom-6 right-6 z-40 flex items-center gap-1">
         <button
           onClick={fillDummyData}
-          className="p-2 text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition shadow-sm"
+          className="px-4 mt-2 mb-4 text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition shadow-sm"
           title="Isi Otomatis (Demo)"
         >
           <Wand2 className="w-4 h-4" />
         </button>
         <button
           onClick={() => setFlowSteps(flowSteps === 3 ? 4 : 3)}
-          className={cn("p-2 border rounded-lg transition shadow-sm", flowSteps === 4 ? "bg-blue-600 text-white border-blue-600" : "text-gray-500 bg-white border-gray-200 hover:bg-gray-100")}
+          className={cn("px-4 mt-2 mb-4 border rounded-lg transition shadow-sm", flowSteps === 4 ? "bg-blue-600 text-white border-blue-600" : "text-gray-500 bg-white border-gray-200 hover:bg-gray-100")}
           title={flowSteps === 3 ? "3 Langkah (klik untuk 4)" : "4 Langkah (klik untuk 3)"}
         >
           {flowSteps === 3 ? <ToggleLeft className="w-4 h-4" /> : <ToggleRight className="w-4 h-4" />}
@@ -1156,7 +1156,7 @@ export default function BuatPokjaPage() {
 
       {/* Toast notification for draft saved */}
       {showSavedToast && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg shadow-lg animate-pulse">
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gapx-4 mt-2 mb-4 px-4 py-3 bg-green-600 text-white rounded-lg shadow-lg animate-pulse">
           <CheckCircle2 className="w-4 h-4" />
           <span className="text-sm font-medium">Draf berhasil disimpan!</span>
         </div>
@@ -1164,7 +1164,7 @@ export default function BuatPokjaPage() {
 
       <div className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 py-8 flex flex-col gap-8">
         {/* Step indicator */}
-        <div className="flex items-center gap-0">
+        <div className="flex items-center gapx-4 mt-2 mb-4">
           {STEPS.map((s, i) => {
             const isActive = s.number === step
             const isDone = s.number < step
@@ -1211,13 +1211,13 @@ export default function BuatPokjaPage() {
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-semibold text-gray-600">Wilayah</label>
-                  <div className="flex items-center gap-2 h-9 px-3 border border-gray-200 rounded-lg bg-gray-50">
+                  <div className="flex items-center gapx-4 mt-2 mb-4 h-9 px-3 border border-gray-200 rounded-lg bg-gray-50">
                     <Building2 className="w-4 h-4 text-gray-400 flex-shrink-0" />
                     <span className="text-sm text-gray-500">{REGION}</span>
                   </div>
                   <p className="text-xs text-gray-400">Wilayah tidak dapat diubah</p>
                 </div>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gapx-4 mt-2 mb-4">
                   <InputField
                     label="Nomor Kanal Pengaduan dan Aspirasi"
                     required
@@ -1242,7 +1242,7 @@ export default function BuatPokjaPage() {
               <div className="flex flex-col gap-6">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-semibold text-gray-600">Wilayah</label>
-                  <div className="flex items-center gap-2 h-9 px-3 border border-gray-200 rounded-lg bg-gray-50">
+                  <div className="flex items-center gapx-4 mt-2 mb-4 h-9 px-3 border border-gray-200 rounded-lg bg-gray-50">
                     <Building2 className="w-4 h-4 text-gray-400 flex-shrink-0" />
                     <span className="text-sm text-gray-500">{REGION}</span>
                   </div>
@@ -1254,7 +1254,7 @@ export default function BuatPokjaPage() {
                 <div className="flex flex-col gap-5">
                   <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Dokumen SK</p>
                   <FileUploadField value={skFile} onChange={setSkFile} error={fileError} />
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="flex flex-col gap-1.5">
                       <label className="text-xs font-semibold text-gray-600">Nomor SK <span className="text-red-500">*</span></label>
                       <input type="text" value={skDetail.nomorSK} onChange={(e) => setSkDetail((p) => ({ ...p, nomorSK: e.target.value }))}
@@ -1281,7 +1281,7 @@ export default function BuatPokjaPage() {
 
                 <hr className="border-gray-100" />
 
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gapx-4 mt-2 mb-4">
                   <InputField
                     label="Nomor Kanal Pengaduan dan Aspirasi"
                     required
@@ -1305,7 +1305,7 @@ export default function BuatPokjaPage() {
             {step === 2 && (
               <div className="flex flex-col gap-6">
 
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3">
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Pimpinan</p>
                   {PIMPINAN_ROLES.map((r) => (
                     <MemberSection
@@ -1320,7 +1320,7 @@ export default function BuatPokjaPage() {
                   ))}
                 </div>
                 {/* Anggota per Bidang - 6 Wajib */}
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3">
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Anggota per Bidang</p>
                   
                   {/* Anggota Wajib 1: Pendidikan */}
@@ -1391,7 +1391,7 @@ export default function BuatPokjaPage() {
                 </div>
 
                 {/* Anggota Lainnya (Dinamis) */}
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3">
                   {anggotaList.length > 0 && (
                     <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Anggota Lainnya (Opsional)</p>
                   )}
@@ -1406,7 +1406,7 @@ export default function BuatPokjaPage() {
                         className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition"
                         onClick={() => toggleCollapse(index)}
                       >
-                        <div className="flex items-center gap-3 flex-1">
+                        <div className="flex items-center gapx-4 mt-2 mb-4 flex-1">
                           <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
                             <User className="w-3.5 h-3.5 text-blue-700" />
                           </div>
@@ -1437,7 +1437,7 @@ export default function BuatPokjaPage() {
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gapx-4 mt-2 mb-4">
                           <div
                             className="p-1 rounded-lg text-gray-400 hover:text-gray-600 transition"
                           >
@@ -1458,7 +1458,7 @@ export default function BuatPokjaPage() {
                               Silakan pilih bidang terlebih dahulu untuk mengaktifkan form anggota
                             </div>
                           )}
-                          <div className={cn("p-4 grid grid-cols-1 sm:grid-cols-2 gap-4", !isBidangSelected && "opacity-40 pointer-events-none")}>
+                          <div className={cn("p-4 grid grid-cols-1 sm:grid-cols-2 gap-3", !isBidangSelected && "opacity-40 pointer-events-none")}>
                           <InputField
                             label="Nama"
                             required
@@ -1538,7 +1538,7 @@ export default function BuatPokjaPage() {
                   <button
                     onClick={addAnggota}
                     type="button"
-                    className="flex items-center justify-center gap-2 w-full py-2.5 mt-2 border-2 border-dashed border-gray-300 rounded-lg text-sm font-medium text-gray-500 hover:border-blue-400 hover:text-blue-600 transition"
+                    className="flex items-center justify-center gapx-4 mt-2 mb-4 w-full py-2.5 mt-2 border-2 border-dashed border-gray-300 rounded-lg text-sm font-medium text-gray-500 hover:border-blue-400 hover:text-blue-600 transition"
                   >
                     <Plus className="w-4 h-4" /> Tambah Anggota
                   </button>
@@ -1550,7 +1550,7 @@ export default function BuatPokjaPage() {
             {flowSteps === 4 && step === 3 && (
               <div className="flex flex-col gap-5">
                 <FileUploadField value={skFile} onChange={setSkFile} error={fileError} />
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-semibold text-gray-600">Nomor SK <span className="text-red-500">*</span></label>
                     <input type="text" value={skDetail.nomorSK} onChange={(e) => setSkDetail((p) => ({ ...p, nomorSK: e.target.value }))}
@@ -1587,7 +1587,7 @@ export default function BuatPokjaPage() {
                     </p>
                     <button onClick={() => setStep(1)} className="text-xs text-blue-600 hover:underline flex items-center gap-1"><Eye className="w-3 h-3" /> Ubah</button>
                   </div>
-                  <div className="rounded-xl border border-gray-200 p-4 grid grid-cols-2 gap-4">
+                  <div className="rounded-xl border border-gray-200 p-4 grid grid-cols-2 gap-3">
                     <ReviewRow label="Wilayah" value={REGION} />
                     <ReviewRow label="Nomor Kanal Pengaduan" value={kanalPengaduan} />
                     {flowSteps === 3 && (
@@ -1627,7 +1627,7 @@ export default function BuatPokjaPage() {
                       <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Dokumen SK</p>
                       <button onClick={() => setStep(3)} className="text-xs text-blue-600 hover:underline flex items-center gap-1"><Eye className="w-3 h-3" /> Ubah</button>
                     </div>
-                    <div className="rounded-xl border border-gray-200 p-4 grid grid-cols-2 gap-4">
+                    <div className="rounded-xl border border-gray-200 p-4 grid grid-cols-2 gap-3">
                       <ReviewRow label="File SK" value={skFile?.name ?? "-"} />
                       <ReviewRow label="Nomor SK" value={skDetail.nomorSK} />
                       <ReviewRow label="Tanggal SK" value={skDetail.tanggalSK} />
@@ -1660,7 +1660,7 @@ export default function BuatPokjaPage() {
         {/* Navigation buttons */}
         <div className="flex items-center justify-between pb-8">
           {step > 1 ? (
-            <button onClick={handleBack} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-100 transition">
+            <button onClick={handleBack} className="flex items-center gapx-4 mt-2 mb-4 px-4 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-100 transition">
               <ChevronLeft className="w-4 h-4" /> Sebelumnya
             </button>
           ) : <div />}
@@ -1670,7 +1670,7 @@ export default function BuatPokjaPage() {
               onClick={handleNext}
               disabled={!canGoNext()}
               className={cn(
-                "flex items-center gap-2 px-5 py-2 text-sm font-semibold rounded-lg transition",
+                "flex items-center gapx-4 mt-2 mb-4 px-5 py-2 text-sm font-semibold rounded-lg transition",
                 canGoNext()
                   ? "bg-blue-600 text-white hover:bg-blue-700"
                   : "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -1679,10 +1679,10 @@ export default function BuatPokjaPage() {
               Selanjutnya <ChevronRight className="w-4 h-4" />
             </button>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gapx-4 mt-2 mb-4">
               <button
                 onClick={handleSubmit}
-                className="flex items-center gap-2 px-6 py-2 text-sm font-semibold bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                className="flex items-center gapx-4 mt-2 mb-4 px-6 py-2 text-sm font-semibold bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
               >
                 <CheckCircle2 className="w-4 h-4" />
                 {isPerbaikanMode ? "Kirim Perbaikan" : "Ajukan"}
