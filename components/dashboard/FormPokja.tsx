@@ -70,7 +70,7 @@ function MemberSection({
         <span className="text-sm font-semibold text-gray-800">{label}</span>
       </div>
       <div className="p-4 space-y-4">
-        {/* Row 1: Nama & Email */}
+        {/* Row 1: Nama & Jenis Kelamin */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <InputField
             label="Nama"
@@ -79,29 +79,6 @@ function MemberSection({
             value={value.nama}
             onChange={(v) => onChange("nama", v)}
           />
-          <InputField
-            label="Email"
-            required
-            type="email"
-            placeholder="nama@dinas.go.id"
-            value={value.email}
-            onChange={(v) => onChange("email", v)}
-          />
-        </div>
-
-        {/* Row 2: Bidang (if specified and disabled) */}
-        {bidangValue !== undefined && (
-          <InputField
-            label="Bidang"
-            required
-            value={bidangValue}
-            readOnly={bidangDisabled}
-            onChange={() => {}}
-          />
-        )}
-
-        {/* Row 3: Jenis Kelamin & No WA */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Jenis Kelamin */}
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-gray-600">
@@ -120,6 +97,18 @@ function MemberSection({
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
             </div>
           </div>
+        </div>
+
+        {/* Row 2: Email & No WA */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField
+            label="Email"
+            required
+            type="email"
+            placeholder="nama@dinas.go.id"
+            value={value.email}
+            onChange={(v) => onChange("email", v)}
+          />
           {/* No WA */}
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-gray-600">
@@ -139,14 +128,33 @@ function MemberSection({
           </div>
         </div>
 
-        {/* Row 4: Instansi */}
-        <InputField
-          label="Instansi"
-          required
-          placeholder="Nama instansi / lembaga"
-          value={value.instansi}
-          onChange={(v) => onChange("instansi", v)}
-        />
+        {/* Row 3: Instansi & Jabatan pada Instansi */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField
+            label="Instansi"
+            required
+            placeholder="Nama instansi / lembaga"
+            value={value.instansi}
+            onChange={(v) => onChange("instansi", v)}
+          />
+          <InputField
+            label="Jabatan pada Instansi"
+            placeholder="Contoh: Kepala Bidang / Staff"
+            value={value.jabatan}
+            onChange={(v) => onChange("jabatan", v)}
+          />
+        </div>
+
+        {/* Row 4: Bidang (if specified and disabled) */}
+        {bidangValue !== undefined && (
+          <InputField
+            label="Bidang"
+            required
+            value={bidangValue}
+            readOnly={bidangDisabled}
+            onChange={() => {}}
+          />
+        )}
       </div>
     </div>
   )
@@ -302,10 +310,11 @@ function ReviewMemberCard({ label, member }: { label: string; member: MemberFiel
       {!isEmpty && (
         <div className="px-3 py-2 grid grid-cols-2 gap-x-4 gap-y-1.5">
           <ReviewRow label="Nama" value={member.nama} />
-          <ReviewRow label="Email" value={member.email} />
           <ReviewRow label="Jenis Kelamin" value={member.jenisKelamin} />
-          <ReviewRow label="Nomor HP" value={member.noWhatsapp} />
           <ReviewRow label="Instansi" value={member.instansi} />
+          <ReviewRow label="Jabatan pada Instansi" value={member.jabatan || "-"} />
+          <ReviewRow label="Email" value={member.email} />
+          <ReviewRow label="Nomor HP" value={member.noWhatsapp} />
         </div>
       )}
     </div>
@@ -317,16 +326,16 @@ function ReviewMemberCard({ label, member }: { label: string; member: MemberFiel
 // ---------------------------------------------------------------------------
 function downloadTemplate() {
   const csv = [
-    ["Jabatan pada Instansi", "Nama", "Email", "Jenis Kelamin", "Nomor HP", "Instansi"],
-    ["Ketua Kelompok Kerja", "", "", "Laki-Laki/Perempuan", "", ""],
-    ["Wakil Ketua Kelompok Kerja", "", "", "Laki-Laki/Perempuan", "", ""],
-    ["Koordinator", "", "", "Laki-Laki/Perempuan", "", ""],
-    ["Bidang Pendidikan", "", "", "Laki-Laki/Perempuan", "", ""],
-    ["Bidang PPPA", "", "", "Laki-Laki/Perempuan", "", ""],
-    ["Bidang Sosial", "", "", "Laki-Laki/Perempuan", "", ""],
-    ["Bidang Kesehatan", "", "", "Laki-Laki/Perempuan", "", ""],
-    ["Bidang Kominfo", "", "", "Laki-Laki/Perempuan", "", ""],
-    ["Bidang Dukbangga", "", "", "Laki-Laki/Perempuan", "", ""],
+    ["Nama", "Email", "Jenis Kelamin", "Nomor HP", "Instansi", "Jabatan pada Instansi"],
+    ["", "", "Laki-Laki/Perempuan", "", "", ""],
+    ["", "", "Laki-Laki/Perempuan", "", "", ""],
+    ["", "", "Laki-Laki/Perempuan", "", "", ""],
+    ["", "", "Laki-Laki/Perempuan", "", "", ""],
+    ["", "", "Laki-Laki/Perempuan", "", "", ""],
+    ["", "", "Laki-Laki/Perempuan", "", "", ""],
+    ["", "", "Laki-Laki/Perempuan", "", "", ""],
+    ["", "", "Laki-Laki/Perempuan", "", "", ""],
+    ["", "", "Laki-Laki/Perempuan", "", "", ""],
   ]
     .map((r) => r.join(","))
     .join("\n")
@@ -341,30 +350,31 @@ function downloadTemplate() {
 
 function parseExcelCSV(text: string, setMembers: React.Dispatch<React.SetStateAction<Members>>) {
   const rows = text.trim().split("\n").slice(1) // skip header
-  const keyMap: Record<string, RoleKey> = {
-    "ketua kelompok kerja": "ketua",
-    "wakil ketua kelompok kerja": "wakil",
-    koordinator: "koordinator",
-    "bidang pendidikan": "pendidikan",
-    "bidang pppa": "pppa",
-    "bidang sosial": "sosial",
-    "bidang kesehatan": "kesehatan",
-    "bidang kominfo": "kominfo",
-    "bidang dukbangga": "dukbangga",
+  const keyMap: Record<number, RoleKey> = {
+    0: "ketua",
+    1: "wakil",
+    2: "koordinator",
+    3: "pendidikan",
+    4: "pppa",
+    5: "sosial",
+    6: "kesehatan",
+    7: "kominfo",
+    8: "dukbangga",
   }
 
   const updates: Partial<Members> = {}
-  rows.forEach((row) => {
-    const cols = row.split(",").map((c) => c.trim().replace(/^"|"$/g, ""))
-    const jabatan = cols[0]?.toLowerCase() ?? ""
-    const key = keyMap[jabatan]
+  rows.forEach((row, idx) => {
+    if (idx >= 9) return
+    const key = keyMap[idx]
     if (!key) return
+    const cols = row.split(",").map((c) => c.trim().replace(/^"|"$/g, ""))
     updates[key] = {
-      nama: cols[1] ?? "",
-      email: cols[2] ?? "",
-      jenisKelamin: (cols[3] === "Laki-Laki" || cols[3] === "Perempuan" ? cols[3] : "") as MemberField["jenisKelamin"],
-      noWhatsapp: (cols[4] ?? "").replace(/\D/g, ""),
-      instansi: cols[5] ?? "",
+      nama: cols[0] ?? "",
+      email: cols[1] ?? "",
+      jenisKelamin: (cols[2] === "Laki-Laki" || cols[2] === "Perempuan" ? cols[2] : "") as MemberField["jenisKelamin"],
+      noWhatsapp: (cols[3] ?? "").replace(/\D/g, ""),
+      instansi: cols[4] ?? "",
+      jabatan: cols[5] ?? "",
     }
   })
 

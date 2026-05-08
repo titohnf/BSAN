@@ -254,7 +254,7 @@ function ReviewMemberCard({ label, member }: { label: string; member: MemberFiel
           <ReviewRow label="Nama" value={member.nama} />
           <ReviewRow label="Jenis Kelamin" value={member.jenisKelamin} />
           <ReviewRow label="Instansi" value={member.instansi} />
-          {member.jabatan && <ReviewRow label="Jabatan pada Instansi" value={member.jabatan} />}
+          <ReviewRow label="Jabatan pada Instansi" value={member.jabatan || "-"} />
           <ReviewRow label="Email" value={member.email} />
           <ReviewRow label="Nomor HP" value={member.noWhatsapp} />
         </div>
@@ -526,12 +526,29 @@ function ReviewAccordion({ members, anggotaList }: { members: Members; anggotaLi
           <ChevronDown className={cn("w-4 h-4 text-gray-400 flex-shrink-0 transition", isOpen && "rotate-180")} />
         </button>
         {isOpen && (
-          <div className="pl-[52px] pr-4 pb-4 pt-1 grid grid-cols-2 gap-3 bg-white">
-            <ReviewRow label="Jenis Kelamin" value={m.jenisKelamin} />
-            <ReviewRow label="Instansi" value={m.instansi} />
-            {m.jabatan && <ReviewRow label="Jabatan pada Instansi" value={m.jabatan} />}
-            <ReviewRow label="Email" value={m.email} />
-            <ReviewRow label="No. HP" value={m.noWhatsapp} />
+          <div className="px-4 pb-3 pt-1 bg-white -mt-1">
+            <div className="grid grid-cols-3 gap-x-6 gap-y-2 pl-[44px]">
+              <div>
+                <p className="text-xs text-gray-400">Jenis Kelamin</p>
+                <p className="text-sm font-medium text-gray-800">{m.jenisKelamin}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">Instansi</p>
+                <p className="text-sm font-medium text-gray-800">{m.instansi}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">Jabatan pada Instansi</p>
+                <p className="text-sm font-medium text-gray-800">{m.jabatan || "-"}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">Email</p>
+                <p className="text-sm font-medium text-gray-800">{m.email}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">No. HP</p>
+                <p className="text-sm font-medium text-gray-800">{m.noWhatsapp}</p>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -555,12 +572,29 @@ function ReviewAccordion({ members, anggotaList }: { members: Members; anggotaLi
           <ChevronDown className={cn("w-4 h-4 text-gray-400 flex-shrink-0 transition", isOpen && "rotate-180")} />
         </button>
         {isOpen && (
-          <div className="pl-[52px] pr-4 pb-4 pt-1 grid grid-cols-2 gap-3 bg-white">
-            <ReviewRow label="Jenis Kelamin" value={a.jenisKelamin} />
-            <ReviewRow label="Instansi" value={a.instansi || ""} />
-            {a.jabatan && <ReviewRow label="Jabatan pada Instansi" value={a.jabatan} />}
-            <ReviewRow label="Email" value={a.email} />
-            <ReviewRow label="No. HP" value={a.noWhatsapp} />
+          <div className="px-4 pb-3 pt-1 bg-white -mt-1">
+            <div className="grid grid-cols-3 gap-x-6 gap-y-2 pl-[44px]">
+              <div>
+                <p className="text-xs text-gray-400">Jenis Kelamin</p>
+                <p className="text-sm font-medium text-gray-800">{a.jenisKelamin}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">Instansi</p>
+                <p className="text-sm font-medium text-gray-800">{a.instansi || "-"}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">Jabatan pada Instansi</p>
+                <p className="text-sm font-medium text-gray-800">{a.jabatan || "-"}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">Email</p>
+                <p className="text-sm font-medium text-gray-800">{a.email}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">No. HP</p>
+                <p className="text-sm font-medium text-gray-800">{a.noWhatsapp}</p>
+              </div>
+            </div>
           </div>
         )}
       </div>
