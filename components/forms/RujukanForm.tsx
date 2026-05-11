@@ -160,9 +160,7 @@ function StatusBadge({ status, jenisMenunggu, jenisButuhPerbaikan }: { status: S
   if (status === "nonaktif") {
     return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">Nonaktif</span>
   }
-  if (status === "menunggu_review") {
-    return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800">Menunggu Review</span>
-  }
+  
   if (status === "butuh_perbaikan") {
     if (jenisButuhPerbaikan === "perbaikan") {
       return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">Butuh Perbaikan</span>
@@ -170,21 +168,9 @@ function StatusBadge({ status, jenisMenunggu, jenisButuhPerbaikan }: { status: S
     return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">Ditolak</span>
   }
   if (status === "menunggu") {
-    if (jenisMenunggu === "perbaikan") {
-      return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">Perlu Diperiksa - Perbaikan</span>
-    }
-    if (jenisMenunggu === "perbaikan_laporan") {
-      return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">Perlu Diperiksa - Laporan Perbaikan</span>
-    }
-    if (jenisMenunggu === "pemulihan") {
-      return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-teal-100 text-teal-700">Perlu Diperiksa - Pemulihan</span>
-    }
-    if (jenisMenunggu === "penonaktifan") {
-      return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">Perlu Diperiksa - Penonaktifan</span>
-    }
-    return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Perlu Verifikasi</span>
+    return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Dalam Proses Verifikasi</span>
   }
-  return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Perlu Verifikasi</span>
+  return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Dalam Proses Verifikasi</span>
 }
 
 const emptyForm = (): FormState => ({
@@ -267,6 +253,12 @@ function RujukanFormInner() {
   const [showHapusModal, setShowHapusModal] = useState(false)
   const [showAjukanModal, setShowAjukanModal] = useState(false)
   const [ajukanAlasan, setAjukanAlasan] = useState("")
+  const [confirmModal, setConfirmModal] = useState<{
+    show: boolean
+    title: string
+    description: string
+    onConfirm: () => void
+  }>({ show: false, title: "", description: "", onConfirm: () => {} })
 
   useEffect(() => {
     setMounted(true)
@@ -380,6 +372,8 @@ function RujukanFormInner() {
       "terverifikasi",
       isPusat ? RUJUKAN_LOG.diverifikasiPusat : dinasLog.diverifikasi(d)
     )
+    const newLog = isPusat ? RUJUKAN_LOG.diverifikasiPusat : dinasLog.diverifikasi(d)
+    setViewLogTerakhir(newLog)
     setForm((prev) => ({ ...prev, status: "terverifikasi" }))
   }
 
@@ -387,15 +381,18 @@ function RujukanFormInner() {
     if (!viewId) return
     const isPusat = readAuthSession()?.role === "pusat"
     const d = getDinasNamaForLogs()
-    persistStatusChange(viewId, "nonaktif", isPusat ? RUJUKAN_LOG.dinonaktifkanPusat : dinasLog.dinonaktifkan(d), { jenisMenunggu: undefined })
+    const newLog = isPusat ? RUJUKAN_LOG.dinonaktifkanPusat : dinasLog.dinonaktifkan(d)
+    persistStatusChange(viewId, "nonaktif", newLog, { jenisMenunggu: undefined })
+    setViewLogTerakhir(newLog)
     setForm((prev) => ({ ...prev, status: "nonaktif", jenisMenunggu: undefined }))
   }
 
   const handleTerimaPerbaikanNonSekolah = () => {
     if (!viewId) return
     const d = getDinasNamaForLogs()
-    const log = `Laporan perbaikan diterima oleh Admin ${d}`
-    persistStatusChange(viewId, "butuh_perbaikan", log, { jenisMenunggu: undefined, jenisButuhPerbaikan: "ditolak" })
+    const newLog = `Laporan perbaikan diterima oleh Admin ${d}`
+    persistStatusChange(viewId, "butuh_perbaikan", newLog, { jenisMenunggu: undefined, jenisButuhPerbaikan: "ditolak" })
+    setViewLogTerakhir(newLog)
     setForm((prev) => ({ ...prev, status: "butuh_perbaikan", jenisMenunggu: undefined, jenisButuhPerbaikan: "ditolak" }))
     router.push(getRujukanFormExitHref())
   }
@@ -417,7 +414,9 @@ function RujukanFormInner() {
     const d = getDinasNamaForLogs()
     const alasan = deleteAlasan.trim()
     const extra = alasan ? { catatanPerbaikan: alasan } : {}
-    persistStatusChange(viewId, "nonaktif", isPusat ? RUJUKAN_LOG.dinonaktifkanPusat : dinasLog.dinonaktifkan(d), extra)
+    const newLog = isPusat ? RUJUKAN_LOG.dinonaktifkanPusat : dinasLog.dinonaktifkan(d)
+    persistStatusChange(viewId, "nonaktif", newLog, extra)
+    setViewLogTerakhir(newLog)
     setForm((prev) => ({ ...prev, status: "nonaktif", ...extra }))
     setShowDeleteModal(false)
     setDeleteAlasan("")
@@ -436,11 +435,9 @@ function RujukanFormInner() {
     const nextStatus = getStatusAfterRestore(usulanDari)
     const isPusat = readAuthSession()?.role === "pusat"
     const d = getDinasNamaForLogs()
-    persistStatusChange(
-      viewId,
-      nextStatus,
-      isPusat ? RUJUKAN_LOG.dipulihkanPusat : dinasLog.dipulihkan(d)
-    )
+    const newLog = isPusat ? RUJUKAN_LOG.dipulihkanPusat : dinasLog.dipulihkan(d)
+    persistStatusChange(viewId, nextStatus, newLog)
+    setViewLogTerakhir(newLog)
     setForm((prev) => ({ ...prev, status: nextStatus }))
   }
 
@@ -491,6 +488,8 @@ function RujukanFormInner() {
     localStorage.setItem("rujukanList", JSON.stringify(stored))
     window.dispatchEvent(new CustomEvent("rujukanUpdated"))
 
+    setViewLogTerakhir(logMsg)
+    setViewCatatanPerbaikan(`Laporan: ${alasan}`)
     setShowReportModal(false)
     setReportAlasan("")
     setReportJenis(null)
@@ -500,7 +499,10 @@ function RujukanFormInner() {
   const handleSekolahNonaktif = () => {
     if (!viewId || !nonaktifAlasan.trim()) return
     const auth = readAuthSession()
-    persistStatusChange(viewId, "menunggu", `Usulan penonaktifan oleh Admin Sekolah ${auth?.namaSekolah ?? ""}`.trim(), { jenisMenunggu: "penonaktifan", catatanPerbaikan: nonaktifAlasan.trim() })
+    const log = `Usulan penonaktifan oleh Admin Sekolah ${auth?.namaSekolah ?? ""}`.trim()
+    persistStatusChange(viewId, "menunggu", log, { jenisMenunggu: "penonaktifan", catatanPerbaikan: nonaktifAlasan.trim() })
+    setViewLogTerakhir(log)
+    setViewCatatanPerbaikan(nonaktifAlasan.trim())
     setForm((prev) => ({ ...prev, status: "menunggu", jenisMenunggu: "penonaktifan" }))
     setShowNonaktifModal(false)
     setNonaktifAlasan("")
@@ -515,6 +517,8 @@ function RujukanFormInner() {
     else { const s = SEED.find((s) => s.id === viewId); if (s) stored.push({ ...s, ...patch }) }
     localStorage.setItem("rujukanList", JSON.stringify(stored))
     window.dispatchEvent(new CustomEvent("rujukanUpdated"))
+    setViewLogTerakhir(patch.logTerakhir)
+    setViewCatatanPerbaikan(patch.catatanPerbaikan)
     setForm((prev) => ({ ...prev, status: "menunggu", jenisMenunggu: "pemulihan" }))
     setShowPulihkanModal(false)
     setPulihkanAlasan("")
@@ -714,17 +718,85 @@ function RujukanFormInner() {
         </div>
       </div>
 
-      {/* Catatan banner */}
-      {viewCatatanPerbaikan && (
+{/* Status Banner - selalu tampil di mode view */}
+      {isView && (
         <div className="max-w-2xl mx-auto px-4 pt-4">
-          <div className="rounded-lg px-4 py-3 bg-yellow-50 border border-yellow-200">
-            <div className="flex items-center gap-1.5 mb-1">
-              <MessageCircle className="w-3.5 h-3.5 text-yellow-600 flex-shrink-0" />
-              <p className="text-xs font-semibold text-yellow-700">
-                Catatan dari {viewLogTerakhir?.match(/\boleh\s+(.+)$/i)?.[1] ?? "Admin"}
-              </p>
-            </div>
-            <p className="text-sm text-yellow-900">{viewCatatanPerbaikan}</p>
+          <div className={`rounded-lg px-4 py-3 border-2 ${(() => {
+            if (form.status === "terverifikasi") return "bg-green-50 border-green-200"
+            if (form.status === "menunggu") {
+              if (form.jenisMenunggu === "perbaikan") return "bg-orange-50 border-orange-200"
+              if (form.jenisMenunggu === "perbaikan_laporan") return "bg-yellow-50 border-yellow-200"
+              if (form.jenisMenunggu === "pemulihan") return "bg-teal-50 border-teal-200"
+              if (form.jenisMenunggu === "penonaktifan") return "bg-red-50 border-red-200"
+              return "bg-amber-50 border-amber-200"
+            }
+            if (form.status === "menunggu_review") return "bg-orange-50 border-orange-200"
+            if (form.status === "butuh_perbaikan") {
+              if (form.jenisButuhPerbaikan === "perbaikan") return "bg-yellow-50 border-yellow-200"
+              return "bg-red-50 border-red-200"
+            }
+            if (form.status === "nonaktif") return "bg-gray-50 border-gray-200"
+            return "bg-amber-50 border-amber-200"
+          })()}`}>
+            <p className={`text-xs font-bold uppercase mb-2 ${(() => {
+            if (form.status === "terverifikasi") return "text-green-700"
+            if (form.status === "menunggu") {
+              if (form.jenisMenunggu === "perbaikan") return "text-orange-700"
+              if (form.jenisMenunggu === "perbaikan_laporan") return "text-yellow-700"
+              if (form.jenisMenunggu === "pemulihan") return "text-teal-700"
+              if (form.jenisMenunggu === "penonaktifan") return "text-red-700"
+              return "text-amber-700"
+            }
+            if (form.status === "menunggu_review") return "text-orange-800"
+            if (form.status === "butuh_perbaikan") {
+              if (form.jenisButuhPerbaikan === "perbaikan") return "text-yellow-700"
+              return "text-red-700"
+            }
+            if (form.status === "nonaktif") return "text-gray-600"
+            return "text-amber-700"
+          })()}`}>
+              {form.status === "terverifikasi" && "Terverifikasi"}
+              {form.status === "menunggu" && (form.jenisMenunggu === "perbaikan" ? "Perlu Diperiksa - Perbaikan" : form.jenisMenunggu === "perbaikan_laporan" ? "Perlu Diperiksa - Laporan Perbaikan" : form.jenisMenunggu === "pemulihan" ? "Perlu Diperiksa - Pemulihan" : form.jenisMenunggu === "penonaktifan" ? "Perlu Diperiksa - Penonaktifan" : "Perlu Diperiksa")}
+              {form.status === "menunggu_review" && "Menunggu Review"}
+              {form.status === "butuh_perbaikan" && (form.jenisButuhPerbaikan === "perbaikan" ? "Butuh Perbaikan" : "Ditolak")}
+              {form.status === "nonaktif" && "Nonaktif"}
+            </p>
+            <p className={`text-sm font-medium mb-1 ${(() => {
+            if (form.status === "terverifikasi") return "text-green-900"
+            if (form.status === "menunggu") {
+              if (form.jenisMenunggu === "perbaikan") return "text-orange-900"
+              if (form.jenisMenunggu === "perbaikan_laporan") return "text-yellow-900"
+              if (form.jenisMenunggu === "pemulihan") return "text-teal-900"
+              if (form.jenisMenunggu === "penonaktifan") return "text-red-900"
+              return "text-amber-900"
+            }
+            if (form.status === "menunggu_review") return "text-orange-900"
+            if (form.status === "butuh_perbaikan") {
+              if (form.jenisButuhPerbaikan === "perbaikan") return "text-yellow-900"
+              return "text-red-900"
+            }
+            if (form.status === "nonaktif") return "text-gray-900"
+            return "text-amber-900"
+          })()}`}>{viewLogTerakhir || "(Tidak ada)"}</p>
+            {viewCatatanPerbaikan && (
+              <p className={`text-xs leading-relaxed ${(() => {
+            if (form.status === "terverifikasi") return "text-green-700"
+            if (form.status === "menunggu") {
+              if (form.jenisMenunggu === "perbaikan") return "text-orange-700"
+              if (form.jenisMenunggu === "perbaikan_laporan") return "text-yellow-700"
+              if (form.jenisMenunggu === "pemulihan") return "text-teal-700"
+              if (form.jenisMenunggu === "penonaktifan") return "text-red-700"
+              return "text-amber-700"
+            }
+            if (form.status === "menunggu_review") return "text-orange-700"
+            if (form.status === "butuh_perbaikan") {
+              if (form.jenisButuhPerbaikan === "perbaikan") return "text-yellow-700"
+              return "text-red-700"
+            }
+            if (form.status === "nonaktif") return "text-gray-600"
+            return "text-amber-700"
+          })()}`}>Catatan: {viewCatatanPerbaikan}</p>
+            )}
           </div>
         </div>
       )}
@@ -972,7 +1044,12 @@ function RujukanFormInner() {
             {form.status === "nonaktif" && !isSekolah && (
               <button
                 type="button"
-                onClick={handleRestore}
+                onClick={() => setConfirmModal({
+                  show: true,
+                  title: "Pulihkan Sumber Dukungan",
+                  description: "Sumber dukungan akan dikembalikan ke status Terverifikasi dan akan tampil kembali di tabel publik.",
+                  onConfirm: handleRestore
+                })}
                 className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition inline-flex items-center justify-center gap-2"
               >
                 <RotateCcw className="w-4 h-4" />
@@ -1044,7 +1121,12 @@ function RujukanFormInner() {
                   <>
                     <button
                       type="button"
-                      onClick={handleTerimaPenonaktifan}
+                      onClick={() => setConfirmModal({
+                        show: true,
+                        title: "Terima Penonaktifan",
+                        description: "Sumber dukungan ini akan dinonaktifkan. Statusnya akan berubah menjadi Nonaktif dan tidak akan ditampilkan di tabel publik.",
+                        onConfirm: handleTerimaPenonaktifan
+                      })}
                       className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-green-600 hover:bg-green-700 transition inline-flex items-center justify-center gap-2"
                     >
                       <CheckCircle className="w-4 h-4" /> Terima Penonaktifan
@@ -1063,7 +1145,12 @@ function RujukanFormInner() {
                   <>
                     <button
                       type="button"
-                      onClick={handleVerify}
+                      onClick={() => setConfirmModal({
+                        show: true,
+                        title: "Terima Pemulihan",
+                        description: "Sumber dukungan ini akan dikembalikan ke status Terverifikasi dan akan tampil kembali di tabel publik.",
+                        onConfirm: handleVerify
+                      })}
                       className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 transition inline-flex items-center justify-center gap-2"
                     >
                       <CheckCircle className="w-4 h-4" /> Terima Pemulihan
@@ -1082,7 +1169,12 @@ function RujukanFormInner() {
                   <>
                     <button
                       type="button"
-                      onClick={handleTerimaPerbaikanNonSekolah}
+                      onClick={() => setConfirmModal({
+                        show: true,
+                        title: "Terima Laporan",
+                        description: "Laporan perbaikan data akan diterima. Status sumber dukungan berubah menjadi Ditolak dan admin sekolah perlu memperbaiki datanya.",
+                        onConfirm: handleTerimaPerbaikanNonSekolah
+                      })}
                       className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-green-600 hover:bg-green-700 transition inline-flex items-center justify-center gap-2"
                     >
                       <CheckCircle className="w-4 h-4" /> Terima Laporan
@@ -1101,7 +1193,12 @@ function RujukanFormInner() {
                   <>
                     <button
                       type="button"
-                      onClick={handleVerify}
+                      onClick={() => setConfirmModal({
+                        show: true,
+                        title: "Terima Pengajuan",
+                        description: "Sumber dukungan baru ini akan diverifikasi dan ditampilkan di tabel publik sebagai sumber dukungan terverifikasi.",
+                        onConfirm: handleVerify
+                      })}
                       className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-green-600 hover:bg-green-700 transition inline-flex items-center justify-center gap-2"
                     >
                       <CheckCircle className="w-4 h-4" /> Terima Pengajuan
@@ -1119,7 +1216,12 @@ function RujukanFormInner() {
                 {mounted && form.status === "terverifikasi" && !isSekolah && (
                   <button
                     type="button"
-                    onClick={handleDelete}
+                    onClick={() => setConfirmModal({
+                      show: true,
+                      title: "Nonaktifkan Sumber Dukungan",
+                      description: "Sumber dukungan ini akan dinonaktifkan dan tidak akan ditampilkan di tabel publik. Anda dapat memulihkannya nanti bila diperlukan.",
+                      onConfirm: handleDelete
+                    })}
                     className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition"
                   >
                     Nonaktif
@@ -1355,9 +1457,17 @@ function RujukanFormInner() {
               </div>
             </div>
             <div className="p-5 space-y-4">
+              <div className="p-3 rounded-lg bg-amber-50 border border-amber-200">
+                <p className="text-sm text-amber-900">
+                  {tolakModalMode === "tolak_penonaktifan" && "Penolakan akan dikirim ke admin sekolah. Status tetap Terverifikasi dan item akan tetap aktif di tabel publik."}
+                  {tolakModalMode === "tolak_laporan" && "Penolakan akan dikirim ke admin sekolah. Status tetap Terverifikasi dan item akan tetap aktif di tabel publik."}
+                  {tolakModalMode === "tolak_pemulihan" && "Penolakan akan dikirim ke admin sekolah. Status akan tetap Nonaktif dan tidak dapat dipulihkan."}
+                  {tolakModalMode === "tolak" && "Penolakan akan dikirim ke admin sekolah. Status berubah menjadi Ditolak dan admin sekolah perlu memperbaiki data."}
+                </p>
+              </div>
               <div>
                 <p className="text-sm font-medium text-gray-700 mb-1">Instansi</p>
-                <p className="text-sm text-gray-900">{form.namaInstansi}</p>
+                <p className="text-sm font-bold text-gray-900">{form.namaInstansi}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Alasan Penolakan</label>
@@ -1504,6 +1614,39 @@ function RujukanFormInner() {
               >
                 Nonaktifkan
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {confirmModal.show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setConfirmModal({ ...confirmModal, show: false })} />
+          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="w-6 h-6 text-amber-600" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">{confirmModal.title}</h3>
+              <p className="text-sm text-gray-600 mb-6">{confirmModal.description}</p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setConfirmModal({ ...confirmModal, show: false })}
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={() => {
+                    confirmModal.onConfirm()
+                    setConfirmModal({ ...confirmModal, show: false })
+                  }}
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition"
+                >
+                  Ya, Lanjutkan
+                </button>
+              </div>
             </div>
           </div>
         </div>

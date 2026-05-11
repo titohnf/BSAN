@@ -110,44 +110,9 @@ function StatusBadge({ status, jenisMenunggu, jenisButuhPerbaikan }: { status: S
     )
   }
   if (status === "menunggu") {
-    if (jenisMenunggu === "perbaikan") {
-      return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">
-          <Flag className="w-3 h-3" /> Perlu Diperiksa - Perbaikan
-        </span>
-      )
-    }
-    if (jenisMenunggu === "perbaikan_laporan") {
-      return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
-          <Flag className="w-3 h-3" /> Perlu Diperiksa - Laporan Perbaikan
-        </span>
-      )
-    }
-    if (jenisMenunggu === "pemulihan") {
-      return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-teal-100 text-teal-700">
-          <RotateCcw className="w-3 h-3" /> Perlu Diperiksa - Pemulihan
-        </span>
-      )
-    }
-    if (jenisMenunggu === "penonaktifan") {
-      return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
-          <XCircle className="w-3 h-3" /> Perlu Diperiksa - Penonaktifan
-        </span>
-      )
-    }
     return (
       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
         <Clock className="w-3 h-3" /> Dalam Proses Verifikasi
-      </span>
-    )
-  }
-  if (status === "menunggu_review") {
-    return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800">
-        <Clock className="w-3 h-3" /> Menunggu Review
       </span>
     )
   }
@@ -390,7 +355,6 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
   const [myView, setMyView] = useState<MyViewFilter>("semua")
   const [filterWilayah, setFilterWilayah] = useState<{ province: string; kabupaten: string } | null>(null)
   const [filterKategori, setFilterKategori] = useState<KategoriDukungan | "semua">("semua")
-  const [filterStatus, setFilterStatus] = useState<StatusRujukan | "semua">("semua")
   const [filterPenyedia, setFilterPenyedia] = useState<KategoriPenyedia | "semua">("semua")
   const [sortMode, setSortMode] = useState<SortMode>("relevansi")
   const [selected, setSelected] = useState<SumberRujukan | null>(null)
@@ -490,7 +454,7 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
   // Reset pagination when filters change
   useEffect(() => {
     setCurrentPage(1)
-  }, [search, myView, filterWilayah, filterKategori, filterStatus, filterPenyedia, sortMode])
+  }, [search, myView, filterWilayah, filterKategori, filterPenyedia, sortMode])
 
   const filtered = list
     .filter((item) => {
@@ -512,7 +476,7 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
       const matchWilayah = !filterWilayah ||
         (filterWilayah.province === item.provinsi && (!filterWilayah.kabupaten || item.kabupatenKota === filterWilayah.kabupaten))
       const matchKategori = filterKategori === "semua" || item.kategoriBentukDukungan === filterKategori
-      const matchStatus = item.status === "terverifikasi" || item.status === "menunggu" || item.status === "butuh_perbaikan" || (item.status === "nonaktif" && item.usulanDari === "sekolah")
+      const matchStatus = item.status === "terverifikasi" || item.status === "menunggu" || (item.status === "nonaktif" && item.usulanDari === "sekolah")
       const matchPenyedia = filterPenyedia === "semua" || item.kategoriPenyedia === filterPenyedia
       return matchSearch && matchWilayah && matchKategori && matchStatus && matchPenyedia
     })

@@ -209,6 +209,45 @@ export const SEED: SumberRujukan[] = [
     dibuatOleh: actorDinasSeed, usulanDari: "dinas",
     logTerakhir: dinasLog.dinonaktifkan(D_SEED),
   },
+  {
+    id: "sr-tolak-aceh-1", namaInstansi: "Klinik Bidan Dewi",
+    kategoriBentukDukungan: "Fasilitas Kesehatan", kategoriPenyedia: "Swasta",
+    provinsi: "Aceh", kabupatenKota: "Lhokseumawe", namaJalan: "Jl. Masjid", nomorJalan: "No. 5",
+    nomorCallCenter: "064512345", aksesInfo: "publik", status: "butuh_perbaikan",
+    jenisButuhPerbaikan: "ditolak",
+    dibuatOleh: "Admin Sekolah SMAN 1 Lhokseumawe", namaSekolah: "SMAN 1 Lhokseumawe",
+    logTerakhir: "Ditolak: Alamat tidak valid",
+    diusulkanDari: "sekolah",
+  },
+  {
+    id: "sr-perbaikan-aceh-1", namaInstansi: "Pusat Konseling Inspiration Aceh",
+    kategoriBentukDukungan: "Konseling", kategoriPenyedia: "Swasta",
+    provinsi: "Aceh", kabupatenKota: "Banda Aceh", namaJalan: "Jl. Hasanamba", nomorJalan: "No. 18",
+    nomorCallCenter: "065198765", aksesInfo: "publik", status: "butuh_perbaikan",
+    jenisButuhPerbaikan: "perbaikan",
+    dibuatOleh: "Admin Sekolah SMA Labschool", namaSekolah: "SMA Labschool Banda Aceh",
+    logTerakhir: "Butuh perbaikan: Upload dokumen tidak lengkap",
+    diusulkanDari: "sekolah",
+  },
+  {
+    id: "sr-review-aceh-1", namaInstansi: "Yayasan Perlindungan Anak Aceh",
+    kategoriBentukDukungan: "Sosial", kategoriPenyedia: "OMS",
+    provinsi: "Aceh", kabupatenKota: "Banda Aceh", namaJalan: "Jl. Sultan", nomorJalan: "No. 12",
+    nomorCallCenter: "065178999", aksesInfo: "publik", status: "menunggu_review",
+    dibuatOleh: "Admin Sekolah SMA Syiah Kuala", namaSekolah: "SMA Syiah Kuala",
+    logTerakhir: "Diproses oleh Admin Dinas Aceh",
+    diusulkanDari: "sekolah",
+  },
+  {
+    id: "sr-pemulihan-aceh-1", namaInstansi: "Puskesmas Langsa",
+    kategoriBentukDukungan: "Fasilitas Kesehatan", kategoriPenyedia: "Pemerintah Daerah",
+    provinsi: "Aceh", kabupatenKota: "Langsa", namaJalan: "Jl. Diponegoro", nomorJalan: "No. 30",
+    nomorCallCenter: "064112233", aksesInfo: "publik", status: "menunggu",
+    jenisMenunggu: "pemulihan",
+    dibuatOleh: "Admin Dinas Aceh", namaSekolah: undefined,
+    logTerakhir: "Usulan pemulihan menunggu verifikasi",
+    diusulkanDari: "dinas",
+  },
   // --- Seed lintas wilayah untuk demo fitur "Semua Wilayah" ---
   {
     id: "sr-jkt-1", namaInstansi: "RSUP Dr. Cipto Mangunkusumo",
@@ -259,6 +298,68 @@ export const SEED: SumberRujukan[] = [
     dibuatOleh: "Admin Pusat", usulanDari: "pusat",
     logTerakhir: RUJUKAN_LOG.dibuatTerverifikasiPusat,
   },
+  // --- Status: butuh_perbaikan (Ditolak) ---
+  {
+    id: "sr-tolak-1", namaInstansi: "Klinik Abadi Sejahtera",
+    kategoriBentukDukungan: "Fasilitas Kesehatan", kategoriPenyedia: "Swasta",
+    provinsi: "Jawa Barat", kabupatenKota: "Bandung", namaJalan: "Jl. Asia Afrika", nomorJalan: "No. 15",
+    nomorCallCenter: "022123456", aksesInfo: "publik", status: "butuh_perbaikan",
+    jenisButuhPerbaikan: "ditolak",
+    dibuatOleh: "Admin Sekolah SMAN 5 Bandung", namaSekolah: "SMAN 5 Bandung",
+    logTerakhir: "Ditolak: Data tidak valid",
+    diusulkanDari: "sekolah",
+  },
+  {
+    id: "sr-tolak-2", namaInstansi: "Pusat Konseling Inspiration",
+    kategoriBentukDukungan: "Konseling", kategoriPenyedia: "Swasta",
+    provinsi: "Jawa Timur", kabupatenKota: "Surabaya", namaJalan: "Jl. Basuki Rahmat", nomorJalan: "No. 88",
+    nomorCallCenter: "031123456", aksesInfo: "publik", status: "butuh_perbaikan",
+    jenisButuhPerbaikan: "perbaikan",
+    dibuatOleh: "Admin Sekolah SMA Hang Tuah 1", namaSekolah: "SMA Hang Tuah 1",
+    logTerakhir: "Butuh perbaikan: Nomor telepon tidak valid",
+    diusulkanDari: "sekolah",
+  },
+  // --- Status: menunggu_review ---
+  {
+    id: "sr-review-2", namaInstansi: "LBH Surabaya",
+    kategoriBentukDukungan: "Bantuan Hukum", kategoriPenyedia: "OMS",
+    provinsi: "Jawa Timur", kabupatenKota: "Surabaya", namaJalan: "Jl. Darmo", nomorJalan: "No. 26",
+    nomorCallCenter: "031567890", aksesInfo: "publik", status: "menunggu_review",
+    dibuatOleh: "Admin Sekolah SMA Alhidayah", namaSekolah: "SMA Alhidayah",
+    logTerakhir: "Diproses oleh Admin Dinas Jawa Timur",
+    diusulkanDari: "sekolah",
+  },
+  // --- Status: menunggu dengan berbagai jenisMenunggu ---
+  {
+    id: "sr-perbaikan-1", namaInstansi: "RS Permata",
+    kategoriBentukDukungan: "Fasilitas Kesehatan", kategoriPenyedia: "Swasta",
+    provinsi: "Banten", kabupatenKota: "Tangerang", namaJalan: "Jl. MH. Thamrin", nomorJalan: "No. 10",
+    nomorCallCenter: "021123789", aksesInfo: "publik", status: "menunggu",
+    jenisMenunggu: "perbaikan",
+    dibuatOleh: "Admin Sekolah SMAN 3 Tangeran", namaSekolah: "SMAN 3 Tangeran",
+    logTerakhir: "Menunggu perbaikan data oleh admin sekolah",
+    diusulkanDari: "sekolah",
+  },
+  {
+    id: "sr-pemulihan-1", namaInstansi: "Puskesmas Sejahtera",
+    kategoriBentukDukungan: "Fasilitas Kesehatan", kategoriPenyedia: "Pemerintah Daerah",
+    provinsi: "Sumatera Selatan", kabupatenKota: "Palembang", namaJalan: "Jl. Jend. Sudirman", nomorJalan: "No. 45",
+    nomorCallCenter: "071112233", aksesInfo: "publik", status: "menunggu",
+    jenisMenunggu: "pemulihan",
+    dibuatOleh: "Admin Dinas Sumatera Selatan", namaSekolah: undefined,
+    logTerakhir: "Usulan pemulihan menunggu verifikasi",
+    diusulkanDari: "dinas",
+  },
+  // --- Status: nonaktif ---
+  {
+    id: "sr-nonaktif-1", namaInstansi: "Klinik Utama Sentosa",
+    kategoriBentukDukungan: "Fasilitas Kesehatan", kategoriPenyedia: "Swasta",
+    provinsi: "Jawa Tengah", kabupatenKota: "Semarang", namaJalan: "Jl. Pandanaran", nomorJalan: "No. 30",
+    nomorCallCenter: "024123456", aksesInfo: "publik", status: "nonaktif",
+    dibuatOleh: "Admin Dinas Jawa Tengah", namaSekolah: undefined,
+    logTerakhir: "Dinonaktifkan karena tidak aktif beroperasi",
+    diusulkanDari: "dinas",
+  },
 ]
 
 // ---------------------------------------------------------------------------
@@ -285,55 +386,13 @@ function StatusBadge({ status, jenisMenunggu, jenisButuhPerbaikan }: { status: S
     )
   }
   if (status === "menunggu") {
-    if (jenisMenunggu === "perbaikan") {
-      return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">
-          <AlertCircle className="w-3 h-3" /> Perlu Diperiksa - Perbaikan
-        </span>
-      )
-    }
-    if (jenisMenunggu === "perbaikan_laporan") {
-      return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
-          <AlertCircle className="w-3 h-3" /> Perlu Diperiksa - Laporan Perbaikan
-        </span>
-      )
-    }
-    if (jenisMenunggu === "pemulihan") {
-      return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-teal-100 text-teal-700">
-          <RotateCcw className="w-3 h-3" /> Perlu Diperiksa - Pemulihan
-        </span>
-      )
-    }
-    if (jenisMenunggu === "penonaktifan") {
-      return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
-          <XCircle className="w-3 h-3" /> Perlu Diperiksa - Penonaktifan
-        </span>
-      )
-    }
     return (
       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
         <Clock className="w-3 h-3" /> Perlu Verifikasi
       </span>
     )
   }
-  if (status === "menunggu_review") {
-    return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800">
-        <Clock className="w-3 h-3" /> Menunggu Review
-      </span>
-    )
-  }
   if (status === "butuh_perbaikan") {
-    if (jenisButuhPerbaikan === "perbaikan") {
-      return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
-          <Pencil className="w-3 h-3" /> Butuh Perbaikan
-        </span>
-      )
-    }
     return (
       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
         <XCircle className="w-3 h-3" /> Ditolak
@@ -426,6 +485,20 @@ function DetailPanel({
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-200 text-gray-500 transition">
             <X className="w-5 h-5" />
           </button>
+        </div>
+
+        {/* Banner Log Terakhir - selalu tampil */}
+        <div className="px-5 py-3 bg-amber-50 border-b-2 border-amber-200">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs font-bold text-amber-700 uppercase">Status</p>
+            <StatusBadge status={item.status} jenisMenunggu={resolveJenisMenunggu(item)} jenisButuhPerbaikan={item.jenisButuhPerbaikan} />
+          </div>
+          <p className="text-sm font-medium text-amber-900 mb-1">Isi Log Terakhir: {item.logTerakhir || "(Tidak ada)"}</p>
+          {item.catatanPerbaikan ? (
+            <p className="text-xs text-amber-700 leading-relaxed">Catatan: {item.catatanPerbaikan}</p>
+          ) : (
+            <p className="text-xs text-amber-600 italic">(Tidak ada catatan)</p>
+          )}
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5">
@@ -788,7 +861,7 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
       const matchWilayah = !filterWilayah || 
         (filterWilayah.province === item.provinsi && (!filterWilayah.kabupaten || item.kabupatenKota === filterWilayah.kabupaten))
       const matchKategori = filterKategori === "semua" || item.kategoriBentukDukungan === filterKategori
-      const matchStatus = filterStatus === "semua" || item.status === filterStatus
+      const matchStatus = filterStatus === "semua" ? item.status !== "menunggu_review" : item.status === filterStatus
       const matchPenyedia = filterPenyedia === "semua" || item.kategoriPenyedia === filterPenyedia
       return matchSearch && matchWilayah && matchKategori && matchStatus && matchPenyedia
     })
@@ -1286,15 +1359,14 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
         </Select>
         <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as StatusRujukan | "semua")}>
           <SelectTrigger className="w-[180px] rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-            <SelectValue placeholder="Semua Status" />
+            <SelectValue placeholder="Semua Status (Terverifikasi, Perlu Verifikasi, Nonaktif, Ditolak)" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Semua Status</SelectItem>
             <SelectItem value="terverifikasi">Terverifikasi</SelectItem>
-            <SelectItem value="menunggu">Perlu Diperiksa</SelectItem>
-            <SelectItem value="menunggu_review">Menunggu Review</SelectItem>
-            <SelectItem value="butuh_perbaikan">Ditolak</SelectItem>
+            <SelectItem value="menunggu">Perlu Verifikasi</SelectItem>
             <SelectItem value="nonaktif">Nonaktif</SelectItem>
+            <SelectItem value="butuh_perbaikan">Ditolak</SelectItem>
           </SelectContent>
         </Select>
         <Select value={filterPenyedia} onValueChange={(v) => setFilterPenyedia(v as KategoriPenyedia | "semua")}>
