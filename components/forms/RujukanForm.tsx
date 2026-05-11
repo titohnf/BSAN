@@ -182,9 +182,9 @@ function StatusBadge({ status, jenisMenunggu, jenisButuhPerbaikan }: { status: S
     if (jenisMenunggu === "penonaktifan") {
       return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">Perlu Diperiksa - Penonaktifan</span>
     }
-    return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Perlu Diperiksa - Pengajuan</span>
+    return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Perlu Verifikasi</span>
   }
-  return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Perlu Diperiksa - Pengajuan</span>
+  return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Perlu Verifikasi</span>
 }
 
 const emptyForm = (): FormState => ({
