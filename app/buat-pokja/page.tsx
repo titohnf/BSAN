@@ -229,11 +229,34 @@ function MandatoryMemberSection({ label, value, onChange, bidangValue, isCollaps
   )
 }
 
+function ReviewTableRow({ label, value }: { label: string; value: string }) {
+  return (
+    <tr>
+      <td className="pr-3 text-gray-400 whitespace-nowrap align-top text-sm">{label}</td>
+      <td className="px-2 text-gray-400 align-top">:</td>
+      <td className="font-medium text-gray-800 text-sm">{value || "-"}</td>
+    </tr>
+  )
+}
+
+function EmailCell({ email }: { email: string }) {
+  if (!email || email === "-") return <span>{email || "-"}</span>
+  const atIdx = email.indexOf("@")
+  if (atIdx === -1) return <span className="break-words">{email}</span>
+  return (
+    <span className="break-words">
+      {email.slice(0, atIdx)}<br />{email.slice(atIdx)}
+    </span>
+  )
+}
+
 function ReviewRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gapx-4 mt-2 mb-4.5">
       <span className="text-xs text-gray-500">{label}</span>
-      <span className="text-sm font-medium text-gray-800">{value || "-"}</span>
+      <span className="text-sm font-medium text-gray-800">
+        {label.toLowerCase() === "email" ? <EmailCell email={value || "-"} /> : (value || "-")}
+      </span>
     </div>
   )
 }
@@ -446,7 +469,7 @@ function ReviewTable({ members, anggotaList, onEdit, onDelete, onResetMember }: 
                 <td className={cn("px-4 py-3 whitespace-nowrap border-b border-gray-100", (row.status === "Belum diisi" || row.status === "Tidak Lengkap") ? "text-red-600 bg-red-50" : "text-gray-500 bg-white")}>{row.jenisKelamin}</td>
                 <td className={cn("px-4 py-3 whitespace-nowrap border-b border-gray-100", (row.status === "Belum diisi" || row.status === "Tidak Lengkap") ? "text-red-600 bg-red-50" : "text-gray-500 bg-white")}>{row.instansi}</td>
                 <td className={cn("px-4 py-3 whitespace-nowrap border-b border-gray-100", (row.status === "Belum diisi" || row.status === "Tidak Lengkap") ? "text-red-600 bg-red-50" : "text-gray-500 bg-white")}>{row.jabatan}</td>
-                <td className={cn("px-4 py-3 whitespace-nowrap border-b border-gray-100", (row.status === "Belum diisi" || row.status === "Tidak Lengkap") ? "text-red-600 bg-red-50" : "text-gray-500 bg-white")}>{row.email}</td>
+                <td className={cn("px-4 py-3 whitespace-nowrap border-b border-gray-100", (row.status === "Belum diisi" || row.status === "Tidak Lengkap") ? "text-red-600 bg-red-50" : "text-gray-500 bg-white")}><EmailCell email={row.email} /></td>
                 <td className={cn("px-4 py-3 whitespace-nowrap border-b border-gray-100", (row.status === "Belum diisi" || row.status === "Tidak Lengkap") ? "text-red-600 bg-red-50" : "text-gray-500 bg-white")}>{row.noHp}</td>
                 <td className={cn("px-4 py-3 whitespace-nowrap border-b border-gray-100", (row.status === "Belum diisi" || row.status === "Tidak Lengkap") ? "bg-red-50" : "bg-white")}>
                   {row.status && (
@@ -509,7 +532,7 @@ function ReviewAccordion({ members, anggotaList }: { members: Members; anggotaLi
     return next
   })
 
-  const MemberRow = ({ rowKey, label, m, purple = false }: { rowKey: string; label: string; m: MemberField; purple?: boolean }) => {
+  const MemberRow = ({ rowKey, label, m, purple = false, variant = "default" }: { rowKey: string; label: string; m: MemberField; purple?: boolean; variant?: "default" | "kecil" | "compact" }) => {
     const isOpen = openKeys.has(rowKey)
     return (
       <div>
@@ -527,28 +550,103 @@ function ReviewAccordion({ members, anggotaList }: { members: Members; anggotaLi
         </button>
         {isOpen && (
           <div className="pl-[52px] pr-4 bg-white -mt-1">
-            <div className="grid grid-cols-3 gap-x-6 gap-y-2 px-4 mt-2 mb-4 border-l-2 border-blue-300">
-              <div>
-                <p className="text-xs text-gray-400">Jenis Kelamin</p>
-                <p className="text-sm font-medium text-gray-800">{m.jenisKelamin}</p>
+            {variant === "compact" ? (
+              <div className="px-4 mt-2 mb-4 border-l-2 border-blue-300">
+                <table className="text-sm">
+                  <tbody>
+                    <tr>
+                      <td className="pr-3 text-gray-400 whitespace-nowrap align-top">Jenis Kelamin</td>
+                      <td className="px-2 text-gray-400 align-top">:</td>
+                      <td className="font-medium text-gray-800">{m.jenisKelamin || "-"}</td>
+                    </tr>
+                    <tr>
+                      <td className="pr-3 text-gray-400 whitespace-nowrap align-top">Instansi</td>
+                      <td className="px-2 text-gray-400 align-top">:</td>
+                      <td className="font-medium text-gray-800">{m.instansi || "-"}</td>
+                    </tr>
+                    <tr>
+                      <td className="pr-3 text-gray-400 whitespace-nowrap align-top">Jabatan pada Instansi</td>
+                      <td className="px-2 text-gray-400 align-top">:</td>
+                      <td className="font-medium text-gray-800">{m.jabatan || "-"}</td>
+                    </tr>
+                    <tr>
+                      <td className="pr-3 text-gray-400 whitespace-nowrap align-top">Email</td>
+                      <td className="px-2 text-gray-400 align-top">:</td>
+                      <td className="font-medium text-gray-800 whitespace-nowrap">{m.email || "-"}</td>
+                    </tr>
+                    <tr>
+                      <td className="pr-3 text-gray-400 whitespace-nowrap align-top">No. HP</td>
+                      <td className="px-2 text-gray-400 align-top">:</td>
+                      <td className="font-medium text-gray-800">{m.noWhatsapp || "-"}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-              <div>
-                <p className="text-xs text-gray-400">Instansi</p>
-                <p className="text-sm font-medium text-gray-800">{m.instansi}</p>
+            ) : variant === "kecil" ? (
+              <div className="px-4 mt-2 mb-4 border-l-2 border-blue-300">
+                <table className="text-sm">
+                  <tbody>
+                    <tr>
+                      <td className="pr-3 text-gray-400 whitespace-nowrap align-top">Jenis Kelamin</td>
+                      <td className="px-2 text-gray-400 align-top">:</td>
+                      <td className="font-medium text-gray-800">{m.jenisKelamin || "-"}</td>
+                    </tr>
+                    <tr>
+                      <td className="pr-3 text-gray-400 whitespace-nowrap align-top">Instansi</td>
+                      <td className="px-2 text-gray-400 align-top">:</td>
+                      <td className="font-medium text-gray-800">{m.instansi || "-"}</td>
+                    </tr>
+                    <tr>
+                      <td className="pr-3 text-gray-400 whitespace-nowrap align-top">Jabatan pada Instansi</td>
+                      <td className="px-2 text-gray-400 align-top">:</td>
+                      <td className="font-medium text-gray-800">{m.jabatan || "-"}</td>
+                    </tr>
+                    <tr>
+                      <td className="pr-3 text-gray-400 whitespace-nowrap align-top">Email</td>
+                      <td className="px-2 text-gray-400 align-top">:</td>
+                      <td className="font-medium text-gray-800 whitespace-nowrap">{m.email || "-"}</td>
+                    </tr>
+                    <tr>
+                      <td className="pr-3 text-gray-400 whitespace-nowrap align-top">No. HP</td>
+                      <td className="px-2 text-gray-400 align-top">:</td>
+                      <td className="font-medium text-gray-800">{m.noWhatsapp || "-"}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-              <div>
-                <p className="text-xs text-gray-400">Jabatan pada Instansi</p>
-                <p className="text-sm font-medium text-gray-800">{m.jabatan || "-"}</p>
+            ) : (
+              <div className="px-4 mt-2 mb-4 border-l-2 border-blue-300">
+                <table className="text-sm">
+                  <tbody>
+                    <tr>
+                      <td className="pr-3 text-gray-400 whitespace-nowrap align-top">Jenis Kelamin</td>
+                      <td className="px-2 text-gray-400 align-top">:</td>
+                      <td className="font-medium text-gray-800">{m.jenisKelamin || "-"}</td>
+                    </tr>
+                    <tr>
+                      <td className="pr-3 text-gray-400 whitespace-nowrap align-top">Instansi</td>
+                      <td className="px-2 text-gray-400 align-top">:</td>
+                      <td className="font-medium text-gray-800">{m.instansi || "-"}</td>
+                    </tr>
+                    <tr>
+                      <td className="pr-3 text-gray-400 whitespace-nowrap align-top">Jabatan pada Instansi</td>
+                      <td className="px-2 text-gray-400 align-top">:</td>
+                      <td className="font-medium text-gray-800">{m.jabatan || "-"}</td>
+                    </tr>
+                    <tr>
+                      <td className="pr-3 text-gray-400 whitespace-nowrap align-top">Email</td>
+                      <td className="px-2 text-gray-400 align-top">:</td>
+                      <td className="font-medium text-gray-800 whitespace-nowrap">{m.email || "-"}</td>
+                    </tr>
+                    <tr>
+                      <td className="pr-3 text-gray-400 whitespace-nowrap align-top">No. HP</td>
+                      <td className="px-2 text-gray-400 align-top">:</td>
+                      <td className="font-medium text-gray-800">{m.noWhatsapp || "-"}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-              <div>
-                <p className="text-xs text-gray-400">Email</p>
-                <p className="text-sm font-medium text-gray-800">{m.email}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-400">No. HP</p>
-                <p className="text-sm font-medium text-gray-800">{m.noWhatsapp}</p>
-              </div>
-            </div>
+            )}
           </div>
         )}
       </div>
@@ -573,27 +671,36 @@ const AnggotaRow = ({ a, rowKey, label }: { a: AnggotaItem; rowKey: string; labe
         </button>
         {isOpen && (
           <div className="pl-[52px] pr-4 bg-white -mt-1">
-            <div className="grid grid-cols-3 gap-x-6 gap-y-2 px-4 mt-2 mb-4 border-l-2 border-purple-300">
-              <div>
-                <p className="text-xs text-gray-400">Jenis Kelamin</p>
-                <p className="text-sm font-medium text-gray-800">{a.jenisKelamin}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-400">Instansi</p>
-                <p className="text-sm font-medium text-gray-800">{a.instansi || "-"}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-400">Jabatan pada Instansi</p>
-                <p className="text-sm font-medium text-gray-800">{a.jabatan || "-"}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-400">Email</p>
-                <p className="text-sm font-medium text-gray-800">{a.email}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-400">No. HP</p>
-                <p className="text-sm font-medium text-gray-800">{a.noWhatsapp}</p>
-              </div>
+            <div className="px-4 mt-2 mb-4 border-l-2 border-purple-300">
+              <table className="text-sm">
+                <tbody>
+                  <tr>
+                    <td className="pr-3 text-gray-400 whitespace-nowrap align-top">Jenis Kelamin</td>
+                    <td className="px-2 text-gray-400 align-top">:</td>
+                    <td className="font-medium text-gray-800">{a.jenisKelamin || "-"}</td>
+                  </tr>
+                  <tr>
+                    <td className="pr-3 text-gray-400 whitespace-nowrap align-top">Instansi</td>
+                    <td className="px-2 text-gray-400 align-top">:</td>
+                    <td className="font-medium text-gray-800">{a.instansi || "-"}</td>
+                  </tr>
+                  <tr>
+                    <td className="pr-3 text-gray-400 whitespace-nowrap align-top">Jabatan pada Instansi</td>
+                    <td className="px-2 text-gray-400 align-top">:</td>
+                    <td className="font-medium text-gray-800">{a.jabatan || "-"}</td>
+                  </tr>
+                  <tr>
+                    <td className="pr-3 text-gray-400 whitespace-nowrap align-top">Email</td>
+                    <td className="px-2 text-gray-400 align-top">:</td>
+                    <td className="font-medium text-gray-800 whitespace-nowrap">{a.email || "-"}</td>
+                  </tr>
+                  <tr>
+                    <td className="pr-3 text-gray-400 whitespace-nowrap align-top">No. HP</td>
+                    <td className="px-2 text-gray-400 align-top">:</td>
+                    <td className="font-medium text-gray-800">{a.noWhatsapp || "-"}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         )}
@@ -621,7 +728,7 @@ const AnggotaRow = ({ a, rowKey, label }: { a: AnggotaItem; rowKey: string; labe
       <div className="rounded-xl border border-gray-200 overflow-hidden">
         <SectionHeader title="Pimpinan" />
         <div className="divide-y divide-gray-200">
-          {PIMPINAN_ROLES.map(r => <MemberRow key={r.key} rowKey={r.key} label={r.label} m={members[r.key]} />)}
+          {PIMPINAN_ROLES.map((r, i) => <MemberRow key={r.key} rowKey={r.key} label={r.label} m={members[r.key]} variant={i === 0 ? "default" : i === 1 ? "kecil" : "compact"} />)}
         </div>
       </div>
 
@@ -1198,7 +1305,7 @@ export default function BuatPokjaPage() {
           >
             <div>
               <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Langkah {step} dari {STEPS.length}</p>
-              <h2 className="text-lg font-bold text-gray-900 mt-0.5">{STEPS[step - 1].label}</h2>
+              <h2 className="text-lg font-bold text-gray-900 mt-0.5">{STEPS[step - 1]?.label ?? "Tinjau Data"}</h2>
             </div>
             {step === 2 && (
               <ChevronDown className={cn("w-4 h-4 text-gray-400 transition", collapseAllStep2 && "rotate-180")} />
@@ -1574,7 +1681,7 @@ export default function BuatPokjaPage() {
                   </div>
                 </div>
               </div>
-            )}
+)}
 
             {/* ---- Review (step 3 in 3-step mode, step 4 in 4-step mode) ---- */}
             {((flowSteps === 3 && step === 3) || (flowSteps === 4 && step === 4)) && (
@@ -1587,17 +1694,21 @@ export default function BuatPokjaPage() {
                     </p>
                     <button onClick={() => setStep(1)} className="text-xs text-blue-600 hover:underline flex items-center gap-1"><Eye className="w-3 h-3" /> Ubah</button>
                   </div>
-                  <div className="rounded-xl border border-gray-200 p-4 grid grid-cols-2 gap-3">
-                    <ReviewRow label="Wilayah" value={REGION} />
-                    <ReviewRow label="Nomor Kanal Pengaduan" value={kanalPengaduan} />
-                    {flowSteps === 3 && (
-                      <>
-                        <ReviewRow label="File SK" value={skFile?.name ?? "-"} />
-                        <ReviewRow label="Nomor SK" value={skDetail.nomorSK} />
-                        <ReviewRow label="Tanggal SK" value={skDetail.tanggalSK} />
-                        <ReviewRow label="Periode" value={skDetail.periodeMulai && skDetail.periodeSelesai ? `${skDetail.periodeMulai} s/d ${skDetail.periodeSelesai}` : "-"} />
-                      </>
-                    )}
+                  <div className="rounded-xl border border-gray-200 p-4">
+                    <table className="w-full">
+                      <tbody>
+                        <ReviewTableRow label="Wilayah" value={REGION} />
+                        <ReviewTableRow label="Nomor Kanal Pengaduan" value={kanalPengaduan} />
+                        {flowSteps === 3 && (
+                          <>
+                            <ReviewTableRow label="File SK" value={skFile?.name ?? "-"} />
+                            <ReviewTableRow label="Nomor SK" value={skDetail.nomorSK} />
+                            <ReviewTableRow label="Tanggal SK" value={skDetail.tanggalSK} />
+                            <ReviewTableRow label="Periode" value={skDetail.periodeMulai && skDetail.periodeSelesai ? `${skDetail.periodeMulai} s/d ${skDetail.periodeSelesai}` : "-"} />
+                          </>
+                        )}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
 
@@ -1627,11 +1738,15 @@ export default function BuatPokjaPage() {
                       <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Dokumen SK</p>
                       <button onClick={() => setStep(3)} className="text-xs text-blue-600 hover:underline flex items-center gap-1"><Eye className="w-3 h-3" /> Ubah</button>
                     </div>
-                    <div className="rounded-xl border border-gray-200 p-4 grid grid-cols-2 gap-3">
-                      <ReviewRow label="File SK" value={skFile?.name ?? "-"} />
-                      <ReviewRow label="Nomor SK" value={skDetail.nomorSK} />
-                      <ReviewRow label="Tanggal SK" value={skDetail.tanggalSK} />
-                      <ReviewRow label="Periode" value={skDetail.periodeMulai && skDetail.periodeSelesai ? `${skDetail.periodeMulai} s/d ${skDetail.periodeSelesai}` : "-"} />
+                    <div className="rounded-xl border border-gray-200 p-4">
+                      <table className="w-full">
+                        <tbody>
+                          <ReviewTableRow label="File SK" value={skFile?.name ?? "-"} />
+                          <ReviewTableRow label="Nomor SK" value={skDetail.nomorSK} />
+                          <ReviewTableRow label="Tanggal SK" value={skDetail.tanggalSK} />
+                          <ReviewTableRow label="Periode" value={skDetail.periodeMulai && skDetail.periodeSelesai ? `${skDetail.periodeMulai} s/d ${skDetail.periodeSelesai}` : "-"} />
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 )}
@@ -1653,12 +1768,10 @@ export default function BuatPokjaPage() {
                   </div>
                 )}
               </div>
-)}
-                      </div>
-                    </div>
-
-        {/* Navigation buttons */}
-        <div className="flex items-center justify-between pb-8">
+            )}
+              </div>
+            </div>
+              <div className="flex items-center justify-between pb-8">
           {step > 1 ? (
             <button onClick={handleBack} className="flex items-center gapx-4 mt-2 mb-4 px-4 py-2 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-100 transition">
               <ChevronLeft className="w-4 h-4" /> Sebelumnya

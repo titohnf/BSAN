@@ -291,7 +291,7 @@ function ReviewRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-0.5">
       <span className="text-xs text-gray-500">{label}</span>
-      <span className="text-sm font-medium text-gray-800">{value || "-"}</span>
+      <span className="text-sm font-medium text-gray-800 whitespace-nowrap overflow-hidden text-overflow-ellipsis">{value || "-"}</span>
     </div>
   )
 }
