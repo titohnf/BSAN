@@ -136,6 +136,46 @@ export const PENYEDIA_CONFIG: Record<string, { color: string; bg: string }> = {
 // ---------------------------------------------------------------------------
 export const SEED: SumberRujukan[] = [
   {
+    id: "sr-nasional-1", namaInstansi: "Kepolisian Republik Indonesia (Polri)",
+    kategoriBentukDukungan: "Kepolisian", kategoriPenyedia: "Pemerintah Pusat",
+    provinsi: "Seluruh Indonesia", kabupatenKota: "Seluruh Indonesia", namaJalan: "Jl. Trunojoyo No. 3", nomorJalan: "",
+    nomorCallCenter: "110", aksesInfo: "publik", status: "terverifikasi",
+    dibuatOleh: "Admin Pusat", usulanDari: "pusat",
+    logTerakhir: RUJUKAN_LOG.dibuatTerverifikasiPusat,
+  },
+  {
+    id: "sr-nasional-2", namaInstansi: "Dinas Pemadam Kebakaran dan Penyelamatan",
+    kategoriBentukDukungan: "Lainnya", kategoriPenyedia: "Pemerintah Daerah",
+    provinsi: "Seluruh Indonesia", kabupatenKota: "Seluruh Indonesia", namaJalan: "", nomorJalan: "",
+    nomorCallCenter: "113", aksesInfo: "publik", status: "terverifikasi",
+    dibuatOleh: "Admin Pusat", usulanDari: "pusat",
+    logTerakhir: RUJUKAN_LOG.dibuatTerverifikasiPusat,
+  },
+  {
+    id: "sr-nasional-3", namaInstansi: "Komisi Perlindungan Anak Indonesia (KPAI)",
+    kategoriBentukDukungan: "Sosial", kategoriPenyedia: "Pemerintah Pusat",
+    provinsi: "Seluruh Indonesia", kabupatenKota: "Seluruh Indonesia", namaJalan: "Jl. Matraman No. 56", nomorJalan: "",
+    nomorCallCenter: "021-6916565", aksesInfo: "publik", status: "terverifikasi",
+    dibuatOleh: "Admin Pusat", usulanDari: "pusat",
+    logTerakhir: RUJUKAN_LOG.dibuatTerverifikasiPusat,
+  },
+  {
+    id: "sr-nasional-4", namaInstansi: "Hotline Nasional KPAI - Pengaduan Anak",
+    kategoriBentukDukungan: "Konseling", kategoriPenyedia: "Pemerintah Pusat",
+    provinsi: "Seluruh Indonesia", kabupatenKota: "Seluruh Indonesia", namaJalan: "Jl. Matraman No. 56", nomorJalan: "",
+    nomorCallCenter: "021-6916565 / 119 ext. 8", aksesInfo: "publik", status: "terverifikasi",
+    dibuatOleh: "Admin Pusat", usulanDari: "pusat",
+    logTerakhir: RUJUKAN_LOG.dibuatTerverifikasiPusat,
+  },
+  {
+    id: "sr-nasional-5", namaInstansi: "BNPT - Badan Nasional Penanggulangan Terorisme",
+    kategoriBentukDukungan: "Lainnya", kategoriPenyedia: "Pemerintah Pusat",
+    provinsi: "Seluruh Indonesia", kabupatenKota: "Seluruh Indonesia", namaJalan: "Jl. Veteres", nomorJalan: "",
+    nomorCallCenter: "021-8090555", aksesInfo: "publik", status: "terverifikasi",
+    dibuatOleh: "Admin Pusat", usulanDari: "pusat",
+    logTerakhir: RUJUKAN_LOG.dibuatTerverifikasiPusat,
+  },
+  {
     id: "sr-review-1",
     namaInstansi: "Unit Layanan Psikologi Terpadu",
     kategoriBentukDukungan: "Psikologi",

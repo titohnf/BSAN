@@ -24,6 +24,7 @@ export function SekolahHeader({ userName, onLogout }: SekolahHeaderProps) {
   const reset = () => {
     localStorage.removeItem("rujukanList")
     localStorage.removeItem("reportList")
+    localStorage.removeItem("laporanAkhirTahunList")
     setOpen(false)
     window.location.reload()
   }

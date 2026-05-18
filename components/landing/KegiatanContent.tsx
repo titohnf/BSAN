@@ -89,9 +89,14 @@ export function KegiatanContent({ hideHeroPrefix = false }: KegiatanContentProps
         </div>
 
         <div className="max-w-6xl mx-auto px-4 pb-0 mb-16">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-8">
+          <div className="flex items-center justify-end mt-8 mb-3">
+            <p className="text-sm text-slate-400">
+              Update terakhir: {new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" })} | {new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
+            </p>
+          </div>
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div>
+              <div className="flex items-center gap-2">
                 <h2 className="font-semibold text-slate-900">Semua Kegiatan</h2>
                 <p className="text-slate-400 text-xs mt-1">{filtered.length} kegiatan ditemukan</p>
               </div>

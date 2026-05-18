@@ -42,16 +42,20 @@ type SumberDukunganContentProps = {
   hideHeroPrefix?: boolean
 }
 
+const NASIONAL_WILAYAH = "Seluruh Indonesia"
+
 export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukunganContentProps) {
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(20)
   const [filterKategori, setFilterKategori] = useState<KategoriDukungan | "semua">("semua")
   const [filterPenyedia, setFilterPenyedia] = useState<KategoriPenyedia | "semua">("semua")
-  const [filterWilayah, setFilterWilayah] = useState<FilterWilayah>(null)
+  const [filterWilayah, setFilterWilayah] = useState<FilterWilayah | null>(null)
+  const [showAllData, setShowAllData] = useState(false)
   const [showWilayahModal, setShowWilayahModal] = useState(false)
   const [modalBrowseProvinsi, setModalBrowseProvinsi] = useState<string | null>(null)
-  const [modalPendingFilter, setModalPendingFilter] = useState<FilterWilayah>(null)
+  const [modalPendingFilter, setModalPendingFilter] = useState<FilterWilayah | "all">("all")
+  const [modalPendingShowAll, setModalPendingShowAll] = useState(false)
   const [selectedItem, setSelectedItem] = useState<SumberRujukan | null>(null)
 
   const filtered = useMemo(() => {
@@ -64,13 +68,18 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
         item.provinsi.toLowerCase().includes(q)
       const matchKategori = filterKategori === "semua" || item.kategoriBentukDukungan === filterKategori
       const matchPenyedia = filterPenyedia === "semua" || item.kategoriPenyedia === filterPenyedia
-      const matchWilayah =
-        !filterWilayah ||
-        (filterWilayah.province === item.provinsi &&
-          (!filterWilayah.kabupaten || item.kabupatenKota === filterWilayah.kabupaten))
+      const matchWilayah = (() => {
+        const isNasional = item.provinsi === NASIONAL_WILAYAH && item.kabupatenKota === NASIONAL_WILAYAH
+        if (isNasional) return true
+        if (!filterWilayah) return false
+        if (filterWilayah.kabupaten) {
+          return filterWilayah.province === item.provinsi && filterWilayah.kabupaten === item.kabupatenKota
+        }
+        return filterWilayah.province === item.provinsi
+      })()
       return matchSearch && matchKategori && matchPenyedia && matchWilayah
     })
-  }, [search, filterKategori, filterPenyedia, filterWilayah])
+  }, [search, filterKategori, filterPenyedia, filterWilayah, showAllData])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
   const safePage = Math.min(page, totalPages)
@@ -83,13 +92,15 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
   }
 
   const openWilayahModal = () => {
-    setModalPendingFilter(filterWilayah)
+    setModalPendingFilter(filterWilayah ?? "all")
     setModalBrowseProvinsi(filterWilayah?.province ?? null)
+    setModalPendingShowAll(filterWilayah === null && !showAllData)
     setShowWilayahModal(true)
   }
 
   const applyWilayahFilter = () => {
-    setFilterWilayah(modalPendingFilter)
+    setFilterWilayah(modalPendingFilter === "all" ? null : modalPendingFilter)
+    setShowAllData(modalPendingShowAll)
     setPage(1)
     setShowWilayahModal(false)
   }
@@ -98,7 +109,7 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
     ? filterWilayah.kabupaten
       ? `${filterWilayah.province} — ${filterWilayah.kabupaten}`
       : filterWilayah.province
-    : "Seluruh Indonesia"
+    : showAllData ? "Seluruh Indonesia" : "Seluruh Indonesia"
 
   const kabupatenForModal = modalBrowseProvinsi
     ? Array.from(new Set(VERIFIED_DATA.filter((i) => i.provinsi === modalBrowseProvinsi).map((i) => i.kabupatenKota)))
@@ -125,8 +136,13 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
         </div>
 
         <div className="max-w-6xl mx-auto px-4 pb-0 mb-16">
+          <div className="flex items-center justify-end mt-8 mb-3">
+            <p className="text-sm text-slate-400">
+              Update terakhir: {new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" })} | {new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
+            </p>
+          </div>
           {/* Table card */}
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-8">
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
             {/* Filter bar */}
             <div className="px-5 py-4 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2">
@@ -139,6 +155,14 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
                   <span className="max-w-[200px] truncate">{wilayahLabel}</span>
                   <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                 </button>
+                {filterWilayah !== null || showAllData ? (
+                  <button
+                    onClick={() => { setFilterWilayah(null); setShowAllData(false); setPage(1) }}
+                    className="h-8 px-3 text-sm text-slate-500 hover:text-slate-800 border border-slate-200 rounded-lg bg-white hover:bg-slate-50 transition-colors shrink-0"
+                  >
+                    Reset
+                  </button>
+                ) : null}
               </div>
               <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
                 <select
@@ -189,11 +213,12 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                      {paged.map((item) => {
+                      {paged.map((item, idx) => {
                         const kategoriCfg = KATEGORI_CONFIG[item.kategoriBentukDukungan]
                         const penyediaCfg = item.kategoriPenyedia ? PENYEDIA_CONFIG[item.kategoriPenyedia] : null
+                        const isNasional = item.provinsi === NASIONAL_WILAYAH && item.kabupatenKota === NASIONAL_WILAYAH
                         return (
-                          <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                          <tr key={item.id} className={cn("hover:bg-gray-50 transition-colors border-b border-gray-200", isNasional && "bg-gray-50 border-l-4 border-l-yellow-500")}>
                             <td className="px-4 py-3.5">
                               <p className="font-semibold text-gray-900 whitespace-nowrap">{item.namaInstansi}</p>
                               {item.website && (
@@ -203,8 +228,10 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
                                 </a>
                               )}
                             </td>
-                            <td className="px-4 py-3.5 text-slate-600">
-                              {item.kabupatenKota ? `Kota ${item.kabupatenKota}` : "-"}
+                            <td className="px-4 py-3.5">
+                              <span className={isNasional ? "text-gray-900" : "text-slate-600"}>
+                                {item.kabupatenKota === NASIONAL_WILAYAH ? "Seluruh Indonesia" : (item.kabupatenKota ? `Kota ${item.kabupatenKota}` : "-")}
+                              </span>
                             </td>
                             <td className="px-4 py-3.5">
                               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
@@ -213,10 +240,10 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
                             </td>
                             <td className="px-4 py-3.5 text-right">
                               <Button
-                                variant="outline"
+                                variant={isNasional ? "default" : "outline"}
                                 size="sm"
                                 onClick={() => setSelectedItem(item)}
-                                className="h-7 text-xs border-slate-200 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                className={cn("h-7 text-xs", isNasional ? "bg-blue-600 hover:bg-blue-700 text-white" : "border-slate-200 text-blue-600 hover:text-blue-700 hover:bg-blue-50")}
                               >
                                 Lihat Detail
                               </Button>
@@ -423,8 +450,8 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
                 <div className="w-1/2 border-r border-gray-100 overflow-y-auto">
                   <div className="p-2 space-y-0.5">
                     <button
-                      onClick={() => { setModalPendingFilter(null); setModalBrowseProvinsi(null) }}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${!modalBrowseProvinsi && modalPendingFilter === null ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-gray-700"}`}
+                      onClick={() => { setModalPendingFilter(null); setModalBrowseProvinsi(null); setShowAllData(true) }}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${!modalBrowseProvinsi && modalPendingFilter === null && showAllData ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-gray-700"}`}
                     >
                       Seluruh Indonesia
                     </button>

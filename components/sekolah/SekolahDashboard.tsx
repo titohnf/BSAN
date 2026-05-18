@@ -6,6 +6,8 @@ import { SekolahSidebar, type SekolahMenu } from "@/components/sekolah/SekolahSi
 import { SekolahHeader } from "@/components/sekolah/SekolahHeader"
 import { SekolahSumberRujukanView } from "@/components/sekolah/SekolahSumberRujukanView"
 import { KegiatanView } from "@/components/dashboard/KegiatanView"
+import { PelanggaranView } from "@/components/sekolah/PelanggaranView"
+import { LaporanAkhirTahunView } from "@/components/sekolah/LaporanAkhirTahunView"
 import { clearAuthAndRedirectToLogin } from "@/lib/logout"
 
 type AuthPayload = {
@@ -45,6 +47,8 @@ export function SekolahDashboard() {
         <main className="flex-1 px-4 md:px-6 py-6">
           {menu === "sumber-rujukan" && <SekolahSumberRujukanView wilayah={wilayah} />}
           {menu === "kegiatan" && <KegiatanView />}
+          {menu === "pelanggaran" && <PelanggaranView />}
+          {menu === "laporan-akhir-tahun" && <LaporanAkhirTahunView />}
         </main>
       </div>
     </div>

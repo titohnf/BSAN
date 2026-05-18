@@ -16,6 +16,7 @@ import { DashboardPusatView } from "@/components/pusat/DashboardPusatView"
 import { DaftarPengajuanView } from "@/components/pusat/DaftarPengajuanView"
 import { DetailPengajuan } from "@/components/pusat/DetailPengajuan"
 import { ValidatePokjaDrawer } from "@/components/pusat/ValidatePokjaDrawer"
+import { LaporanAkhirTahunPusatView } from "@/components/pusat/LaporanAkhirTahunPusatView"
 
 import { SekolahDashboard } from "@/components/sekolah/SekolahDashboard"
 
@@ -539,6 +540,7 @@ function DashboardPageInner() {
               )}
               {pusatMenu === "sumber-rujukan" && <SumberRujukanView />}
               {pusatMenu === "k" && < KegiatanView />}
+              {pusatMenu === "laporan-akhir-tahun" && <LaporanAkhirTahunPusatView />}
             </main>
           </div>
           {selectedPengajuan && (

@@ -146,9 +146,9 @@ export default function LandingPage() {
           </div>
 
           <div className="max-w-6xl mx-auto px-4 py-12">
-            <div className="flex items-center gap-3 mb-6">
-              <h2 className="text-xl font-bold text-slate-900 shrink-0">Ringkasan Portal BSAN</h2>
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between gap-3 mb-6">
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-bold text-slate-900 shrink-0">Ringkasan Portal BSAN</h2>
                 <button
                   onClick={() => { setModalPendingProvince(selectedProvince); setModalPendingKota(selectedProvince ? selectedKota : null); setModalBrowseProvince(selectedProvince || null); setShowWilayahModal(true) }}
                   className="h-9 px-3 text-sm border border-slate-400 rounded-lg bg-white text-slate-800 font-medium hover:bg-slate-50 hover:border-slate-500 transition-colors flex items-center gap-2"
@@ -162,6 +162,11 @@ export default function LandingPage() {
                 {isFiltered && (
                   <button onClick={() => { setSelectedProvince(""); setSelectedKota("") }} className="h-9 px-3 text-sm text-slate-500 hover:text-slate-800 border border-slate-200 rounded-lg bg-white hover:bg-slate-50 transition-colors">Reset</button>
                 )}
+              </div>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-slate-400">
+                  Update terakhir: {new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" })} | {new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
+                </p>
               </div>
             </div>
 

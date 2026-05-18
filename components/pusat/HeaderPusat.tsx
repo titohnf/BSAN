@@ -23,6 +23,7 @@ export function HeaderPusat() {
 
   const reset = () => {
     localStorage.removeItem("pokjaList")
+    localStorage.removeItem("laporanAkhirTahunList")
     setOpen(false)
     window.location.reload()
   }

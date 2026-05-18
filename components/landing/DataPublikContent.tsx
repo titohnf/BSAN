@@ -316,7 +316,12 @@ export function DataPublikContent({ showBackButton = false, heroTitle, heroSubti
         </div>
 
         <div className="max-w-6xl mx-auto px-4 pb-0 mb-16">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-16">
+          <div className="flex items-center justify-end mt-8 mb-3">
+            <p className="text-sm text-slate-400">
+              Update terakhir: {new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" })} | {new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
+            </p>
+          </div>
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
               <div className="px-5 py-4 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <h2 className="font-semibold text-slate-900 shrink-0">Data Kelompok Kerja</h2>
@@ -328,8 +333,16 @@ export function DataPublikContent({ showBackButton = false, heroTitle, heroSubti
                   <span className="max-w-[200px] truncate">{wilayahLabel}</span>
                   <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                 </button>
+                {wilayahFilter !== "all" && (
+                  <button
+                    onClick={() => { setWilayahFilter("all"); setPage(1) }}
+                    className="h-8 px-3 text-sm text-slate-500 hover:text-slate-800 border border-slate-200 rounded-lg bg-white hover:bg-slate-50 transition-colors shrink-0"
+                  >
+                    Reset
+                  </button>
+                )}
               </div>
-              <div className="flex items-center gap-2 w-full sm:w-auto">
+              <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
                 <select
                   value={statusFilter}
                   onChange={(e) => { setStatusFilter(e.target.value as typeof statusFilter); setPage(1) }}
@@ -349,14 +362,15 @@ export function DataPublikContent({ showBackButton = false, heroTitle, heroSubti
                     className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                   />
                 </div>
+                
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={exportCSV}
-                  className="gap-1.5 border-slate-200 shrink-0"
+                  className="h-9 gap-1.5 border-slate-200 shrink-0"
                 >
                   <Download className="w-4 h-4" />
-                  CSV
+                  Ekspor Excel
                 </Button>
               </div>
             </div>
@@ -365,9 +379,9 @@ export function DataPublikContent({ showBackButton = false, heroTitle, heroSubti
               <TableHeader>
                 <TableRow className="bg-slate-50/70 hover:bg-slate-50/70">
                   <TableHead className="w-12 text-slate-500 text-xs font-semibold uppercase tracking-wide pl-5">No</TableHead>
-<TableHead className="w-64 text-slate-500 text-xs font-semibold uppercase tracking-wide">Wilayah</TableHead>
-                      <TableHead className="w-56 text-slate-500 text-xs font-semibold uppercase tracking-wide">Provinsi</TableHead>
-                  <TableHead className="text-slate-500 text-xs font-semibold uppercase tracking-wide">Dukungan Bidang Tersedia</TableHead>
+                  <TableHead className="w-64 text-slate-500 text-xs font-semibold uppercase tracking-wide">Wilayah</TableHead>
+                  <TableHead className="w-56 text-slate-500 text-xs font-semibold uppercase tracking-wide">Provinsi</TableHead>
+                  <TableHead className="w-44 text-slate-500 text-xs font-semibold uppercase tracking-wide">Cakupan</TableHead>
                   <TableHead className="w-40 text-slate-500 text-xs font-semibold uppercase tracking-wide">Status</TableHead>
                   <TableHead className="w-28" />
                 </TableRow>
@@ -384,38 +398,10 @@ export function DataPublikContent({ showBackButton = false, heroTitle, heroSubti
                         <TableCell className="text-slate-600">
                           {row.provinsi.includes(" - ") ? row.provinsi.split(" - ")[0] : row.provinsi}
                         </TableCell>
-                        <TableCell>
-                          {(() => {
-                            const bidangs = getBidangList(row)
-                            if (bidangs.length === 0) return <span className="text-slate-400">-</span>
-                            const visible = bidangs.slice(0, 2)
-                            const hidden = bidangs.slice(2)
-                            return (
-                              <div className="flex flex-wrap gap-1">
-                                {visible.map((b) => (
-                                  <span key={b} className="inline-block px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-xs font-medium">
-                                    {b.replace("Bidang ", "")}
-                                  </span>
-                                ))}
-                                {hidden.length > 0 && (
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <span className="inline-block px-2 py-0.5 rounded-full bg-slate-200 text-slate-500 text-xs font-medium cursor-default">
-                                        dan {hidden.length} lainnya
-                                      </span>
-                                    </TooltipTrigger>
-                                    <TooltipContent className="!bg-white !text-slate-700 border border-slate-200 shadow-md px-3 py-2" arrowClassName="!bg-white !fill-white">
-                                      <ul className="space-y-1">
-                                        {hidden.map((b) => (
-                                          <li key={b} className="text-xs">{b.replace("Bidang ", "")}</li>
-                                        ))}
-                                      </ul>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                )}
-                              </div>
-                            )
-                          })()}
+                        <TableCell className="text-slate-600">
+                          <span className="text-sm text-slate-600">
+                            {row.provinsi.includes(" - ") ? "Kota/Kabupaten" : "Provinsi"}
+                          </span>
                         </TableCell>
                         <TableCell>{statusBadge(row.statusPokja)}</TableCell>
                         <TableCell>
