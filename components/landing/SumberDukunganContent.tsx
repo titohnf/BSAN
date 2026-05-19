@@ -51,7 +51,7 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
   const [filterKategori, setFilterKategori] = useState<KategoriDukungan | "semua">("semua")
   const [filterPenyedia, setFilterPenyedia] = useState<KategoriPenyedia | "semua">("Pemerintah Pusat")
   const [filterWilayah, setFilterWilayah] = useState<FilterWilayah | null>(null)
-  const [showAllData, setShowAllData] = useState(false)
+  const [showAllData, setShowAllData] = useState(true)
   const [showWilayahModal, setShowWilayahModal] = useState(false)
   const [modalBrowseProvinsi, setModalBrowseProvinsi] = useState<string | null>(null)
   const [modalPendingFilter, setModalPendingFilter] = useState<FilterWilayah | "all">("all")
@@ -156,9 +156,9 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
                   <span className="max-w-[200px] truncate">{wilayahLabel}</span>
                   <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                 </button>
-                {filterWilayah !== null || showAllData ? (
+                {(filterWilayah !== null || filterPenyedia !== "Pemerintah Pusat") ? (
                   <button
-                    onClick={() => { setFilterWilayah(null); setShowAllData(false); setFilterPenyedia("semua"); setPage(1) }}
+                    onClick={() => { setFilterWilayah(null); setShowAllData(true); setFilterPenyedia("Pemerintah Pusat"); setPage(1) }}
                     className="h-8 px-3 text-sm text-slate-500 hover:text-slate-800 border border-slate-200 rounded-lg bg-white hover:bg-slate-50 transition-colors shrink-0"
                   >
                     Reset
