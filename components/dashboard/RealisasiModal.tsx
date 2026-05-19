@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { X, Camera } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import type { Activities, Realisasi } from "./ActivitiesView"
+import type { Activities, Realisasi } from "./KegaitanView"
 
 interface RealisasiModalProps {
   kegiatan: Activities
