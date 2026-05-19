@@ -3,20 +3,20 @@
 import { useState } from "react"
 import { X, Camera } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import type { Kegiatan, Realisasi } from "./KegaitanView"
+import type { Activities, Realisasi } from "./ActivitiesView"
 
 interface RealisasiModalProps {
-  kegiatan: Kegiatan
+  kegiatan: Activities
   onClose: () => void
   onSave: (id: string, realisasi: Realisasi) => void
 }
 
 export function RealisasiModal({ kegiatan, onClose, onSave }: RealisasiModalProps) {
-  const [jumlahPeserta, setJumlahPeserta] = useState(kegaitan.realisasi?.jumlahPeserta?.toString() || "")
-  const [tanggalRealisasi, setTanggalRealisasi] = useState(kegaitan.realisasi?.tanggalRealisasi || "")
-  const [catatan, setCatatan] = useState(kegaitan.realisasi?.catatan || "")
-  const [dokumentasi, setDokumentasi] = useState(kegaitan.realisasi?.dokumentasi || "")
-  const [dokumentasiPreview, setDokumentasiPreview] = useState(kegaitan.realisasi?.dokumentasi || "")
+  const [jumlahPeserta, setJumlahPeserta] = useState(kegaitan?.realisasi?.jumlahPeserta?.toString() || "")
+  const [tanggalRealisasi, setTanggalRealisasi] = useState(kegaitan?.realisasi?.tanggalRealisasi || "")
+  const [catatan, setCatatan] = useState(kegaitan?.realisasi?.catatan || "")
+  const [dokumentasi, setDokumentasi] = useState(kegaitan?.realisasi?.dokumentasi || "")
+  const [dokumentasiPreview, setDokumentasiPreview] = useState(kegaitan?.realisasi?.dokumentasi || "")
   const [isUploading, setIsUploading] = useState(false)
 
   const handleDokumentasiChange = (e: React.ChangeEvent<HTMLInputElement>) => {

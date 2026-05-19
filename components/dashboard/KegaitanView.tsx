@@ -80,12 +80,12 @@ export function ActivitiesView() {
     }
   }, [])
 
-  const handleRealisasiSave = (id: string, realizesi: Realisasi) => {
+  const handleRealisasiSave = (id: string, realisasi: Realisasi) => {
     setList(prev => prev.map(item => 
-      item.id === id ? { ...item, realizesi } : item
+      item.id === id ? { ...item, realisasi } : item
     ))
     const updated = list.map(item => 
-      item.id === id ? { ...item, realizesi } : item
+      item.id === id ? { ...item, realisasi } : item
     )
     sessionStorage.setItem("kegaitanList", JSON.stringify(updated))
     window.dispatchEvent(new Event("kegaitanUpdated"))
@@ -174,7 +174,7 @@ export function ActivitiesView() {
 
       {selectedRealisasi && (
         <RealisasiModal 
-          kegaitan={selectedRealisasi} 
+          kegiatan={selectedRealisasi} 
           onClose={() => setSelectedRealisasi(null)}
           onSave={handleRealisasiSave}
         />
