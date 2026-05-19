@@ -1,7 +1,7 @@
 "use client"
 
-import React, { useState, useMemo } from "react"
-import { useRouter } from "next/navigation"
+import React, { useState, useMemo, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import {
   MapPin,
   Search,
@@ -187,6 +187,7 @@ type DataPublikContentProps = {
 
 export function DataPublikContent({ showBackButton = false, heroTitle, heroSubtitle, hideHeroPrefix = false }: DataPublikContentProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
   const [showWilayahModal, setShowWilayahModal] = useState(false)
@@ -197,6 +198,20 @@ export function DataPublikContent({ showBackButton = false, heroTitle, heroSubti
   // modal-internal state
   const [modalPending, setModalPending] = useState<string>("all")
   const [modalBrowseProvince, setModalBrowseProvince] = useState<string | null>(null)
+
+  useEffect(() => {
+    const provinsi = searchParams.get("provinsi")
+    const kota = searchParams.get("kota")
+    const hanyaProvinsi = searchParams.get("hanya_provinsi")
+
+    if (hanyaProvinsi === "true") {
+      setWilayahFilter("provinsi_only")
+    } else if (provinsi && kota) {
+      setWilayahFilter(`${provinsi} - ${kota}`)
+    } else if (provinsi) {
+      setWilayahFilter(`semua_kab:${provinsi}`)
+    }
+  }, [searchParams])
 
   const PROVINSI_ONLY = useMemo(() => PROVINSI_DATA.filter(r => !r.provinsi.includes(" - ")), [])
 
@@ -248,6 +263,21 @@ export function DataPublikContent({ showBackButton = false, heroTitle, heroSubti
     setWilayahFilter(modalPending)
     setPage(1)
     setShowWilayahModal(false)
+
+    // Update URL with filter params
+    const params = new URLSearchParams()
+    if (modalPending === "provinsi_only") {
+      params.set("hanya_provinsi", "true")
+    } else if (modalPending.startsWith("semua_kab:")) {
+      const prov = modalPending.slice("semua_kab:".length)
+      params.set("provinsi", prov)
+    } else if (modalPending.includes(" - ")) {
+      const [prov, kota] = modalPending.split(" - ")
+      params.set("provinsi", prov)
+      params.set("kota", kota)
+    }
+    const queryString = params.toString()
+    router.push(queryString ? `/kelompok-kerja?${queryString}` : "/kelompok-kerja")
   }
 
   const wilayahLabel = useMemo(() => {
@@ -335,7 +365,7 @@ export function DataPublikContent({ showBackButton = false, heroTitle, heroSubti
                 </button>
                 {wilayahFilter !== "all" && (
                   <button
-                    onClick={() => { setWilayahFilter("all"); setPage(1) }}
+                    onClick={() => { setWilayahFilter("all"); setPage(1); router.push("/kelompok-kerja") }}
                     className="h-8 px-3 text-sm text-slate-500 hover:text-slate-800 border border-slate-200 rounded-lg bg-white hover:bg-slate-50 transition-colors shrink-0"
                   >
                     Reset

@@ -143,14 +143,7 @@ export const SEED: SumberRujukan[] = [
     dibuatOleh: "Admin Pusat", usulanDari: "pusat",
     logTerakhir: RUJUKAN_LOG.dibuatTerverifikasiPusat,
   },
-  {
-    id: "sr-nasional-2", namaInstansi: "Dinas Pemadam Kebakaran dan Penyelamatan",
-    kategoriBentukDukungan: "Lainnya", kategoriPenyedia: "Pemerintah Daerah",
-    provinsi: "Seluruh Indonesia", kabupatenKota: "Seluruh Indonesia", namaJalan: "", nomorJalan: "",
-    nomorCallCenter: "113", aksesInfo: "publik", status: "terverifikasi",
-    dibuatOleh: "Admin Pusat", usulanDari: "pusat",
-    logTerakhir: RUJUKAN_LOG.dibuatTerverifikasiPusat,
-  },
+  
   {
     id: "sr-nasional-3", namaInstansi: "Komisi Perlindungan Anak Indonesia (KPAI)",
     kategoriBentukDukungan: "Sosial", kategoriPenyedia: "Pemerintah Pusat",
