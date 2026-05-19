@@ -49,7 +49,7 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(20)
   const [filterKategori, setFilterKategori] = useState<KategoriDukungan | "semua">("semua")
-  const [filterPenyedia, setFilterPenyedia] = useState<KategoriPenyedia | "semua">("semua")
+  const [filterPenyedia, setFilterPenyedia] = useState<KategoriPenyedia | "semua">("Pemerintah Pusat")
   const [filterWilayah, setFilterWilayah] = useState<FilterWilayah | null>(null)
   const [showAllData, setShowAllData] = useState(false)
   const [showWilayahModal, setShowWilayahModal] = useState(false)
@@ -101,6 +101,7 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
   const applyWilayahFilter = () => {
     setFilterWilayah(modalPendingFilter === "all" ? null : modalPendingFilter)
     setShowAllData(modalPendingShowAll)
+    setFilterPenyedia("semua")
     setPage(1)
     setShowWilayahModal(false)
   }
@@ -157,7 +158,7 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
                 </button>
                 {filterWilayah !== null || showAllData ? (
                   <button
-                    onClick={() => { setFilterWilayah(null); setShowAllData(false); setPage(1) }}
+                    onClick={() => { setFilterWilayah(null); setShowAllData(false); setFilterPenyedia("semua"); setPage(1) }}
                     className="h-8 px-3 text-sm text-slate-500 hover:text-slate-800 border border-slate-200 rounded-lg bg-white hover:bg-slate-50 transition-colors shrink-0"
                   >
                     Reset
