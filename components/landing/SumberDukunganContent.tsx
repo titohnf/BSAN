@@ -99,15 +99,19 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
   }
 
   const applyWilayahFilter = () => {
+    const isNasionalDefault = modalPendingFilter === null && !modalPendingShowAll
     setFilterWilayah(modalPendingFilter === "all" ? null : modalPendingFilter)
     setShowAllData(modalPendingShowAll)
+    if (!isNasionalDefault) {
+      setFilterPenyedia("semua")
+    }
     setPage(1)
     setShowWilayahModal(false)
   }
 
   const wilayahLabel = filterWilayah
     ? filterWilayah.kabupaten
-      ? `${filterWilayah.province} — ${filterWilayah.kabupaten}`
+      ? filterWilayah.kabupaten
       : filterWilayah.province
     : showAllData ? "Seluruh Indonesia" : "Nasional"
 
