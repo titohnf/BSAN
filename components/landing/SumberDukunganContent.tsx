@@ -42,7 +42,7 @@ type SumberDukunganContentProps = {
   hideHeroPrefix?: boolean
 }
 
-const NASIONAL_WILAYAH = "Seluruh Indonesia"
+const NASIONAL_WILAYAH = "Nasional"
 
 export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukunganContentProps) {
   const [search, setSearch] = useState("")
@@ -51,7 +51,7 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
   const [filterKategori, setFilterKategori] = useState<KategoriDukungan | "semua">("semua")
   const [filterPenyedia, setFilterPenyedia] = useState<KategoriPenyedia | "semua">("Pemerintah Pusat")
   const [filterWilayah, setFilterWilayah] = useState<FilterWilayah | null>(null)
-  const [showAllData, setShowAllData] = useState(true)
+  const [showAllData, setShowAllData] = useState(false)
   const [showWilayahModal, setShowWilayahModal] = useState(false)
   const [modalBrowseProvinsi, setModalBrowseProvinsi] = useState<string | null>(null)
   const [modalPendingFilter, setModalPendingFilter] = useState<FilterWilayah | "all">("all")
@@ -69,9 +69,9 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
       const matchKategori = filterKategori === "semua" || item.kategoriBentukDukungan === filterKategori
       const matchPenyedia = filterPenyedia === "semua" || item.kategoriPenyedia === filterPenyedia
       const matchWilayah = (() => {
-        const isNasional = item.provinsi === NASIONAL_WILAYAH && item.kabupatenKota === NASIONAL_WILAYAH
-        if (isNasional) return true
-        if (!filterWilayah) return false
+        const isNasional = (item.provinsi === NASIONAL_WILAYAH || item.provinsi === "Seluruh Indonesia") && (item.kabupatenKota === NASIONAL_WILAYAH || item.kabupatenKota === "Seluruh Indonesia")
+        if (showAllData) return true
+        if (!filterWilayah) return isNasional
         if (filterWilayah.kabupaten) {
           return filterWilayah.province === item.provinsi && filterWilayah.kabupaten === item.kabupatenKota
         }
@@ -94,14 +94,13 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
   const openWilayahModal = () => {
     setModalPendingFilter(filterWilayah ?? "all")
     setModalBrowseProvinsi(filterWilayah?.province ?? null)
-    setModalPendingShowAll(filterWilayah === null && !showAllData)
+    setModalPendingShowAll(showAllData)
     setShowWilayahModal(true)
   }
 
   const applyWilayahFilter = () => {
     setFilterWilayah(modalPendingFilter === "all" ? null : modalPendingFilter)
     setShowAllData(modalPendingShowAll)
-    setFilterPenyedia("semua")
     setPage(1)
     setShowWilayahModal(false)
   }
@@ -110,7 +109,7 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
     ? filterWilayah.kabupaten
       ? `${filterWilayah.province} — ${filterWilayah.kabupaten}`
       : filterWilayah.province
-    : showAllData ? "Seluruh Indonesia" : "Seluruh Indonesia"
+    : showAllData ? "Seluruh Indonesia" : "Nasional"
 
   const kabupatenForModal = modalBrowseProvinsi
     ? Array.from(new Set(VERIFIED_DATA.filter((i) => i.provinsi === modalBrowseProvinsi).map((i) => i.kabupatenKota)))
@@ -156,9 +155,9 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
                   <span className="max-w-[200px] truncate">{wilayahLabel}</span>
                   <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                 </button>
-                {(filterWilayah !== null || filterPenyedia !== "Pemerintah Pusat") ? (
+                {(filterWilayah !== null || filterPenyedia !== "Pemerintah Pusat" || showAllData) ? (
                   <button
-                    onClick={() => { setFilterWilayah(null); setShowAllData(true); setFilterPenyedia("Pemerintah Pusat"); setPage(1) }}
+                    onClick={() => { setFilterWilayah(null); setShowAllData(false); setFilterPenyedia("Pemerintah Pusat"); setPage(1) }}
                     className="h-8 px-3 text-sm text-slate-500 hover:text-slate-800 border border-slate-200 rounded-lg bg-white hover:bg-slate-50 transition-colors shrink-0"
                   >
                     Reset
@@ -217,7 +216,7 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
                       {paged.map((item, idx) => {
                         const kategoriCfg = KATEGORI_CONFIG[item.kategoriBentukDukungan]
                         const penyediaCfg = item.kategoriPenyedia ? PENYEDIA_CONFIG[item.kategoriPenyedia] : null
-                        const isNasional = item.provinsi === NASIONAL_WILAYAH && item.kabupatenKota === NASIONAL_WILAYAH
+const isNasional = (item.provinsi === NASIONAL_WILAYAH || item.provinsi === "Seluruh Indonesia") && (item.kabupatenKota === NASIONAL_WILAYAH || item.kabupatenKota === "Seluruh Indonesia")
                         return (
                           <tr key={item.id} className={cn("hover:bg-gray-50 transition-colors border-b border-gray-200", isNasional && "bg-gray-50 border-l-4 border-l-yellow-500")}>
                             <td className="px-4 py-3.5">
@@ -231,7 +230,7 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
                             </td>
                             <td className="px-4 py-3.5">
                               <span className={isNasional ? "text-gray-900" : "text-slate-600"}>
-                                {item.kabupatenKota === NASIONAL_WILAYAH ? "Seluruh Indonesia" : (item.kabupatenKota ? `Kota ${item.kabupatenKota}` : "-")}
+                                {isNasional ? "Nasional" : (item.kabupatenKota ? `Kota ${item.kabupatenKota}` : "-")}
                               </span>
                             </td>
                             <td className="px-4 py-3.5">
@@ -346,7 +345,7 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
                 <div>
                   <p className="text-xs text-slate-500 mb-1">Wilayah</p>
                   <p className="text-sm font-medium text-slate-900">
-                    {selectedItem.kabupatenKota ? `Kota ${selectedItem.kabupatenKota}` : "-"}
+                    {(selectedItem.provinsi === NASIONAL_WILAYAH || selectedItem.provinsi === "Seluruh Indonesia") && (selectedItem.kabupatenKota === NASIONAL_WILAYAH || selectedItem.kabupatenKota === "Seluruh Indonesia") ? "Nasional" : (selectedItem.kabupatenKota ? `Kota ${selectedItem.kabupatenKota}` : "-")}
                   </p>
                 </div>
                 {selectedItem.kategoriPenyedia && (
@@ -357,7 +356,9 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
                 )}
                 <div>
                   <p className="text-xs text-slate-500 mb-1">Provinsi</p>
-                  <p className="text-sm text-slate-900">{selectedItem.provinsi || "-"}</p>
+                  <p className="text-sm text-slate-900">
+                    {(selectedItem.provinsi === NASIONAL_WILAYAH || selectedItem.provinsi === "Seluruh Indonesia") && (selectedItem.kabupatenKota === NASIONAL_WILAYAH || selectedItem.kabupatenKota === "Seluruh Indonesia") ? "Nasional" : (selectedItem.provinsi || "-")}
+                  </p>
                 </div>
               </div>
 
@@ -451,10 +452,16 @@ export function SumberDukunganContent({ hideHeroPrefix = false }: SumberDukungan
                 <div className="w-1/2 border-r border-gray-100 overflow-y-auto">
                   <div className="p-2 space-y-0.5">
                     <button
-                      onClick={() => { setModalPendingFilter(null); setModalBrowseProvinsi(null); setShowAllData(true) }}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${!modalBrowseProvinsi && modalPendingFilter === null && showAllData ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-gray-700"}`}
+                      onClick={() => { setModalPendingFilter(null); setModalBrowseProvinsi(null); setModalPendingShowAll(true) }}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${!modalBrowseProvinsi && modalPendingFilter === null && modalPendingShowAll ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-gray-700"}`}
                     >
                       Seluruh Indonesia
+                    </button>
+                    <button
+                      onClick={() => { setModalPendingFilter(null); setModalBrowseProvinsi(null); setModalPendingShowAll(false) }}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${!modalBrowseProvinsi && modalPendingFilter === null && !modalPendingShowAll ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-gray-700"}`}
+                    >
+                      Nasional
                     </button>
                     <div className="border-t border-gray-100 my-1" />
                     {PROVINSI_LIST.map((province) => {
