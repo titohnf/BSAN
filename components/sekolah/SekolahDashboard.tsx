@@ -17,11 +17,22 @@ type AuthPayload = {
   namaSekolah?: string
 }
 
-export function SekolahDashboard() {
+interface SekolahDashboardProps {
+  searchParams?: { get: (key: string) => string | null }
+}
+
+export function SekolahDashboard({ searchParams }: SekolahDashboardProps) {
   const router = useRouter()
   const [menu, setMenu] = useState<SekolahMenu>("sumber-rujukan")
   const [wilayah, setWilayah] = useState("Aceh - Banda Aceh")
   const [displayName, setDisplayName] = useState("Admin Sekolah")
+
+  useEffect(() => {
+    const menuParam = searchParams?.get("menu") as SekolahMenu | null
+    if (menuParam && ["sumber-rujukan", "kegiatan", "pelanggaran", "laporan-akhir-tahun"].includes(menuParam)) {
+      setMenu(menuParam)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     try {

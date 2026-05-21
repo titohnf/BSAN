@@ -3,21 +3,33 @@
 import { useState, useEffect, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import {
-  ArrowLeft, Calendar, Upload, X, Users, FileText,
-  CheckCircle, PlayCircle, Clock,
+  ArrowLeft, Calendar, X,
+  CheckCircle, PlayCircle, Clock, Camera, FileCheck,
+  Landmark, Building2, GraduationCap, Heart, HelpCircle,
+  MapPin, Users,
 } from "lucide-react"
+import { RealisasiModal } from "@/components/dashboard/RealisasiModal"
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
-type StatusKegiatan = "selesai" | "berlangsung" | "menunggu"
+type StatusKegiatan = "menunggu" | "berlangsung" | "selesai" | "terealisasi"
+
+interface PesertaItem {
+  kategori: string
+  jumlah: string
+}
 
 interface KegiatanForm {
   namaKegiatan: string
-  penyelenggara: string
-  waktuKegiatan: string
+  penyelenggara: string[]
+  tanggalMulai: string
+  tanggalSelesai: string
   deskripsiKegiatan: string
-  dokumentasi: string
+  lokasi: string
+  linkGoogleMap: string
+  tautanMeeting: string
+  peserta: PesertaItem[]
   status: StatusKegiatan
 }
 
@@ -25,28 +37,54 @@ interface KegiatanForm {
 // Seed data (must match KegiatanView SEED_DATA)
 // ---------------------------------------------------------------------------
 const SEED_DATA = [
-  { id: "kg-1", namaKegiatan: "Workshop PKSA", penyelenggara: "SMA Negeri 1 Banda Aceh", waktuKegiatan: "2025-04-15T10:00", deskripsiKegiatan: "Workshop pengenalan isu kekerasan pada anak", dokumentasi: "", status: "selesai" as StatusKegiatan },
-  { id: "kg-2", namaKegiatan: "Sosialisasi Hak Anak", penyelenggara: "SMP Negeri 2 Banda Aceh", waktuKegiatan: "2025-06-20T14:00", deskripsiKegiatan: "Sosialisasi hak anak kepada seluruh siswa dan wali kelas", dokumentasi: "", status: "berlangsung" as StatusKegiatan },
-  { id: "kg-3", namaKegiatan: "Rapat Koordinasi Kelompok Kerja", penyelenggara: "Dinas Pendidikan Prov Aceh", waktuKegiatan: "2025-07-10T09:00", deskripsiKegiatan: "Rapat koordinasi bulanan antar anggota kelompok kerja", dokumentasi: "", status: "menunggu" as StatusKegiatan },
+  { id: "kg-1", namaKegiatan: "Workshop PKSA", penyelenggara: ["Sekolah"], tanggalMulai: "2025-04-15", tanggalSelesai: "2025-04-15", deskripsiKegiatan: "Workshop pengenalan isu kekerasan pada anak", lokasi: "Aula Sekolah", linkGoogleMap: "", tautanMeeting: "", peserta: [{ kategori: "Guru", jumlah: "20" }, { kategori: "Siswa", jumlah: "30" }], status: "selesai" as StatusKegiatan },
+  { id: "kg-2", namaKegiatan: "Sosialisasi Hak Anak", penyelenggara: ["Pusat", "Sekolah"], tanggalMulai: "2025-06-20", tanggalSelesai: "2025-06-21", deskripsiKegiatan: "Sosialisasi hak anak kepada seluruh siswa dan wali kelas", lokasi: "Ruang Serbaguna", linkGoogleMap: "https://maps.google.com", tautanMeeting: "https://zoom.us/j/123", peserta: [{ kategori: "Siswa", jumlah: "80" }, { kategori: "Masyarakat", jumlah: "40" }], status: "berlangsung" as StatusKegiatan },
+  { id: "kg-3", namaKegiatan: "Rapat Koordinasi Kelompok Kerja", penyelenggara: ["Dinas Pendidikan", "Dinas Sosial"], tanggalMulai: "2025-07-10", tanggalSelesai: "2025-07-10", deskripsiKegiatan: "Rapat koordinasi bulanan antar anggota kelompok kerja", lokasi: "Kantor Dinas Pendidikan", linkGoogleMap: "", tautanMeeting: "", peserta: [{ kategori: "Guru", jumlah: "30" }], status: "menunggu" as StatusKegiatan },
 ]
 
 const PENYELENGGARA_OPTIONS = [
-  "SMA Negeri 1 Banda Aceh",
-  "SMP Negeri 2 Banda Aceh",
-  "SMA Negeri 3 Banda Aceh",
-  "SMP Negeri 1 Aceh Besar",
-  "Dinas Pendidikan Prov Aceh",
+  "Sekolah",
+  "Pusat",
+  "Dinas Pendidikan",
+  "Dinas PPPA",
+  "Dinas Sosial",
+  "Dinas Kesehatan",
+  "Dinas Kominfo",
+  "Dinas Dukbangga",
+  "Organisasi Masyarakat",
   "Lainnya",
 ]
 
 const emptyForm = (): KegiatanForm => ({
   namaKegiatan: "",
-  penyelenggara: "",
-  waktuKegiatan: "",
+  penyelenggara: [],
+  tanggalMulai: "",
+  tanggalSelesai: "",
   deskripsiKegiatan: "",
-  dokumentasi: "",
+  lokasi: "",
+  linkGoogleMap: "",
+  tautanMeeting: "",
+  peserta: [],
   status: "menunggu",
 })
+
+function getPenyelenggaraIcon(type: string) {
+  const lower = type.toLowerCase()
+  if (lower === "pusat") return Landmark
+  if (lower.startsWith("dinas")) return Building2
+  if (lower === "sekolah") return GraduationCap
+  if (lower === "organisasi masyarakat") return Heart
+  return HelpCircle
+}
+
+function getPenyelenggaraColors(type: string) {
+  const lower = type.toLowerCase()
+  if (lower === "pusat") return { bg: "bg-blue-500/10", text: "text-blue-700" }
+  if (lower.startsWith("dinas")) return { bg: "bg-emerald-500/10", text: "text-emerald-700" }
+  if (lower === "sekolah") return { bg: "bg-amber-500/10", text: "text-amber-700" }
+  if (lower === "organisasi masyarakat") return { bg: "bg-purple-500/10", text: "text-purple-700" }
+  return { bg: "bg-gray-500/10", text: "text-gray-700" }
+}
 
 // ---------------------------------------------------------------------------
 // Shared helper components (same as tambah-rujukan)
@@ -112,11 +150,9 @@ function SelectInput({
 
 function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-      <div className="flex items-center gap-2.5 px-5 py-4 bg-gray-50 border-b border-gray-200">
-        <div className="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center text-blue-700 flex-shrink-0">
-          {icon}
-        </div>
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+      <div className="flex items-center gap-2.5 px-5 py-4 bg-gray-50 border-b border-gray-200 rounded-t-xl">
+        <span className="text-gray-900 flex-shrink-0">{icon}</span>
         <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
       </div>
       <div className="p-5">{children}</div>
@@ -125,6 +161,11 @@ function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: 
 }
 
 function StatusBadge({ status }: { status: StatusKegiatan }) {
+  if (status === "terealisasi") return (
+    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+      <CheckCircle className="w-3 h-3" /> Terealisasi
+    </span>
+  )
   if (status === "selesai") return (
     <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
       <CheckCircle className="w-3 h-3" /> Selesai
@@ -154,10 +195,60 @@ function TambahKegiatanInner() {
   const isEdit = !!editId
   const isView = !!viewId
   const isReadOnly = isView
+  const [role, setRole] = useState<string>("")
 
   const [form, setForm] = useState<KegiatanForm>(emptyForm)
   const [submitted, setSubmitted] = useState(false)
-  const [dokumentasiFile, setDokumentasiFile] = useState<File | null>(null)
+  const [showRealisasiModal, setShowRealisasiModal] = useState(false)
+  const [showRealisasiForm, setShowRealisasiForm] = useState(false)
+  const [realizeForm, setRealizeForm] = useState({ jumlahPeserta: "", tanggalRealisasi: "", catatan: "", dokumentasi: "" })
+  const [realizeData, setRealizeData] = useState<{
+    jumlahPeserta: number
+    tanggalRealisasi: string
+    catatan: string
+    dokumentasi: string
+    createdAt: string
+  } | null>(null)
+
+  const [tagInput, setTagInput] = useState("")
+  const [showTagDropdown, setShowTagDropdown] = useState(false)
+  const availableOptions = PENYELENGGARA_OPTIONS.filter((o) => !form.penyelenggara.includes(o))
+  const filteredTagOptions = tagInput
+    ? availableOptions.filter((o) => o.toLowerCase().includes(tagInput.toLowerCase()))
+    : availableOptions
+
+  useEffect(() => {
+    try {
+      const authRaw = localStorage.getItem("auth")
+      if (authRaw) {
+        const parsed = JSON.parse(authRaw) as { role: string }
+        setRole(parsed.role)
+      }
+    } catch {}
+  }, [])
+
+  useEffect(() => {
+    if (!isReadOnly && form.tanggalMulai && form.tanggalSelesai) {
+      const mulai = new Date(form.tanggalMulai)
+      const selesai = new Date(form.tanggalSelesai)
+      selesai.setHours(23, 59, 59, 999)
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+
+      if (selesai < today) {
+        setForm(prev => ({ ...prev, status: "terealisasi" }))
+        setShowRealisasiForm(true)
+      } else if (mulai <= today && today <= selesai) {
+        setForm(prev => ({ ...prev, status: "berlangsung" }))
+        setShowRealisasiForm(false)
+        setRealizeForm({ jumlahPeserta: "", tanggalRealisasi: "", catatan: "", dokumentasi: "" })
+      } else {
+        setForm(prev => ({ ...prev, status: "menunggu" }))
+        setShowRealisasiForm(false)
+        setRealizeForm({ jumlahPeserta: "", tanggalRealisasi: "", catatan: "", dokumentasi: "" })
+      }
+    }
+  }, [form.tanggalMulai, form.tanggalSelesai, isReadOnly])
 
   useEffect(() => {
     if (!activeId) return
@@ -172,12 +263,19 @@ function TambahKegiatanInner() {
     if (existing) {
       setForm({
         namaKegiatan: (existing.namaKegiatan as string) ?? "",
-        penyelenggara: (existing.penyelenggara as string) ?? "",
-        waktuKegiatan: (existing.waktuKegiatan as string) ?? "",
+        penyelenggara: Array.isArray(existing.penyelenggara) ? existing.penyelenggara as string[] : typeof existing.penyelenggara === "string" && existing.penyelenggara ? [existing.penyelenggara as string] : [],
+        tanggalMulai: (existing.tanggalMulai as string) ?? (existing.waktuKegiatan as string) ?? "",
+        tanggalSelesai: (existing.tanggalSelesai as string) ?? "",
         deskripsiKegiatan: (existing.deskripsiKegiatan as string) ?? "",
-        dokumentasi: (existing.dokumentasi as string) ?? "",
+        lokasi: (existing.lokasi as string) ?? "",
+        linkGoogleMap: (existing.linkGoogleMap as string) ?? "",
+        tautanMeeting: (existing.tautanMeeting as string) ?? "",
+        peserta: Array.isArray(existing.peserta) ? existing.peserta as PesertaItem[] : [],
         status: (existing.status as StatusKegiatan) ?? "menunggu",
       })
+      if (existing.realize) {
+        setRealizeData(existing.realize as typeof realizeData)
+      }
     }
   }, [activeId])
 
@@ -186,29 +284,61 @@ function TambahKegiatanInner() {
 
   const canSubmit =
     form.namaKegiatan.trim() !== "" &&
-    form.penyelenggara.trim() !== "" &&
-    form.waktuKegiatan.trim() !== "" &&
-    form.deskripsiKegiatan.trim() !== ""
+    form.penyelenggara.length > 0 &&
+    form.tanggalMulai.trim() !== "" &&
+    form.tanggalSelesai.trim() !== "" &&
+    form.deskripsiKegiatan.trim() !== "" &&
+    (form.status !== "terealisasi" || (realizeForm.jumlahPeserta !== "" && realizeForm.tanggalRealisasi !== ""))
 
   const handleSubmit = () => {
     if (!canSubmit) return
     try {
       const allData = JSON.parse(sessionStorage.getItem("kegiatanList") ?? "[]") as Array<Record<string, unknown>>
       if (isEdit && editId) {
-        const updated = allData.map((item) =>
-          item.id === editId ? { ...item, ...form, dokumentasi: dokumentasiFile?.name ?? form.dokumentasi } : item
-        )
+        const updated = allData.map((item) => {
+          if (item.id !== editId) return item
+          const updatedItem: Record<string, unknown> = {
+            ...item, ...form,
+            peserta: form.peserta,
+          }
+          if (form.status === "terealisasi" && realizeForm.jumlahPeserta && realizeForm.tanggalRealisasi) {
+            updatedItem.realize = {
+              jumlahPeserta: parseInt(realizeForm.jumlahPeserta),
+              tanggalRealisasi: realizeForm.tanggalRealisasi,
+              catatan: realizeForm.catatan,
+              dokumentasi: realizeForm.dokumentasi,
+              createdAt: new Date().toISOString(),
+            }
+          }
+          return updatedItem
+        })
         if (!allData.find((item) => item.id === editId)) {
-          updated.push({ id: editId, ...form, dokumentasi: dokumentasiFile?.name ?? "", createdAt: new Date().toISOString() })
+          updated.push({ id: editId, ...form, createdAt: new Date().toISOString() })
         }
         sessionStorage.setItem("kegiatanList", JSON.stringify(updated))
       } else {
-        const newItem = {
+        const newItem: Record<string, unknown> = {
           id: `kg-${Date.now()}`,
-          ...form,
-          dokumentasi: dokumentasiFile?.name ?? "",
-          status: "menunggu" as StatusKegiatan,
+          namaKegiatan: form.namaKegiatan,
+          penyelenggara: form.penyelenggara,
+          tanggalMulai: form.tanggalMulai,
+          tanggalSelesai: form.tanggalSelesai,
+          deskripsiKegiatan: form.deskripsiKegiatan,
+          lokasi: form.lokasi,
+          linkGoogleMap: form.linkGoogleMap,
+          tautanMeeting: form.tautanMeeting,
+          peserta: form.peserta,
+          status: form.status,
           createdAt: new Date().toISOString(),
+        }
+        if (form.status === "terealisasi" && realizeForm.jumlahPeserta && realizeForm.tanggalRealisasi) {
+          newItem.realize = {
+            jumlahPeserta: parseInt(realizeForm.jumlahPeserta),
+            tanggalRealisasi: realizeForm.tanggalRealisasi,
+            catatan: realizeForm.catatan,
+            dokumentasi: realizeForm.dokumentasi,
+            createdAt: new Date().toISOString(),
+          }
         }
         sessionStorage.setItem("kegiatanList", JSON.stringify([...allData, newItem]))
       }
@@ -219,7 +349,13 @@ function TambahKegiatanInner() {
 
   useEffect(() => {
     if (!submitted) return
-    const t = setTimeout(() => router.back(), 1500)
+    const t = setTimeout(() => {
+      if (role === "sekolah") {
+        window.location.href = "/dashboard?menu=kegiatan"
+      } else {
+        router.back()
+      }
+    }, 1500)
     return () => clearTimeout(t)
   }, [submitted])
 
@@ -249,7 +385,13 @@ function TambahKegiatanInner() {
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
           <button
-            onClick={() => router.back()}
+            onClick={() => {
+              if (role === "sekolah") {
+                window.location.href = "/dashboard?menu=kegiatan"
+              } else {
+                router.back()
+              }
+            }}
             className="p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition"
             aria-label="Kembali"
           >
@@ -268,6 +410,69 @@ function TambahKegiatanInner() {
         </div>
       </div>
 
+      {/* Laporan Realisasi — di atas, hanya untuk detail & status selesai */}
+      {isView && (form.status === "selesai" || form.status === "terealisasi") && (
+        <div className="max-w-2xl mx-auto px-4 pt-6">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="flex items-center gap-2.5 px-5 py-4 bg-gray-50 border-b border-gray-200">
+              <div className="w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center text-green-700 flex-shrink-0">
+                <FileCheck className="w-4 h-4" />
+              </div>
+              <h3 className="text-sm font-semibold text-gray-900">Laporan Realisasi Kegiatan</h3>
+            </div>
+            <div className="p-5">
+              {realizeData ? (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <p className="text-xs text-gray-500 mb-1">Jumlah Peserta</p>
+                      <p className="text-sm font-semibold text-gray-900">{realizeData.jumlahPeserta} orang</p>
+                    </div>
+                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <p className="text-xs text-gray-500 mb-1">Tanggal Pelaksanaan</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {new Date(realizeData.tanggalRealisasi).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+                      </p>
+                    </div>
+                  </div>
+                  {realizeData.dokumentasi && (
+                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <p className="text-xs text-gray-500 mb-2">Dokumentasi</p>
+                      <div className="flex items-center gap-2">
+                        <Camera className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm text-gray-700">{realizeData.dokumentasi}</span>
+                      </div>
+                    </div>
+                  )}
+                  {realizeData.catatan && (
+                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <p className="text-xs text-gray-500 mb-1">Catatan</p>
+                      <p className="text-sm text-gray-700">{realizeData.catatan}</p>
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-400">
+                    Dilaporkan pada {new Date(realizeData.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+                  </p>
+                </div>
+              ) : (
+                <div className="text-center py-4">
+                  <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-3">
+                    <FileCheck className="w-6 h-6 text-amber-600" />
+                  </div>
+                  <p className="text-sm text-gray-600 mb-3">Belum ada laporan realize untuk kegiatan ini.</p>
+                  <button
+                    onClick={() => setShowRealisasiModal(true)}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition"
+                  >
+                    <FileCheck className="w-4 h-4" /> Lapor Realisasi
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Form body */}
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
 
@@ -283,101 +488,245 @@ function TambahKegiatanInner() {
                 disabled={isReadOnly}
               />
             </div>
-            <div className="flex flex-col gap-1.5">
-              <FieldLabel required={!isReadOnly}>Penyelenggara</FieldLabel>
-              <SelectInput
-                value={form.penyelenggara}
-                onChange={(v) => set("penyelenggara", v)}
-                options={PENYELENGGARA_OPTIONS}
-                placeholder="Pilih penyelenggara"
+            <div className="sm:col-span-2 flex flex-col gap-1.5">
+              <FieldLabel required={!isReadOnly}>Deskripsi</FieldLabel>
+              <textarea
+                value={form.deskripsiKegiatan}
+                onChange={(e) => set("deskripsiKegiatan", e.target.value)}
+                placeholder="Jelaskan tujuan dan hasil kegiatan..."
+                rows={4}
                 disabled={isReadOnly}
+                className="p-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none disabled:bg-gray-50 disabled:text-gray-600 disabled:cursor-default"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <FieldLabel required={!isReadOnly}>Waktu Kegiatan</FieldLabel>
+              <FieldLabel required={!isReadOnly}>Tanggal Mulai</FieldLabel>
               <TextInput
-                type="datetime-local"
-                value={form.waktuKegiatan}
-                onChange={(v) => set("waktuKegiatan", v)}
+                type="date"
+                value={form.tanggalMulai}
+                onChange={(v) => set("tanggalMulai", v)}
+                disabled={isReadOnly}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <FieldLabel required={!isReadOnly}>Tanggal Selesai</FieldLabel>
+              <TextInput
+                type="date"
+                value={form.tanggalSelesai}
+                onChange={(v) => set("tanggalSelesai", v)}
                 disabled={isReadOnly}
               />
             </div>
           </div>
         </SectionCard>
 
-        {/* Deskripsi */}
-        <SectionCard icon={<FileText className="w-4 h-4" />} title="Deskripsi Kegiatan">
-          <div className="flex flex-col gap-1.5">
-            <FieldLabel required={!isReadOnly}>Deskripsi</FieldLabel>
-            <textarea
-              value={form.deskripsiKegiatan}
-              onChange={(e) => set("deskripsiKegiatan", e.target.value)}
-              placeholder="Jelaskan tujuan dan hasil kegiatan..."
-              rows={4}
-              disabled={isReadOnly}
-              className="p-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none disabled:bg-gray-50 disabled:text-gray-600 disabled:cursor-default"
-            />
-          </div>
-        </SectionCard>
-
-        {/* Dokumentasi */}
-        <SectionCard icon={<Upload className="w-4 h-4" />} title="Dokumentasi Kegiatan">
-          {isReadOnly ? (
-            <div className="flex flex-col gap-1.5">
-              <FieldLabel>Dokumentasi</FieldLabel>
-              <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                <p className="text-sm text-gray-600">{form.dokumentasi || "Tidak ada dokumentasi"}</p>
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-3">
-              <div className="relative rounded-lg border-2 border-dashed border-gray-300 p-5 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition">
-                <Upload className="w-5 h-5 text-gray-400 mx-auto mb-2" />
-                <p className="text-xs text-gray-600 font-medium">Klik untuk unggah foto / video dokumentasi</p>
-                <p className="text-xs text-gray-400 mt-1">JPG, PNG, MP4 — maks. 10 MB</p>
+        {/* Form Realisasi - tampil saat status terealisasi */}
+        {showRealisasiForm && (
+          <SectionCard icon={<FileCheck className="w-4 h-4" />} title="Laporan Realisasi">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <FieldLabel required>Jumlah Peserta</FieldLabel>
                 <input
-                  type="file"
-                  accept="image/*,video/*"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0] ?? null
-                    setDokumentasiFile(f)
-                    if (f) set("dokumentasi", f.name)
-                  }}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  type="number"
+                  min="1"
+                  value={realizeForm.jumlahPeserta}
+                  onChange={(e) => setRealizeForm(prev => ({ ...prev, jumlahPeserta: e.target.value }))}
+                  placeholder="Contoh: 50"
+                  className="w-full h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white"
                 />
               </div>
-              {dokumentasiFile && (
-                <div className="flex items-center gap-2 p-2.5 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-xs text-green-700 flex-1 truncate">{dokumentasiFile.name}</p>
-                  <button
-                    onClick={() => { setDokumentasiFile(null); set("dokumentasi", "") }}
-                    className="p-1 hover:bg-red-100 rounded text-red-500 transition"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
+              <div className="flex flex-col gap-1.5">
+                <FieldLabel required>Tanggal Pelaksanaan</FieldLabel>
+                <input
+                  type="date"
+                  value={realizeForm.tanggalRealisasi}
+                  onChange={(e) => setRealizeForm(prev => ({ ...prev, tanggalRealisasi: e.target.value }))}
+                  className="w-full h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white"
+                />
+              </div>
+            </div>
+            <div className="flex flex-col gap-1.5 mt-4">
+              <FieldLabel>Catatan</FieldLabel>
+              <textarea
+                value={realizeForm.catatan}
+                onChange={(e) => setRealizeForm(prev => ({ ...prev, catatan: e.target.value }))}
+                placeholder="Tambahkan catatan jika diperlukan..."
+                rows={3}
+                className="p-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none"
+              />
+            </div>
+          </SectionCard>
+        )}
+
+        {/* Penyelenggara */}
+        <SectionCard icon={<Building2 className="w-4 h-4" />} title="Penyelenggara">
+          {isReadOnly ? (
+            <div className="flex flex-col gap-1.5">
+              {form.penyelenggara.length > 0 ? form.penyelenggara.map((p) => {
+                const Icon = getPenyelenggaraIcon(p)
+                const colors = getPenyelenggaraColors(p)
+                return (
+                  <div key={p} className="flex items-center gap-2 py-1.5 px-2 bg-gray-50 rounded-lg">
+                    <div className={`w-8 h-8 rounded-full ${colors.bg} flex items-center justify-center flex-shrink-0`}>
+                      <Icon className={`w-4 h-4 ${colors.text}`} />
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">{p}</span>
+                  </div>
+                )
+              }) : <span className="text-sm text-gray-400">-</span>}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <div className="relative">
+                <input
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onFocus={() => setShowTagDropdown(true)}
+                  onBlur={() => setTimeout(() => setShowTagDropdown(false), 200)}
+                  onClick={() => setShowTagDropdown(true)}
+                  placeholder="Tambah Penyelenggara"
+                  className="w-full h-9 px-3 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                {showTagDropdown && filteredTagOptions.length > 0 && (
+                  <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                    {filteredTagOptions.map((o) => (
+                      <button
+                        key={o}
+                        type="button"
+                        onMouseDown={(e) => { e.preventDefault(); set("penyelenggara", [...form.penyelenggara, o]); setTagInput(""); setShowTagDropdown(false) }}
+                        className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 text-gray-700"
+                      >
+                        {o}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {form.penyelenggara.length > 0 && (
+                <div className="flex flex-col gap-1.5">
+                  {form.penyelenggara.map((p) => {
+                    const Icon = getPenyelenggaraIcon(p)
+                    const colors = getPenyelenggaraColors(p)
+                    return (
+                      <div key={p} className="flex items-center gap-2 py-1.5 px-2 bg-gray-50 rounded-lg">
+                        <div className={`w-8 h-8 rounded-full ${colors.bg} flex items-center justify-center flex-shrink-0`}>
+                          <Icon className={`w-4 h-4 ${colors.text}`} />
+                        </div>
+                        <span className="text-sm font-medium text-gray-700 flex-1">{p}</span>
+                        <button type="button" onClick={() => set("penyelenggara", form.penyelenggara.filter((x) => x !== p))} className="p-0.5 hover:bg-gray-200 rounded-full">
+                          <X className="w-3.5 h-3.5 text-gray-400" />
+                        </button>
+                      </div>
+                    )
+                  })}
                 </div>
               )}
             </div>
           )}
         </SectionCard>
 
-        {/* Penyelenggara info — view only */}
-        {isView && (
-          <SectionCard icon={<Users className="w-4 h-4" />} title="Penyelenggara">
-            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                <Users className="w-4 h-4 text-blue-700" />
-              </div>
-              <p className="text-sm font-medium text-gray-700">{form.penyelenggara || "-"}</p>
+        {/* Peserta */}
+        <SectionCard icon={<Users className="w-4 h-4" />} title="Peserta">
+          {isReadOnly ? (
+            <div className="flex flex-col gap-2">
+              {form.peserta.length > 0 ? form.peserta.map((p, i) => (
+                <div key={i} className="flex items-center gap-3 py-2 px-3 bg-gray-50 rounded-lg">
+                  <span className="text-sm font-medium text-gray-700 min-w-[100px]">{p.kategori}</span>
+                  <span className="text-sm text-gray-500">: {p.jumlah} orang</span>
+                </div>
+              )) : <span className="text-sm text-gray-400">-</span>}
             </div>
-          </SectionCard>
-        )}
+          ) : (
+            <div className="flex flex-col gap-3">
+              {form.peserta.map((p, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <input
+                    value={p.kategori}
+                    onChange={(e) => {
+                      const next = [...form.peserta]
+                      next[i] = { ...next[i], kategori: e.target.value }
+                      set("peserta", next)
+                    }}
+                    placeholder="Kategori"
+                    className="flex-1 h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <input
+                    type="number"
+                    min="1"
+                    value={p.jumlah}
+                    onChange={(e) => {
+                      const next = [...form.peserta]
+                      next[i] = { ...next[i], jumlah: e.target.value }
+                      set("peserta", next)
+                    }}
+                    placeholder="Jumlah"
+                    className="w-24 h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <span className="text-sm text-gray-500 whitespace-nowrap">orang</span>
+                  <button
+                    type="button"
+                    onClick={() => set("peserta", form.peserta.filter((_, idx) => idx !== i))}
+                    className="p-1.5 hover:bg-red-50 rounded-lg text-red-400 hover:text-red-600 transition"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => set("peserta", [...form.peserta, { kategori: "", jumlah: "" }])}
+                className="flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition self-start"
+              >
+                + Tambah Kategori
+              </button>
+            </div>
+          )}
+        </SectionCard>
+
+        {/* Lokasi */}
+        <SectionCard icon={<MapPin className="w-4 h-4" />} title="Lokasi">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <FieldLabel required={!isReadOnly}>Lokasi Kegiatan</FieldLabel>
+              <TextInput
+                value={form.lokasi}
+                onChange={(v) => set("lokasi", v)}
+                placeholder="Contoh: Aula Sekolah SDN 01"
+                disabled={isReadOnly}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <FieldLabel>Link Google Map</FieldLabel>
+              <TextInput
+                value={form.linkGoogleMap}
+                onChange={(v) => set("linkGoogleMap", v)}
+                placeholder="https://maps.google.com/..."
+                disabled={isReadOnly}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <FieldLabel>Tautan Meeting Online / Zoom</FieldLabel>
+              <TextInput
+                value={form.tautanMeeting}
+                onChange={(v) => set("tautanMeeting", v)}
+                placeholder="https://zoom.us/j/..."
+                disabled={isReadOnly}
+              />
+            </div>
+          </div>
+        </SectionCard>
 
         {/* Footer actions */}
         {!isReadOnly && (
           <div className="flex gap-3 pt-2">
             <button
-              onClick={() => router.back()}
+              onClick={() => {
+                if (role === "sekolah") {
+                  window.location.href = "/dashboard?menu=kegiatan"
+                } else {
+                  router.back()
+                }
+              }}
               className="flex-1 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium text-sm hover:bg-gray-50 transition"
             >
               Batal
@@ -405,7 +754,6 @@ function TambahKegiatanInner() {
                 try {
                   const stored = JSON.parse(sessionStorage.getItem("kegiatanList") ?? "[]") as Array<Record<string, unknown>>
                   const filtered = stored.filter((i) => i.id !== viewId)
-                  // If it's a SEED item, mark as deleted instead of removing
                   const isSeed = ["kg-1", "kg-2", "kg-3"].includes(viewId ?? "")
                   if (isSeed) {
                     const override = stored.find((i) => i.id === viewId) ?? { id: viewId }
@@ -415,22 +763,52 @@ function TambahKegiatanInner() {
                   }
                   window.dispatchEvent(new CustomEvent("kegiatanUpdated"))
                 } catch {}
-                router.back()
+                if (role === "sekolah") {
+                  window.location.href = "/dashboard?menu=kegiatan"
+                } else {
+                  router.back()
+                }
               }}
               className="flex-1 py-2.5 rounded-lg border border-red-300 text-red-600 font-medium text-sm hover:bg-red-50 transition"
             >
               Hapus
             </button>
-            <button
-              onClick={() => router.back()}
-              className="flex-1 py-2.5 rounded-lg bg-blue-600 text-white font-medium text-sm hover:bg-blue-700 transition"
-            >
-              Tutup
-            </button>
           </div>
         )}
 
       </div>
+
+      {showRealisasiModal && (
+        <RealisasiModal
+          kegiatan={{
+            id: activeId ?? "",
+            namaKegiatan: form.namaKegiatan,
+            penyelenggara: form.penyelenggara,
+            tanggalMulai: form.tanggalMulai,
+            tanggalSelesai: form.tanggalSelesai,
+            deskripsiKegiatan: form.deskripsiKegiatan,
+            status: form.status,
+            realize: realizeData,
+          }}
+          onClose={() => setShowRealisasiModal(false)}
+          onSave={(id, realize) => {
+            setRealizeData(realize)
+            setForm(prev => ({ ...prev, status: "terealisasi" as StatusKegiatan }))
+            setShowRealisasiModal(false)
+            try {
+              const stored = JSON.parse(sessionStorage.getItem("kegiatanList") ?? "[]") as Array<Record<string, unknown>>
+              const idx = stored.findIndex((i) => i.id === id)
+              if (idx !== -1) {
+                stored[idx] = { ...stored[idx], realize, status: "terealisasi" }
+              } else {
+                stored.push({ id, realize, status: "terealisasi" })
+              }
+              sessionStorage.setItem("kegiatanList", JSON.stringify(stored))
+              window.dispatchEvent(new CustomEvent("kegiatanUpdated"))
+            } catch {}
+          }}
+        />
+      )}
     </div>
   )
 }

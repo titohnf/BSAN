@@ -66,6 +66,8 @@ export interface SumberRujukan {
   jenisButuhPerbaikan?: "ditolak" | "perbaikan"
   /** Nama sekolah yang pernah melaporkan item ini (untuk filter "pernah dilaporkan"). */
   dilaporkanOlehSekolah?: string
+  /** Ditandai sebagai sumber dukungan nasional */
+  isNasional?: boolean
 }
 
 const KOTA_SET = new Set([
@@ -841,7 +843,7 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
   const [filterKategori, setFilterKategori] = useState<KategoriDukungan | "semua">("semua")
   const [filterStatus, setFilterStatus] = useState<StatusRujukan | "semua">("semua")
   const [filterPenyedia, setFilterPenyedia] = useState<KategoriPenyedia | "semua">("semua")
-  const [sortMode, setSortMode] = useState<SortMode>("relevansi")
+  const [sortMode, setSortMode] = useState<SortMode>("terbaru")
   const [selected, setSelected] = useState<SumberRujukan | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(10)
@@ -891,8 +893,9 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
         item.namaInstansi.toLowerCase().includes(search.toLowerCase()) ||
         item.kabupatenKota.toLowerCase().includes(search.toLowerCase()) ||
         item.provinsi.toLowerCase().includes(search.toLowerCase())
-      const matchWilayah = !filterWilayah || 
-        (filterWilayah.province === item.provinsi && (!filterWilayah.kabupaten || item.kabupatenKota === filterWilayah.kabupaten))
+      const isNasionalItem = item.isNasional || item.provinsi === "Seluruh Indonesia" || (!item.provinsi && !item.kabupatenKota)
+      const matchWilayah = !filterWilayah || isNasionalItem ||
+        (filterWilayah.province === item.provinsi && (!filterWilayah.kabupaten || !item.kabupatenKota || item.kabupatenKota === filterWilayah.kabupaten))
       const matchKategori = filterKategori === "semua" || item.kategoriBentukDukungan === filterKategori
       const matchStatus = filterStatus === "semua" ? item.status !== "menunggu_review" : item.status === filterStatus
       const matchPenyedia = filterPenyedia === "semua" || item.kategoriPenyedia === filterPenyedia
@@ -900,7 +903,11 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
     })
     .sort((a, b) => {
       if (sortMode === "nama_az") return a.namaInstansi.localeCompare(b.namaInstansi)
-      if (sortMode === "terbaru") return (b.createdAt ?? b.id).localeCompare(a.createdAt ?? a.id)
+      if (sortMode === "terbaru") {
+        if (a.createdAt && !b.createdAt) return -1
+        if (!a.createdAt && b.createdAt) return 1
+        return (b.createdAt ?? b.id).localeCompare(a.createdAt ?? a.id)
+      }
       // relevansi: wilayah sendiri → provinsi sama → lainnya
       const rankA = a.kabupatenKota === myKabupatenKota && a.provinsi === myProvinsi ? 0 : a.provinsi === myProvinsi ? 1 : 2
       const rankB = b.kabupatenKota === myKabupatenKota && b.provinsi === myProvinsi ? 0 : b.provinsi === myProvinsi ? 1 : 2
@@ -1289,17 +1296,9 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
                 <Upload className="w-4 h-4" /> Import
                 <input type="file" accept=".csv,.xlsx,.xls" onChange={importExcel} className="hidden" />
               </label>
+              <div className="w-px h-7 bg-gray-200" />
             </>
           )}
-          {/* Export CSV */}
-          <button
-            type="button"
-            onClick={exportToCSV}
-            disabled={filtered.length === 0}
-            className="flex items-center gap-1.5 h-9 px-4 rounded-lg text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <Download className="w-4 h-4" /> Ekspor CSV
-          </button>
           {/* Add New - Primary Action */}
           <button
             onClick={() => router.push("/sumber-rujukan/form")}
@@ -1367,18 +1366,31 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
       </div>
       )}
 
-      {/* Filter bar */}
-      <div className="flex flex-col sm:flex-row gap-2 items-end flex-wrap">
-        {/* Search */}
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Ketik nama instansi atau kota"
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-          />
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Ketik nama instansi atau kota"
+          className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+        />
+      </div>
+
+      {/* Sort + Filter + Ekspor */}
+      <div className="flex flex-row items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 bg-white">
+          <ArrowUpDown className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+          <select
+            value={sortMode}
+            onChange={(e) => setSortMode(e.target.value as SortMode)}
+            className="text-sm focus:outline-none bg-transparent text-gray-700"
+          >
+            <option value="terbaru">Terbaru</option>
+            <option value="nama_az">Nama A–Z</option>
+          </select>
         </div>
+        <div className="w-px h-6 bg-gray-200" />
         <Select value={filterKategori} onValueChange={(v) => setFilterKategori(v as KategoriDukungan | "semua")}>
           <SelectTrigger className="w-[180px] rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
             <SelectValue placeholder="Semua Kategori" />
@@ -1392,7 +1404,7 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
         </Select>
         <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as StatusRujukan | "semua")}>
           <SelectTrigger className="w-[180px] rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-            <SelectValue placeholder="Semua Status (Terverifikasi, Perlu Verifikasi, Nonaktif, Ditolak)" />
+            <SelectValue placeholder="Semua Status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Semua Status</SelectItem>
@@ -1413,19 +1425,15 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
             ))}
           </SelectContent>
         </Select>
-        {/* Sort */}
-        <div className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 bg-white">
-          <ArrowUpDown className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-          <select
-            value={sortMode}
-            onChange={(e) => setSortMode(e.target.value as SortMode)}
-            className="text-sm focus:outline-none bg-transparent text-gray-700"
-          >
-            <option value="relevansi">Relevansi</option>
-            <option value="terbaru">Terbaru</option>
-            <option value="nama_az">Nama A–Z</option>
-          </select>
-        </div>
+        <div className="w-px h-6 bg-gray-200" />
+        <button
+          type="button"
+          onClick={exportToCSV}
+          disabled={filtered.length === 0}
+          className="flex items-center gap-1.5 h-9 px-4 rounded-lg text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          <Download className="w-4 h-4" /> Ekspor CSV
+        </button>
       </div>
 
       {/* Table */}
@@ -1474,7 +1482,7 @@ export function SumberRujukanView({ wilayahDinas }: { wilayahDinas?: { provinsi:
                         </div>
                       </td>
                       <td className="px-4 py-3.5">
-                        <p className="text-sm text-gray-800 whitespace-nowrap">{getWilayahType(item.kabupatenKota)} {item.kabupatenKota}</p>
+                        <p className="text-sm text-gray-800 whitespace-nowrap">{item.isNasional || item.provinsi === "Seluruh Indonesia" ? "Nasional" : `${getWilayahType(item.kabupatenKota)} ${item.kabupatenKota}`}</p>
                       </td>
                       <td className="px-4 py-3.5">
                         <p className="text-xs text-gray-600 max-w-[220px] leading-relaxed">{formatLogTerakhirDisplay(item, dinasNamaLog)}</p>

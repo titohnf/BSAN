@@ -30,6 +30,7 @@ export function Header({ userName = "Admin Dinas" }: HeaderProps) {
     localStorage.removeItem("pokjaList")
     localStorage.removeItem("rujukanList")
     localStorage.removeItem("reportList")
+    sessionStorage.removeItem("kegiatanList")
     clearDraft()
     setOpen(false)
     window.location.reload()

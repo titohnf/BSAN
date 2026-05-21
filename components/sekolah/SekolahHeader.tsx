@@ -25,6 +25,7 @@ export function SekolahHeader({ userName, onLogout }: SekolahHeaderProps) {
     localStorage.removeItem("rujukanList")
     localStorage.removeItem("reportList")
     localStorage.removeItem("laporanAkhirTahunList")
+    sessionStorage.removeItem("kegiatanList")
     setOpen(false)
     window.location.reload()
   }

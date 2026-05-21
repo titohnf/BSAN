@@ -451,6 +451,18 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
     }
   }, [])
 
+  // Load reported IDs from reportList
+  const myReportIds = useMemo(() => {
+    try {
+      const raw = localStorage.getItem("reportList")
+      if (!raw) return new Set<string>()
+      const reports = JSON.parse(raw) as Array<{ sumberId: string }>
+      return new Set(reports.map((r) => r.sumberId))
+    } catch {
+      return new Set<string>()
+    }
+  }, [list])
+
   // Reset pagination when filters change
   useEffect(() => {
     setCurrentPage(1)
@@ -458,16 +470,15 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
 
   const filtered = list
     .filter((item) => {
-      // Tab "usulan_saya": tampilkan semua usulan sekolah termasuk yang nonaktif
+      // Tab filter
       if (myView === "usulan_saya") {
-        return item.usulanDari === "sekolah"
+        if (item.usulanDari !== "sekolah") return false
+      } else if (myView === "dilaporkan") {
+        if (!myReportIds.has(item.id)) return false
+      } else {
+        // Tab "semua": hanya status terverifikasi
+        if (item.status !== "terverifikasi") return false
       }
-      // Tab "dilaporkan": item non-milik-sekolah yang pernah dilaporkan (perbaikan/penonaktifan)
-      if (myView === "dilaporkan") {
-        return item.jenisMenunggu === "perbaikan_laporan" || item.jenisMenunggu === "penonaktifan"
-      }
-      // Tab "semua": filter normal
-      if (item.status === "nonaktif" && item.usulanDari !== "sekolah") return false
       const matchSearch =
         search.trim() === "" ||
         item.namaInstansi.toLowerCase().includes(search.toLowerCase()) ||
@@ -476,9 +487,8 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
       const matchWilayah = !filterWilayah ||
         (filterWilayah.province === item.provinsi && (!filterWilayah.kabupaten || item.kabupatenKota === filterWilayah.kabupaten))
       const matchKategori = filterKategori === "semua" || item.kategoriBentukDukungan === filterKategori
-      const matchStatus = item.status === "terverifikasi" || item.status === "menunggu" || (item.status === "nonaktif" && item.usulanDari === "sekolah")
       const matchPenyedia = filterPenyedia === "semua" || item.kategoriPenyedia === filterPenyedia
-      return matchSearch && matchWilayah && matchKategori && matchStatus && matchPenyedia
+      return matchSearch && matchWilayah && matchKategori && matchPenyedia
     })
     .sort((a, b) => {
       if (sortMode === "nama_az") return a.namaInstansi.localeCompare(b.namaInstansi)
@@ -911,7 +921,7 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
                           )}
                         </td>
                         <td className="px-4 py-3.5 text-sm text-gray-800">
-                          {getWilayahType(item.kabupatenKota)} {item.kabupatenKota}
+                          {item.isNasional || item.provinsi === "Seluruh Indonesia" ? "Nasional" : `${getWilayahType(item.kabupatenKota)} ${item.kabupatenKota}`}
                         </td>
                         <td className="px-4 py-3.5">
                           <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 whitespace-nowrap">

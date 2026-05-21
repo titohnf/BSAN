@@ -565,7 +565,7 @@ function DashboardPageInner() {
 
       {role === "sekolah" && (
         <div className="min-h-screen bg-gray-50">
-          <SekolahDashboard />
+          <SekolahDashboard searchParams={searchParams} />
         </div>
       )}
     </>

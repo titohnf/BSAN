@@ -3,20 +3,20 @@
 import { useState } from "react"
 import { X, Camera } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import type { Activities, Realisasi } from "./KegaitanView"
+import type { Kegiatan } from "./KegiatanView"
 
 interface RealisasiModalProps {
-  kegiatan: Activities
+  kegiatan: Kegiatan
   onClose: () => void
-  onSave: (id: string, realisasi: Realisasi) => void
+  onSave: (id: string, realize: { jumlahPeserta: number; tanggalRealisasi: string; catatan: string; dokumentasi: string; createdAt: string }) => void
 }
 
 export function RealisasiModal({ kegiatan, onClose, onSave }: RealisasiModalProps) {
-  const [jumlahPeserta, setJumlahPeserta] = useState(kegaitan?.realisasi?.jumlahPeserta?.toString() || "")
-  const [tanggalRealisasi, setTanggalRealisasi] = useState(kegaitan?.realisasi?.tanggalRealisasi || "")
-  const [catatan, setCatatan] = useState(kegaitan?.realisasi?.catatan || "")
-  const [dokumentasi, setDokumentasi] = useState(kegaitan?.realisasi?.dokumentasi || "")
-  const [dokumentasiPreview, setDokumentasiPreview] = useState(kegaitan?.realisasi?.dokumentasi || "")
+  const [jumlahPeserta, setJumlahPeserta] = useState(kegiatan?.realize?.jumlahPeserta?.toString() || "")
+  const [tanggalRealisasi, setTanggalRealisasi] = useState(kegiatan?.realize?.tanggalRealisasi || "")
+  const [catatan, setCatatan] = useState(kegiatan?.realize?.catatan || "")
+  const [dokumentasi, setDokumentasi] = useState(kegiatan?.realize?.dokumentasi || "")
+  const [dokumentasiPreview, setDokumentasiPreview] = useState(kegiatan?.realize?.dokumentasi || "")
   const [isUploading, setIsUploading] = useState(false)
 
   const handleDokumentasiChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,7 +37,7 @@ export function RealisasiModal({ kegiatan, onClose, onSave }: RealisasiModalProp
     e.preventDefault()
     if (!jumlahPeserta || !tanggalRealisasi) return
 
-    onSave(kegaitan.id, {
+    onSave(kegiatan.id, {
       jumlahPeserta: parseInt(jumlahPeserta),
       tanggalRealisasi,
       catatan,
@@ -56,7 +56,7 @@ export function RealisasiModal({ kegiatan, onClose, onSave }: RealisasiModalProp
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 shrink-0">
           <div>
             <h3 className="text-base font-bold text-gray-900">Laporan Realisasi Kegiatan</h3>
-            <p className="text-xs text-gray-500 mt-0.5">{kegaitan.namaActivities}</p>
+            <p className="text-xs text-gray-500 mt-0.5">{kegiatan.namaKegiatan}</p>
           </div>
           <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg">
             <X className="w-5 h-5 text-gray-500" />

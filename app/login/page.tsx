@@ -42,6 +42,7 @@ export default function LoginPage() {
             : user.role === "dinas"
               ? {
                   ...base,
+                  wilayah: "Aceh - Banda Aceh",
                   namaDinas: "Dinas Pendidikan Provinsi Aceh",
                 }
               : base
