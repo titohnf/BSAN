@@ -200,6 +200,13 @@ function TambahKegiatanInner() {
 
   const [form, setForm] = useState<KegiatanForm>(emptyForm)
   const [submitted, setSubmitted] = useState(false)
+  const [realizeData, setRealizeData] = useState<{
+    jumlahPeserta: number
+    tanggalRealisasi: string
+    catatan: string
+    dokumentasi: string
+    createdAt: string
+  } | null>(null)
 
   const [tagInput, setTagInput] = useState("")
   const [showTagDropdown, setShowTagDropdown] = useState(false)
