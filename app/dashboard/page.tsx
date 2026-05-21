@@ -25,7 +25,7 @@ import type { PokjaItem, PokjaData } from "@/types/pokja"
 import { getDrafts, clearDraft } from "@/lib/draft-storage"
 
 type AdminRole = "dinas" | "pusat" | "sekolah"
-type DinaMenu = "dashboard" | "data-pokja" | "sumber-rujukan" | "kActivities"
+type DinaMenu = "dashboard" | "data-pokja" | "sumber-rujukan" | "kegiatan"
 
 const REGION = "Provinsi Aceh"
 
@@ -187,6 +187,14 @@ function DashboardPageInner() {
       router.replace("/")
     }
   }, [])
+
+  // Handle ?menu= URL param for dinas
+  useEffect(() => {
+    const menuParam = searchParams.get("menu") as DinaMenu | null
+    if (menuParam && ["dashboard", "data-pokja", "sumber-rujukan", "kegiatan"].includes(menuParam)) {
+      setDinasMenu(menuParam)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     try {
@@ -491,7 +499,7 @@ function DashboardPageInner() {
                   onBuatPokja={navigateToBuatPokja}
                   onViewDataPokja={() => setDinasMenu("data-pokja")}
                   onViewSumberRujukan={() => setDinasMenu("sumber-rujukan")}
-                  onViewActivities={() => setDinasMenu("kActivities")}
+                  onViewActivities={() => setDinasMenu("kegiatan")}
                   onPerbaikiPokja={handlePerbaikiPokja}
                   onContinueDraft={() => router.push("/buat-pokja?draftId=draft_ongoing")}
                 />
@@ -507,7 +515,7 @@ function DashboardPageInner() {
                 />
               )}
               {dinasMenu === "sumber-rujukan" && <SumberRujukanView />}
-              {dinasMenu === "kActivities" && < KegiatanView />}
+              {dinasMenu === "kegiatan" && <KegiatanView />}
             </main>
           </div>
         </div>

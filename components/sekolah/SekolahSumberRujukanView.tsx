@@ -356,7 +356,7 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
   const [filterWilayah, setFilterWilayah] = useState<{ province: string; kabupaten: string } | null>(null)
   const [filterKategori, setFilterKategori] = useState<KategoriDukungan | "semua">("semua")
   const [filterPenyedia, setFilterPenyedia] = useState<KategoriPenyedia | "semua">("semua")
-  const [sortMode, setSortMode] = useState<SortMode>("relevansi")
+  const [sortMode, setSortMode] = useState<SortMode>("terbaru")
   const [selected, setSelected] = useState<SumberRujukan | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
@@ -739,22 +739,12 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
           </div>
           <p className="text-xs text-gray-500 mt-0.5">Daftar kontak layanan untuk membangun lingkungan sekolah yang aman, nyaman, dan inklusif</p>
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <button
-            type="button"
-            onClick={downloadCsv}
-            disabled={filtered.length === 0}
-            className="flex items-center gap-1.5 h-9 px-4 rounded-lg text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <Download className="w-4 h-4" /> Ekspor CSV
-          </button>
-          <button
-            onClick={() => router.push(`/sumber-rujukan/form?provinsi=${encodeURIComponent(formProvinsi)}&kabupaten=${encodeURIComponent(formKabupaten)}`)}
-            className="flex items-center gap-1.5 h-9 px-4 rounded-lg text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition"
-          >
-            <Plus className="w-4 h-4" /> Usul Sumber Dukungan
-          </button>
-        </div>
+        <button
+          onClick={() => router.push(`/sumber-rujukan/form?provinsi=${encodeURIComponent(formProvinsi)}&kabupaten=${encodeURIComponent(formKabupaten)}`)}
+          className="flex items-center gap-1.5 h-9 px-4 rounded-lg text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition flex-shrink-0"
+        >
+          <Plus className="w-4 h-4" /> Usul Sumber Dukungan
+        </button>
       </div>
 
       {/* Divider */}
@@ -832,18 +822,31 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
         ))}
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-2 items-end flex-wrap">
-        {/* Filter Mode */}
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Ketik nama instansi atau kota"
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
-          />
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Ketik nama instansi atau kota"
+          className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+        />
+      </div>
+
+      {/* Sort + Filter + Ekspor CSV */}
+      <div className="flex flex-row items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 bg-white">
+          <ArrowUpDown className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+          <select
+            value={sortMode}
+            onChange={(e) => setSortMode(e.target.value as SortMode)}
+            className="text-sm focus:outline-none bg-transparent text-gray-700"
+          >
+            <option value="terbaru">Terbaru</option>
+            <option value="nama_az">Nama A–Z</option>
+          </select>
         </div>
+        <div className="w-px h-6 bg-gray-200" />
         <select
           value={filterKategori}
           onChange={(e) => setFilterKategori(e.target.value as KategoriDukungan | "semua")}
@@ -864,19 +867,15 @@ export function SekolahSumberRujukanView({ wilayah }: SekolahSumberRujukanViewPr
             <option key={p} value={p}>{p}</option>
           ))}
         </select>
-        {/* Sort */}
-        <div className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 bg-white">
-          <ArrowUpDown className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-          <select
-            value={sortMode}
-            onChange={(e) => setSortMode(e.target.value as SortMode)}
-            className="text-sm focus:outline-none bg-transparent text-gray-700"
-          >
-            <option value="relevansi">Relevansi</option>
-            <option value="terbaru">Terbaru</option>
-            <option value="nama_az">Nama A–Z</option>
-          </select>
-        </div>
+        <div className="w-px h-6 bg-gray-200" />
+        <button
+          type="button"
+          onClick={downloadCsv}
+          disabled={filtered.length === 0}
+          className="flex items-center gap-1.5 h-9 px-4 rounded-lg text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          <Download className="w-4 h-4" /> Ekspor CSV
+        </button>
       </div>
 
       {/* Table */}

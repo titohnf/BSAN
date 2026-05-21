@@ -4,11 +4,10 @@ import { useState, useEffect, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import {
   ArrowLeft, Calendar, X,
-  CheckCircle, PlayCircle, Clock, Camera, FileCheck,
+  CheckCircle, PlayCircle, Clock, FileCheck,
   Landmark, Building2, GraduationCap, Heart, HelpCircle,
-  MapPin, Users,
+  MapPin, Users, Link,
 } from "lucide-react"
-import { RealisasiModal } from "@/components/dashboard/RealisasiModal"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -30,6 +29,7 @@ interface KegiatanForm {
   linkGoogleMap: string
   tautanMeeting: string
   peserta: PesertaItem[]
+  linkDokumentasi: string
   status: StatusKegiatan
 }
 
@@ -37,9 +37,9 @@ interface KegiatanForm {
 // Seed data (must match KegiatanView SEED_DATA)
 // ---------------------------------------------------------------------------
 const SEED_DATA = [
-  { id: "kg-1", namaKegiatan: "Workshop PKSA", penyelenggara: ["Sekolah"], tanggalMulai: "2025-04-15", tanggalSelesai: "2025-04-15", deskripsiKegiatan: "Workshop pengenalan isu kekerasan pada anak", lokasi: "Aula Sekolah", linkGoogleMap: "", tautanMeeting: "", peserta: [{ kategori: "Guru", jumlah: "20" }, { kategori: "Siswa", jumlah: "30" }], status: "selesai" as StatusKegiatan },
-  { id: "kg-2", namaKegiatan: "Sosialisasi Hak Anak", penyelenggara: ["Pusat", "Sekolah"], tanggalMulai: "2025-06-20", tanggalSelesai: "2025-06-21", deskripsiKegiatan: "Sosialisasi hak anak kepada seluruh siswa dan wali kelas", lokasi: "Ruang Serbaguna", linkGoogleMap: "https://maps.google.com", tautanMeeting: "https://zoom.us/j/123", peserta: [{ kategori: "Siswa", jumlah: "80" }, { kategori: "Masyarakat", jumlah: "40" }], status: "berlangsung" as StatusKegiatan },
-  { id: "kg-3", namaKegiatan: "Rapat Koordinasi Kelompok Kerja", penyelenggara: ["Dinas Pendidikan", "Dinas Sosial"], tanggalMulai: "2025-07-10", tanggalSelesai: "2025-07-10", deskripsiKegiatan: "Rapat koordinasi bulanan antar anggota kelompok kerja", lokasi: "Kantor Dinas Pendidikan", linkGoogleMap: "", tautanMeeting: "", peserta: [{ kategori: "Guru", jumlah: "30" }], status: "menunggu" as StatusKegiatan },
+  { id: "kg-1", namaKegiatan: "Workshop PKSA", penyelenggara: ["Sekolah"], tanggalMulai: "2025-04-15", tanggalSelesai: "2025-04-15", deskripsiKegiatan: "Workshop pengenalan isu kekerasan pada anak", lokasi: "Aula Sekolah", linkGoogleMap: "", tautanMeeting: "", peserta: [{ kategori: "Guru", jumlah: "20" }, { kategori: "Siswa", jumlah: "30" }], linkDokumentasi: "", status: "selesai" as StatusKegiatan },
+  { id: "kg-2", namaKegiatan: "Sosialisasi Hak Anak", penyelenggara: ["Pusat", "Sekolah"], tanggalMulai: "2025-06-20", tanggalSelesai: "2025-06-21", deskripsiKegiatan: "Sosialisasi hak anak kepada seluruh siswa dan wali kelas", lokasi: "Ruang Serbaguna", linkGoogleMap: "https://maps.google.com", tautanMeeting: "https://zoom.us/j/123", peserta: [{ kategori: "Siswa", jumlah: "80" }, { kategori: "Masyarakat", jumlah: "40" }], linkDokumentasi: "https://docs.example.com", status: "berlangsung" as StatusKegiatan },
+  { id: "kg-3", namaKegiatan: "Rapat Koordinasi Kelompok Kerja", penyelenggara: ["Dinas Pendidikan", "Dinas Sosial"], tanggalMulai: "2025-07-10", tanggalSelesai: "2025-07-10", deskripsiKegiatan: "Rapat koordinasi bulanan antar anggota kelompok kerja", lokasi: "Kantor Dinas Pendidikan", linkGoogleMap: "", tautanMeeting: "", peserta: [{ kategori: "Guru", jumlah: "30" }], linkDokumentasi: "", status: "menunggu" as StatusKegiatan },
 ]
 
 const PENYELENGGARA_OPTIONS = [
@@ -65,6 +65,7 @@ const emptyForm = (): KegiatanForm => ({
   linkGoogleMap: "",
   tautanMeeting: "",
   peserta: [],
+  linkDokumentasi: "",
   status: "menunggu",
 })
 
@@ -199,16 +200,6 @@ function TambahKegiatanInner() {
 
   const [form, setForm] = useState<KegiatanForm>(emptyForm)
   const [submitted, setSubmitted] = useState(false)
-  const [showRealisasiModal, setShowRealisasiModal] = useState(false)
-  const [showRealisasiForm, setShowRealisasiForm] = useState(false)
-  const [realizeForm, setRealizeForm] = useState({ jumlahPeserta: "", tanggalRealisasi: "", catatan: "", dokumentasi: "" })
-  const [realizeData, setRealizeData] = useState<{
-    jumlahPeserta: number
-    tanggalRealisasi: string
-    catatan: string
-    dokumentasi: string
-    createdAt: string
-  } | null>(null)
 
   const [tagInput, setTagInput] = useState("")
   const [showTagDropdown, setShowTagDropdown] = useState(false)
@@ -227,6 +218,12 @@ function TambahKegiatanInner() {
     } catch {}
   }, [])
 
+  const isPast =
+    !isReadOnly &&
+    form.tanggalMulai &&
+    form.tanggalSelesai &&
+    new Date(form.tanggalSelesai).setHours(23, 59, 59, 999) < new Date().setHours(0, 0, 0, 0)
+
   useEffect(() => {
     if (!isReadOnly && form.tanggalMulai && form.tanggalSelesai) {
       const mulai = new Date(form.tanggalMulai)
@@ -237,15 +234,10 @@ function TambahKegiatanInner() {
 
       if (selesai < today) {
         setForm(prev => ({ ...prev, status: "terealisasi" }))
-        setShowRealisasiForm(true)
       } else if (mulai <= today && today <= selesai) {
         setForm(prev => ({ ...prev, status: "berlangsung" }))
-        setShowRealisasiForm(false)
-        setRealizeForm({ jumlahPeserta: "", tanggalRealisasi: "", catatan: "", dokumentasi: "" })
       } else {
         setForm(prev => ({ ...prev, status: "menunggu" }))
-        setShowRealisasiForm(false)
-        setRealizeForm({ jumlahPeserta: "", tanggalRealisasi: "", catatan: "", dokumentasi: "" })
       }
     }
   }, [form.tanggalMulai, form.tanggalSelesai, isReadOnly])
@@ -271,6 +263,7 @@ function TambahKegiatanInner() {
         linkGoogleMap: (existing.linkGoogleMap as string) ?? "",
         tautanMeeting: (existing.tautanMeeting as string) ?? "",
         peserta: Array.isArray(existing.peserta) ? existing.peserta as PesertaItem[] : [],
+        linkDokumentasi: (existing.linkDokumentasi as string) ?? "",
         status: (existing.status as StatusKegiatan) ?? "menunggu",
       })
       if (existing.realize) {
@@ -288,7 +281,7 @@ function TambahKegiatanInner() {
     form.tanggalMulai.trim() !== "" &&
     form.tanggalSelesai.trim() !== "" &&
     form.deskripsiKegiatan.trim() !== "" &&
-    (form.status !== "terealisasi" || (realizeForm.jumlahPeserta !== "" && realizeForm.tanggalRealisasi !== ""))
+    (form.status !== "terealisasi" || form.linkDokumentasi.trim() !== "")
 
   const handleSubmit = () => {
     if (!canSubmit) return
@@ -297,20 +290,7 @@ function TambahKegiatanInner() {
       if (isEdit && editId) {
         const updated = allData.map((item) => {
           if (item.id !== editId) return item
-          const updatedItem: Record<string, unknown> = {
-            ...item, ...form,
-            peserta: form.peserta,
-          }
-          if (form.status === "terealisasi" && realizeForm.jumlahPeserta && realizeForm.tanggalRealisasi) {
-            updatedItem.realize = {
-              jumlahPeserta: parseInt(realizeForm.jumlahPeserta),
-              tanggalRealisasi: realizeForm.tanggalRealisasi,
-              catatan: realizeForm.catatan,
-              dokumentasi: realizeForm.dokumentasi,
-              createdAt: new Date().toISOString(),
-            }
-          }
-          return updatedItem
+          return { ...item, ...form, peserta: form.peserta }
         })
         if (!allData.find((item) => item.id === editId)) {
           updated.push({ id: editId, ...form, createdAt: new Date().toISOString() })
@@ -328,17 +308,9 @@ function TambahKegiatanInner() {
           linkGoogleMap: form.linkGoogleMap,
           tautanMeeting: form.tautanMeeting,
           peserta: form.peserta,
+          linkDokumentasi: form.linkDokumentasi,
           status: form.status,
           createdAt: new Date().toISOString(),
-        }
-        if (form.status === "terealisasi" && realizeForm.jumlahPeserta && realizeForm.tanggalRealisasi) {
-          newItem.realize = {
-            jumlahPeserta: parseInt(realizeForm.jumlahPeserta),
-            tanggalRealisasi: realizeForm.tanggalRealisasi,
-            catatan: realizeForm.catatan,
-            dokumentasi: realizeForm.dokumentasi,
-            createdAt: new Date().toISOString(),
-          }
         }
         sessionStorage.setItem("kegiatanList", JSON.stringify([...allData, newItem]))
       }
@@ -386,7 +358,7 @@ function TambahKegiatanInner() {
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
           <button
             onClick={() => {
-              if (role === "sekolah") {
+              if (role === "sekolah" || role === "dinas") {
                 window.location.href = "/dashboard?menu=kegiatan"
               } else {
                 router.back()
@@ -407,71 +379,16 @@ function TambahKegiatanInner() {
               <p className="text-xs text-gray-500">{pageSubtitle}</p>
             )}
           </div>
+          {isView && form.status === "selesai" && (
+            <a
+              href={`/laporkan-realisasi?id=${viewId}`}
+              className="flex items-center gap-1.5 h-9 px-4 rounded-lg text-sm font-semibold text-white bg-green-600 hover:bg-green-700 transition shrink-0"
+            >
+              <FileCheck className="w-4 h-4" /> Laporkan Realisasi
+            </a>
+          )}
         </div>
       </div>
-
-      {/* Laporan Realisasi — di atas, hanya untuk detail & status selesai */}
-      {isView && (form.status === "selesai" || form.status === "terealisasi") && (
-        <div className="max-w-2xl mx-auto px-4 pt-6">
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="flex items-center gap-2.5 px-5 py-4 bg-gray-50 border-b border-gray-200">
-              <div className="w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center text-green-700 flex-shrink-0">
-                <FileCheck className="w-4 h-4" />
-              </div>
-              <h3 className="text-sm font-semibold text-gray-900">Laporan Realisasi Kegiatan</h3>
-            </div>
-            <div className="p-5">
-              {realizeData ? (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                      <p className="text-xs text-gray-500 mb-1">Jumlah Peserta</p>
-                      <p className="text-sm font-semibold text-gray-900">{realizeData.jumlahPeserta} orang</p>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                      <p className="text-xs text-gray-500 mb-1">Tanggal Pelaksanaan</p>
-                      <p className="text-sm font-semibold text-gray-900">
-                        {new Date(realizeData.tanggalRealisasi).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
-                      </p>
-                    </div>
-                  </div>
-                  {realizeData.dokumentasi && (
-                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                      <p className="text-xs text-gray-500 mb-2">Dokumentasi</p>
-                      <div className="flex items-center gap-2">
-                        <Camera className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-700">{realizeData.dokumentasi}</span>
-                      </div>
-                    </div>
-                  )}
-                  {realizeData.catatan && (
-                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                      <p className="text-xs text-gray-500 mb-1">Catatan</p>
-                      <p className="text-sm text-gray-700">{realizeData.catatan}</p>
-                    </div>
-                  )}
-                  <p className="text-xs text-gray-400">
-                    Dilaporkan pada {new Date(realizeData.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
-                  </p>
-                </div>
-              ) : (
-                <div className="text-center py-4">
-                  <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-3">
-                    <FileCheck className="w-6 h-6 text-amber-600" />
-                  </div>
-                  <p className="text-sm text-gray-600 mb-3">Belum ada laporan realize untuk kegiatan ini.</p>
-                  <button
-                    onClick={() => setShowRealisasiModal(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition"
-                  >
-                    <FileCheck className="w-4 h-4" /> Lapor Realisasi
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Form body */}
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
@@ -519,44 +436,6 @@ function TambahKegiatanInner() {
             </div>
           </div>
         </SectionCard>
-
-        {/* Form Realisasi - tampil saat status terealisasi */}
-        {showRealisasiForm && (
-          <SectionCard icon={<FileCheck className="w-4 h-4" />} title="Laporan Realisasi">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <FieldLabel required>Jumlah Peserta</FieldLabel>
-                <input
-                  type="number"
-                  min="1"
-                  value={realizeForm.jumlahPeserta}
-                  onChange={(e) => setRealizeForm(prev => ({ ...prev, jumlahPeserta: e.target.value }))}
-                  placeholder="Contoh: 50"
-                  className="w-full h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white"
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <FieldLabel required>Tanggal Pelaksanaan</FieldLabel>
-                <input
-                  type="date"
-                  value={realizeForm.tanggalRealisasi}
-                  onChange={(e) => setRealizeForm(prev => ({ ...prev, tanggalRealisasi: e.target.value }))}
-                  className="w-full h-9 px-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white"
-                />
-              </div>
-            </div>
-            <div className="flex flex-col gap-1.5 mt-4">
-              <FieldLabel>Catatan</FieldLabel>
-              <textarea
-                value={realizeForm.catatan}
-                onChange={(e) => setRealizeForm(prev => ({ ...prev, catatan: e.target.value }))}
-                placeholder="Tambahkan catatan jika diperlukan..."
-                rows={3}
-                className="p-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none"
-              />
-            </div>
-          </SectionCard>
-        )}
 
         {/* Penyelenggara */}
         <SectionCard icon={<Building2 className="w-4 h-4" />} title="Penyelenggara">
@@ -716,6 +595,21 @@ function TambahKegiatanInner() {
           </div>
         </SectionCard>
 
+        {/* Link Dokumentasi — tampil saat kegiatan sudah lewat */}
+        {(isPast || form.linkDokumentasi) && (
+          <SectionCard icon={<Link className="w-4 h-4" />} title="Link Dokumentasi">
+            <div className="flex flex-col gap-1.5">
+              <FieldLabel required={isPast && !isReadOnly}>Link Dokumentasi Kegiatan</FieldLabel>
+              <TextInput
+                value={form.linkDokumentasi}
+                onChange={(v) => set("linkDokumentasi", v)}
+                placeholder="https://..."
+                disabled={isReadOnly}
+              />
+            </div>
+          </SectionCard>
+        )}
+
         {/* Footer actions */}
         {!isReadOnly && (
           <div className="flex gap-3 pt-2">
@@ -741,7 +635,7 @@ function TambahKegiatanInner() {
           </div>
         )}
 
-        {isReadOnly && (
+        {isReadOnly && form.status !== "selesai" && form.status !== "berlangsung" && form.status !== "terealisasi" && (
           <div className="flex gap-3 pt-2 pb-4">
             <a
               href={`/tambah-kegiatan?edit=${viewId}`}
@@ -778,37 +672,6 @@ function TambahKegiatanInner() {
 
       </div>
 
-      {showRealisasiModal && (
-        <RealisasiModal
-          kegiatan={{
-            id: activeId ?? "",
-            namaKegiatan: form.namaKegiatan,
-            penyelenggara: form.penyelenggara,
-            tanggalMulai: form.tanggalMulai,
-            tanggalSelesai: form.tanggalSelesai,
-            deskripsiKegiatan: form.deskripsiKegiatan,
-            status: form.status,
-            realize: realizeData,
-          }}
-          onClose={() => setShowRealisasiModal(false)}
-          onSave={(id, realize) => {
-            setRealizeData(realize)
-            setForm(prev => ({ ...prev, status: "terealisasi" as StatusKegiatan }))
-            setShowRealisasiModal(false)
-            try {
-              const stored = JSON.parse(sessionStorage.getItem("kegiatanList") ?? "[]") as Array<Record<string, unknown>>
-              const idx = stored.findIndex((i) => i.id === id)
-              if (idx !== -1) {
-                stored[idx] = { ...stored[idx], realize, status: "terealisasi" }
-              } else {
-                stored.push({ id, realize, status: "terealisasi" })
-              }
-              sessionStorage.setItem("kegiatanList", JSON.stringify(stored))
-              window.dispatchEvent(new CustomEvent("kegiatanUpdated"))
-            } catch {}
-          }}
-        />
-      )}
     </div>
   )
 }
