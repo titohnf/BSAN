@@ -125,7 +125,7 @@ export function KegiatanView() {
       {/* Table */}
       <div className="rounded-xl border border-gray-200 overflow-hidden bg-white shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+          <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200 text-left">
                 <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Nama Kegiatan</th>
